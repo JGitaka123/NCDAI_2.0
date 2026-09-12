@@ -13,6 +13,7 @@ export type DosingAssessment = { version: string; results: { medicine_id: string
 export type ClinicalData = {
   systolic_bp: number | null; diastolic_bp: number | null; repeat_systolic_bp: number | null; repeat_diastolic_bp: number | null;
   pulse: number | null; hba1c: number | null; glucose: number | null; glucose_unit: 'mmol/L' | 'mg/dL';
+  acutely_unwell?: TriState; acute_kidney_injury?: TriState;
   egfr: number | null; potassium: number | null; pregnancy_status: TriState | 'not_applicable';
   known_hypertension: TriState; known_diabetes: TriState; medications: Medication[]; medications_reviewed: boolean;
   known_asthma: TriState; known_copd: TriState; known_ckd: TriState; known_cancer: TriState;

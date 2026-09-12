@@ -13,7 +13,7 @@ from uuid import uuid4
 
 from .evidence import EVIDENCE_VERSION, REVIEW_STATUS, evidence
 
-RULESET_VERSION = "ncdai-2-rules-0.1.1"
+RULESET_VERSION = "ncdai-2-rules-0.1.2"
 
 ACE = {"lisinopril", "enalapril", "ramipril", "captopril", "perindopril"}
 ARB = {"losartan", "valsartan", "candesartan", "telmisartan", "irbesartan"}
@@ -115,7 +115,7 @@ def assess(data: dict, age: int, sex: str) -> dict:
     pregnancy = data.get("pregnancy_status", "unknown")
     if pregnancy not in {"yes", "no", "unknown", "not_applicable"}:
         raise ValueError("Unrecognized pregnancy status")
-    for field in KNOWN_FIELDS:
+    for field in (*KNOWN_FIELDS, "acutely_unwell", "acute_kidney_injury"):
         if data.get(field, "unknown") not in {"yes", "no", "unknown"}:
             raise ValueError(f"Unrecognized {field} status")
     pregnant = pregnancy == "yes"
@@ -200,9 +200,25 @@ def assess(data: dict, age: int, sex: str) -> dict:
         add("RENAL_SEVERE", "kidney", "critical", "urgent", "Severely reduced kidney function",
             "Arrange prompt clinical assessment and referral planning; assess acute deterioration, urine output and previous results. A single result cannot establish chronicity.", "WHO_HEARTS_D_2020", "KDIGO_CKD_2024")
     if potassium is not None and potassium >= 5.5:
-        add("POTASSIUM_HIGH", "acute_safety", "critical" if potassium >= 6 else "warning",
-            "emergency" if potassium >= 6.5 else "urgent" if potassium >= 6 else "soon", "Elevated potassium",
-            "Assess clinical state, ECG needs, sample validity and medicines. At 6.5 mmol/L or above arrange immediate hospital assessment; 6.0-6.4 needs same-day review and repeat testing.", "UKKA_POTASSIUM_2026")
+        # A negative dosing-context entry cannot cancel a positive acute finding.
+        acute = (data.get("acutely_unwell") == "yes" or
+                 data.get("acute_kidney_injury") == "yes" or
+                 (data.get("dosing_context") or {}).get("acute_illness") == "yes")
+        for field in ("acutely_unwell", "acute_kidney_injury"):
+            if data.get(field, "unknown") == "unknown":
+                missing.append(field)
+        if potassium >= 6.5:
+            detail = "Arrange immediate hospital assessment and treatment. Do not delay transfer for a community repeat sample."
+        elif acute:
+            detail = "Arrange same-day hospital assessment because acute illness or acute kidney injury is recorded. Escalate immediately if unstable; do not wait for routine repeat testing."
+        elif potassium >= 6:
+            detail = "Arrange same-day clinical review and repeat potassium within one day. Assess whether hospital care is needed."
+        else:
+            detail = "For an unexpected result, repeat potassium within three days, or sooner as clinically indicated. Confirm clinical stability and previous results before setting follow-up."
+        detail += " Assess clinical state, ECG needs, sample validity and medicines. Unknown acute illness or kidney injury must be assessed now; if present, consider hospital assessment today. No potassium-lowering dose is generated."
+        add("POTASSIUM_HIGH", "acute_safety", "critical" if potassium >= 6 or acute else "warning",
+            "emergency" if potassium >= 6.5 else "urgent" if potassium >= 6 or acute else "soon",
+            "Elevated potassium", detail, "UKKA_POTASSIUM_2026")
     if potassium is not None and potassium < 3.5:
         add("POTASSIUM_LOW", "acute_safety", "critical" if potassium < 3 else "warning",
             "emergency" if potassium < 2.5 else "urgent" if potassium < 3 else "soon", "Reduced potassium",

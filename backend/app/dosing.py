@@ -13,7 +13,7 @@ import json
 from .dosing_schemas import DosingInput
 from .evidence import evidence
 
-DOSING_VERSION = "ncdai-dose-reference-0.1.0"
+DOSING_VERSION = "ncdai-dose-reference-0.1.1"
 KENYA_PDF_SHA256 = "e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
 SCOPE_NOTE = (
     "Selected oral single-ingredient adult starting-dose references, not prescriptions. "
@@ -99,6 +99,9 @@ def evaluate_dosing(data: dict, age: int, sex: str, urgency: str, *, now=None):
         for field in ("medications_reviewed", "allergies_reviewed", "symptoms_reviewed"):
             if data.get(field) is not True:
                 block(field, "Complete " + field.replace("_", " ") + " before requesting a dose reference.")
+        for field in ("acutely_unwell", "acute_kidney_injury"):
+            if data.get(field) != "no":
+                block(field, "Confirm absence of " + field.replace("_", " ") + "; otherwise use individualized dosing review.")
         if data.get("allergies"):
             block("allergy_history", "Recorded allergy history requires individual medicine/excipient and cross-reactivity review; no dose is cleared here.")
         if data.get("pregnancy_status") not in {"no", "not_applicable"}:

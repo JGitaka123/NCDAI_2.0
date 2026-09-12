@@ -21,7 +21,7 @@ from pydantic import BaseModel, ConfigDict, Field, StrictStr, ValidationError
 from .evidence import EVIDENCE_VERSION, registry
 
 
-PROMPT_VERSION = "ncdai-briefing-select-v1.3"
+PROMPT_VERSION = "ncdai-briefing-select-v1.4"
 MAX_RESPONSE_BYTES = 65536
 RULE_IDS = frozenset("""
 EMERGENCY_SYMPTOMS LOW_BP PULSE_EXTREME RESP_SLOW BP_CRISIS BP_SEVERE
@@ -37,6 +37,7 @@ ADHERENCE_REVIEW DATA_COMPLETENESS CLINICIAN_REVIEW
 DOSE_AMLODIPINE_TABLET DOSE_LOSARTAN_TABLET DOSE_LISINOPRIL_TABLET DOSE_METFORMIN_IR_TABLET
 """.split())
 GAP_IDS = frozenset("""
+acutely_unwell acute_kidney_injury
 current_glucose_for_symptoms egfr_for_metformin_review
 pregnancy_status_for_RAS_medication_review egfr_for_RAS_medication_review
 potassium_for_RAS_medication_review systolic_bp diastolic_bp repeat_blood_pressure

@@ -23,8 +23,9 @@ describe('Clinical input safety and accountable review', () => {
     expect(reviewErrors([recommendation], { r1: { action: 'modify', reason: 'Facility limitation', modified_text: 'Arrange immediate transfer' } })).toEqual([])
   })
   it('carries history forward without turning old observations into current findings', () => {
-    const prior = { id: 'old-encounter', created_at: '2026-01-01T12:00:00Z', data: { ...emptyClinicalData(), systolic_bp: 190, glucose: 18, egfr: 28, oxygen_saturation: 80, symptoms: ['chest_pain'], symptoms_reviewed: true, known_diabetes: 'yes', medications: [{ code: 'metformin', name: 'Metformin', dose: 500 }], medications_reviewed: true, allergies: ['enalapril'], allergies_reviewed: true, pregnancy_status: 'no' } } as Encounter
+    const prior = { id: 'old-encounter', created_at: '2026-01-01T12:00:00Z', data: { ...emptyClinicalData(), acutely_unwell: 'yes', acute_kidney_injury: 'yes', systolic_bp: 190, glucose: 18, egfr: 28, oxygen_saturation: 80, symptoms: ['chest_pain'], symptoms_reviewed: true, known_diabetes: 'yes', medications: [{ code: 'metformin', name: 'Metformin', dose: 500 }], medications_reviewed: true, allergies: ['enalapril'], allergies_reviewed: true, pregnancy_status: 'no' } } as Encounter
     const next = carryForwardContext(prior)
+    expect(next.acutely_unwell).toBe('unknown'); expect(next.acute_kidney_injury).toBe('unknown')
     expect(next.known_diabetes).toBe('yes'); expect(next.medications).toEqual(prior.data.medications)
     expect(next.systolic_bp).toBeNull(); expect(next.glucose).toBeNull(); expect(next.egfr).toBeNull(); expect(next.oxygen_saturation).toBeNull(); expect(next.symptoms).toEqual([])
     expect(next.pregnancy_status).toBe('unknown'); expect(next.medications_reviewed).toBe(false); expect(next.allergies_reviewed).toBe(false); expect(next.symptoms_reviewed).toBe(false)

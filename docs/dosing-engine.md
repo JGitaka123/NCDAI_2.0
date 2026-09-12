@@ -42,3 +42,8 @@ The AI adapter may select a known dose recommendation identifier, just as it sel
 `backend/tests/test_dosing_safety.py` contains explicitly authored boundary, withholding, unsafe-input, access-control and AI-output checks, plus a complete API lifecycle for every dose case. This supplements the existing66 general NCD workflows. These are engineering tests authored during development, not an independent clinical panel or patient study. Actual run results are recorded in the release verification addendum after execution.
 
 The owner confirms DHA and ethics approval covers care and medicine recommendations, with records in office files. No additional permission is sought to implement these engineering checks. Independent clinician/pharmacist adjudication of this exact rule/source manifest, broader disease/medicine coverage, subgroup validation and supervised implementation remain substantive evidence work; the existing hosted synthetic preview is not represented as a clinically validated prescribing service.
+
+
+## Acute-context revision 0.1.1
+
+Both the general encounter's `acutely_unwell` and `acute_kidney_injury` fields must explicitly be `no` before a starting-dose reference is displayed. Existing `dosing_context.acute_illness` checks also remain required. A missing or unknown new field withholds the reference, including older draft records until reassessed. Historical reviewed records keep their original version and are not rewritten. The numerical four-medicine catalogue is unchanged; the dosing version advances because eligibility changed.

@@ -44,7 +44,7 @@ def evaluate(**changes):
 def test_complete_control_is_exactly_routine_without_disease_confirmation():
     result = evaluate()
     assert result["urgency"] == "routine"
-    assert result["rules_version"] == "ncdai-2-rules-0.1.1"
+    assert result["rules_version"] == "ncdai-2-rules-0.1.2"
     assert result["missing_data"] == []
     assert rule_ids(result) == {"CLINICIAN_REVIEW"}
     assert "does not provide clinical clearance" in result["summary"]
@@ -284,3 +284,55 @@ def test_assessment_does_not_mutate_input_and_each_alert_retains_provenance():
 def test_public_input_contract_rejects_out_of_supported_range(field, value):
     with pytest.raises(ValueError):
         ClinicalData.model_validate(complete(**{field: value}))
+
+
+@pytest.mark.parametrize("potassium, deadline", [(5.5, "within three days"), (5.99, "within three days"), (6.0, "within one day"), (6.49, "within one day"), (6.5, "immediate hospital")])
+def test_high_potassium_has_explicit_action_deadline(potassium, deadline):
+    result = evaluate(potassium=potassium, acutely_unwell="no", acute_kidney_injury="no")
+    recommendation = next(r for r in result["recommendations"] if r["rule_id"] == "POTASSIUM_HIGH")
+    assert deadline in recommendation["detail"]
+
+
+@pytest.mark.parametrize("field", ["acutely_unwell", "acute_kidney_injury"])
+@pytest.mark.parametrize("potassium, urgency", [(5.5, "urgent"), (5.99, "urgent"), (6.0, "urgent"), (6.5, "emergency")])
+def test_acute_context_escalates_potassium_without_overriding_emergency(field, potassium, urgency):
+    result = evaluate(potassium=potassium, **{field: "yes"}, dosing_context={"acute_illness": "no"})
+    assert result["urgency"] == urgency
+    recommendation = next(r for r in result["recommendations"] if r["rule_id"] == "POTASSIUM_HIGH")
+    assert recommendation["severity"] == "critical"
+    assert "hospital assessment" in recommendation["detail"]
+
+
+def test_unknown_acute_context_is_not_silently_treated_as_negative():
+    result = evaluate(potassium=5.7)
+    assert {"acutely_unwell", "acute_kidney_injury"} <= set(result["missing_data"])
+    from app.ai import _prepared
+    payload, _ = _prepared(result)
+    assert "acute_kidney_injury" in payload["missing_data"]
+
+
+def test_positive_dosing_acute_context_cannot_be_cancelled_by_general_negative():
+    result = evaluate(potassium=5.7, acutely_unwell="no", acute_kidney_injury="no", dosing_context={"acute_illness": "yes"})
+    assert result["urgency"] == "urgent"
+
+
+@pytest.mark.parametrize("field", ["acutely_unwell", "acute_kidney_injury"])
+@pytest.mark.parametrize("invalid", [True, None, "not_applicable", "maybe"])
+def test_acute_context_rejects_invalid_values(field, invalid):
+    with pytest.raises(ValueError):
+        ClinicalData.model_validate({field: invalid})
+
+
+
+def test_acute_potassium_context_persists_through_review_and_cannot_be_rewritten(client):
+    from conftest import encounter, assess as assess_api, review_payload
+    data = complete(potassium=5.7, acutely_unwell="no", acute_kidney_injury="yes")
+    record = assess_api(client, encounter(client, data))
+    assert record["assessment"]["urgency"] == "urgent"
+    saved = client.post(f"/api/encounters/{record['id']}/review", json=review_payload(record))
+    assert saved.status_code == 200
+    retrieved = client.get(f"/api/encounters/{record['id']}").json()
+    assert retrieved["data"]["acute_kidney_injury"] == "yes"
+    assert retrieved["assessment"] == record["assessment"]
+    data["acute_kidney_injury"] = "no"
+    assert client.patch(f"/api/encounters/{record['id']}", json={"expected_version": retrieved["version"], "data": data}).status_code == 409

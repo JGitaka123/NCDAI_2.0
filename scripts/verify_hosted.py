@@ -95,6 +95,7 @@ def run():
         now = datetime.now(timezone.utc).isoformat()
         reference_data = {**data, 'systolic_bp': 150, 'diastolic_bp': 95, 'repeat_systolic_bp': 148, 'repeat_diastolic_bp': 94,
             'egfr': 85, 'known_ckd': 'no', 'symptoms': [], 'observed_at': now, 'medicine_availability': 'available',
+            'acutely_unwell': 'no', 'acute_kidney_injury': 'no',
             'dosing_context': {'hepatic_impairment': 'no', 'acute_illness': 'no', 'dialysis': 'no', 'frailty': 'no',
                 'breastfeeding': 'not_applicable', 'contraindications_reviewed': True, 'interactions_reviewed': True,
                 'renal_observed_at': now, 'potassium_observed_at': now}}

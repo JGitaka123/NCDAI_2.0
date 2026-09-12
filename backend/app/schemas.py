@@ -77,6 +77,8 @@ class ClinicalData(StrictModel):
     glucose_unit: Literal["mmol/L", "mg/dL"] = "mmol/L"
     egfr: float | None = Field(default=None, ge=0, le=200)
     potassium: float | None = Field(default=None, ge=1, le=10)
+    acutely_unwell: Known = "unknown"
+    acute_kidney_injury: Known = "unknown"
     pregnancy_status: Pregnancy = "unknown"
     known_hypertension: Known = "unknown"
     known_diabetes: Known = "unknown"

@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, expect, it, vi } from 'vitest'
 import DoseSupport from '../DoseSupport'
+import ClinicalIntake from '../ClinicalIntake'
 import Account from '../Account'
 import UserAccess from '../UserAccess'
 import { emptyClinicalData, emptyDosingContext } from '../clinical'
@@ -79,4 +80,24 @@ it('protects self access and confirms another account change before calling the 
   await userEvent.click(screen.getByRole('button', { name: 'Confirm deactivation' }))
   await waitFor(() => expect(api).toHaveBeenCalledWith('/users/other/status', { method: 'PATCH', body: { active: false } }))
   expect(await screen.findByRole('button', { name: 'Activate Synthetic Colleague' })).toBeEnabled()
+})
+
+
+function AcuteHarness() {
+  const [data, setData] = useState<ClinicalData>(emptyClinicalData())
+  return <><ClinicalIntake data={data} onChange={setData} disabled={false} /><output data-testid="acute-data">{JSON.stringify(data)}</output></>
+}
+
+it('records acute illness and suspected kidney injury explicitly without interpreting unchecked symptoms', async () => {
+  render(<AcuteHarness />)
+  const illness = screen.getByLabelText('Acutely unwell now')
+  const kidney = screen.getByLabelText('Acute kidney injury suspected or confirmed')
+  expect(illness).toHaveValue('unknown')
+  expect(kidney).toHaveValue('unknown')
+  await userEvent.selectOptions(illness, 'no')
+  await userEvent.selectOptions(kidney, 'yes')
+  const data = JSON.parse(screen.getByTestId('acute-data').textContent!)
+  expect(data.acutely_unwell).toBe('no')
+  expect(data.acute_kidney_injury).toBe('yes')
+  expect(data.symptoms_reviewed).toBe(false)
 })

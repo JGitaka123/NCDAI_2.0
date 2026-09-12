@@ -4,6 +4,10 @@
 
 Reviewed `backend/app/clinical.py`, `backend/app/evidence.py` and `docs/clinical-safety-spec.md` at rules `ncdai-2-rules-0.1.1`, evidence `ncdai-2026-09-12.1`. This bounded review checks source interpretation and provenance, not full clinical coverage. No clinical code or expected case outcomes were changed.
 
+## Current engineering correction
+
+Rules `ncdai-2-rules-0.1.2` implement EV-02's missing repeat deadlines and structured acute-illness/AKI modifier, with boundary, contradictory-context, persistence and immutable-review tests. The July 2026 source sections were reopened and verified. This closes the identified implementation omission; clinical adjudication of the local routing policy is still distinct. See [the clinical deployment release record](clinical-deployment-status.md). The older findings below remain historical.
+
 ## Findings and disposition
 
 **Subsequent update, 12 September 2026:** the owner confirms DHA and ethics approval in office files covers care and medication recommendations. This is accepted as approval-scope confirmation; the exact clinical-rule implementation still needs independent validation. The official Kenya PDF has now been downloaded and hashed, and printed pages16,35,41 were visually inspected. EV-03's adult source-access question is resolved: section4.8 explicitly uses the inclusive3.9mmol/L threshold. The PDF's opening pages do not establish an edition date. [Dose/source verification](dosing-engine.md) records the file hash and new dose-source conflicts. EV-01's broader source licensing, supersession and clinical adjudication work and EV-02's incomplete potassium pathway remain substantive evidence tasks. The original review below is retained as a dated record, not a statement that the owner has no approvals.

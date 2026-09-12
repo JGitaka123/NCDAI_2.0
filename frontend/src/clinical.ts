@@ -8,6 +8,7 @@ export function emptyClinicalData(): ClinicalData {
   return {
     systolic_bp: null, diastolic_bp: null, repeat_systolic_bp: null, repeat_diastolic_bp: null,
     pulse: null, hba1c: null, glucose: null, glucose_unit: 'mmol/L', egfr: null, potassium: null,
+    acutely_unwell: 'unknown', acute_kidney_injury: 'unknown',
     pregnancy_status: 'unknown', known_hypertension: 'unknown', known_diabetes: 'unknown',
     known_asthma: 'unknown', known_copd: 'unknown', known_ckd: 'unknown', known_cancer: 'unknown',
     oxygen_saturation: null, respiratory_rate: null, tobacco_use: 'unknown',

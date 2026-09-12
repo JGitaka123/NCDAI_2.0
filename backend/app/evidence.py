@@ -6,7 +6,7 @@ redistributed. See docs/clinical-safety-spec.md for operational adaptations.
 
 from copy import deepcopy
 
-EVIDENCE_VERSION = "ncdai-2026-09-12.2"
+EVIDENCE_VERSION = "ncdai-2026-09-12.3"
 REVIEW_STATUS = "proposed_requires_independent_clinician_signoff"
 REVIEWED_ON = "2026-09-12"
 

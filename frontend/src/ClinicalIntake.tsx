@@ -24,6 +24,10 @@ export default function ClinicalIntake({ data, onChange, disabled }: { data: Cli
     </div></details>
     <details className="intake-section" open><summary><span><span className="section-number">02</span> Symptoms & warning signs</span><span className="summary-tag">{data.symptoms.length} recorded</span></summary><div className="intake-section-content">
       <p className="field-note">Select symptoms reported or observed now. An unchecked item is not a confirmed negative finding.</p>
+      <div className="form-grid two-cols">
+        <HistoryField label="Acutely unwell now" value={data.acutely_unwell ?? 'unknown'} onChange={v => change('acutely_unwell', v)} />
+        <HistoryField label="Acute kidney injury suspected or confirmed" value={data.acute_kidney_injury ?? 'unknown'} onChange={v => change('acute_kidney_injury', v)} />
+      </div>
       <div className="symptom-grid">{symptoms.map(([value, label]) => <label key={value} className={`check-tile ${data.symptoms.includes(value) ? 'check-tile-selected' : ''}`}><input type="checkbox" checked={data.symptoms.includes(value)} onChange={e => change('symptoms', e.target.checked ? [...data.symptoms, value] : data.symptoms.filter(s => s !== value))} /><span>{label}</span></label>)}</div>
       <label className="review-checkbox"><input type="checkbox" checked={data.symptoms_reviewed} onChange={e => change('symptoms_reviewed', e.target.checked)} /><span><strong>Symptom assessment completed</strong><small>{data.symptoms.length ? 'The selected symptoms reflect the assessment.' : 'If checked with no symptoms selected, none of the listed symptoms were reported or observed.'}</small></span></label>
     </div></details>

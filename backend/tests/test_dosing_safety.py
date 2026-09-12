@@ -78,7 +78,7 @@ CASES.extend([
 
 def case_data(case):
     now = datetime.now(timezone.utc).isoformat()
-    data = dict(systolic_bp=150, diastolic_bp=95, repeat_systolic_bp=148, repeat_diastolic_bp=94,
+    data = dict(acutely_unwell="no", acute_kidney_injury="no", systolic_bp=150, diastolic_bp=95, repeat_systolic_bp=148, repeat_diastolic_bp=94,
                 pulse=78, oxygen_saturation=98, respiratory_rate=16, hba1c=7.5, glucose=8.0,
                 glucose_unit="mmol/L", egfr=85, potassium=4.2, observed_at=now, pregnancy_status="no",
                 known_hypertension="yes", known_diabetes="yes", known_ckd="no", known_cancer="no",
@@ -208,3 +208,16 @@ def test_ai_can_only_select_canonical_dose_text():
     outgoing, _ = _prepared(record)
     serialized = json.dumps(outgoing)
     assert "dose_mg" not in serialized and "500" not in serialized and "mg/day" not in serialized
+
+
+@pytest.mark.parametrize("field", ["acutely_unwell", "acute_kidney_injury"])
+@pytest.mark.parametrize("value", ["yes", "unknown", None])
+def test_acute_context_requires_explicit_negative_before_dose_reference(field, value):
+    data = case_data(dict(expected="reference"))
+    if value is None:
+        data.pop(field)
+    else:
+        data[field] = value
+    result = assess(data, 52, "female")["dosing"]["results"][0]
+    assert result["status"] == "blocked"
+    assert result["reference"] is None
