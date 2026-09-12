@@ -37,7 +37,7 @@ def run():
         client.headers['X-CSRF-Token'] = auth_response.json()['csrf_token']
         report['checks'].append('authenticated session with secure HttpOnly Strict cookie')
         catalogue = request('GET', '/dosing/catalogue')
-        assert catalogue['version'] == 'ncdai-dose-reference-0.1.0' and len(catalogue['medicines']) == 4
+        assert catalogue['version'] == 'ncdai-dose-reference-0.1.1' and len(catalogue['medicines']) == 4
         report['dosing'] = {'version': catalogue['version'], 'manifest_sha256': catalogue['manifest_sha256']}
 
         record_id = 'HOSTED-' + uuid4().hex[:12]
@@ -111,6 +111,21 @@ def run():
         request('PATCH', f"/encounters/{second['id']}", 409, json={'expected_version': second['version'], 'data': reference_data})
         request('GET', f"/fhir/Bundle/{second['id']}")
         report['checks'].append('dose catalogue verified; emergency dose withheld; eligible reference persisted, reviewed and immutable')
+        acute_data = {**reference_data, 'potassium': 5.7, 'acute_kidney_injury': 'yes'}
+        acute = request('POST', '/encounters', 201, json={'patient_id': patient['id'], 'data': acute_data})
+        acute = request('POST', f"/encounters/{acute['id']}/assess")
+        assert acute['assessment']['rules_version'] == 'ncdai-2-rules-0.1.2'
+        assert acute['assessment']['urgency'] == 'urgent'
+        assert acute['data']['acute_kidney_injury'] == 'yes'
+        potassium = next(item for item in acute['assessment']['recommendations'] if item['rule_id'] == 'POTASSIUM_HIGH')
+        assert potassium['severity'] == 'critical' and 'same-day hospital assessment' in potassium['detail']
+        assert acute['assessment']['dosing']['results'][0]['status'] == 'blocked'
+        acute = request('POST', f"/encounters/{acute['id']}/review", json={'assessment_id': acute['assessment']['id'],
+            'expected_version': acute['version'], 'decisions': [{'recommendation_id': item['id'], 'action': 'accept'} for item in acute['assessment']['recommendations']],
+            'note': 'Fictional AKI/potassium escalation verification; no clinical care delivered.'})
+        assert acute['status'] == 'reviewed'
+        request('PATCH', f"/encounters/{acute['id']}", 409, json={'expected_version': acute['version'], 'data': reference_data})
+        report['checks'].append('potassium 5.7 with suspected AKI: urgent hospital advice, dose withheld, persisted review immutable')
         audit = request('GET', '/audit/verify')
         assert audit['valid']
         report['audit'] = {'valid': audit['valid'], 'events': audit['events']}
@@ -118,7 +133,7 @@ def run():
         request('GET', '/patients', 401)
         report['checks'].append('audit chain valid; logout revokes access')
     report['passed'] = True
-    destination = ROOT / 'docs/test-results/hosted-dose-acceptance.json'
+    destination = ROOT / 'docs/test-results/hosted-clinical-readiness-acceptance.json'
     destination.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(report, indent=2))
 

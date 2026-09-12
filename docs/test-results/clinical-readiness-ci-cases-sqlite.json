@@ -1,0 +1,1461 @@
+{
+  "run_id": "f8b7f965be",
+  "started_at": "2026-09-12T19:34:47.706321+00:00",
+  "completed_at": "2026-09-12T19:34:55.524037+00:00",
+  "kind": "Synthetic API workflow engineering verification, not clinical validation",
+  "database": "SQLite",
+  "live_ai_enabled": false,
+  "ai_statuses": {
+    "ready": 0,
+    "disabled": 0,
+    "unavailable": 0,
+    "blocked": 0
+  },
+  "emr_connections": 0,
+  "total": 66,
+  "passed": 66,
+  "failed": 0,
+  "dashboard": {
+    "patients": 66,
+    "encounters": 66,
+    "reviewed": 66,
+    "open_referrals": 0,
+    "urgent_assessments": 43
+  },
+  "audit": {
+    "valid": true,
+    "events": 530,
+    "head_hash": "ec8b968c5033944798c644c6511aefbcf441f7e164d24c55161cb36f4c2f27d7",
+    "limitation": "Hash chain detects modification against retained history; external anchoring is required to detect full-history rewrite or tail deletion."
+  },
+  "cases": [
+    {
+      "id": "NCD-001",
+      "domain": "cardiovascular",
+      "title": "Stable treated hypertension review",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DIABETES_CONFIRM",
+        "HTN_FOLLOWUP"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.085
+    },
+    {
+      "id": "NCD-002",
+      "domain": "cardiovascular",
+      "title": "Severe isolated systolic reading",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "BP_SEVERE",
+        "DATA_COMPLETENESS"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.068
+    },
+    {
+      "id": "NCD-003",
+      "domain": "cardiovascular",
+      "title": "Severe isolated diastolic reading",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "BP_SEVERE",
+        "DATA_COMPLETENESS"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.125
+    },
+    {
+      "id": "NCD-004",
+      "domain": "cardiovascular",
+      "title": "Chest pain despite normal blood pressure",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.052
+    },
+    {
+      "id": "NCD-005",
+      "domain": "cardiovascular",
+      "title": "Focal neurological deficit with normal pressure",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.11
+    },
+    {
+      "id": "NCD-006",
+      "domain": "cardiovascular",
+      "title": "Confusion requires immediate assessment",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.052
+    },
+    {
+      "id": "NCD-007",
+      "domain": "cardiovascular",
+      "title": "Seizure cannot be reassured by normal glucose",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.053
+    },
+    {
+      "id": "NCD-008",
+      "domain": "cardiovascular",
+      "title": "Severe hypertension with visual disturbance",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "BP_CRISIS",
+        "DATA_COMPLETENESS"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.085
+    },
+    {
+      "id": "NCD-009",
+      "domain": "cardiovascular",
+      "title": "Severe hypertension with headache",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "BP_CRISIS",
+        "DATA_COMPLETENESS"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.052
+    },
+    {
+      "id": "NCD-010",
+      "domain": "cardiovascular",
+      "title": "Low repeat BP must not erase acute chest pain",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "BP_SEVERE",
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.053
+    },
+    {
+      "id": "NCD-011",
+      "domain": "cardiovascular",
+      "title": "Male patient with treated NCD and missed medicines",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "ADHERENCE_REVIEW",
+        "BP_REVIEW",
+        "DATA_COMPLETENESS",
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 4,
+      "status": "passed",
+      "duration_seconds": 0.058
+    },
+    {
+      "id": "NCD-012",
+      "domain": "cardiovascular",
+      "title": "Unknown symptoms remain unknown",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DATA_COMPLETENESS",
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.098
+    },
+    {
+      "id": "NCD-013",
+      "domain": "diabetes",
+      "title": "Low glucose in mmol per litre",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.066
+    },
+    {
+      "id": "NCD-014",
+      "domain": "diabetes",
+      "title": "Severe low glucose",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.053
+    },
+    {
+      "id": "NCD-015",
+      "domain": "diabetes",
+      "title": "Equivalent low glucose in mg per decilitre",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.3
+    },
+    {
+      "id": "NCD-016",
+      "domain": "diabetes",
+      "title": "Equivalent severe low glucose in mg per decilitre",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.247
+    },
+    {
+      "id": "NCD-017",
+      "domain": "diabetes",
+      "title": "Hypoglycaemia inclusive guideline boundary",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.054
+    },
+    {
+      "id": "NCD-018",
+      "domain": "diabetes",
+      "title": "Just above hypoglycaemia threshold",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.054
+    },
+    {
+      "id": "NCD-019",
+      "domain": "diabetes",
+      "title": "High glucose and dehydration",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "HYPERGLYCEMIC_CRISIS"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.199
+    },
+    {
+      "id": "NCD-020",
+      "domain": "diabetes",
+      "title": "High glucose and vomiting",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "HYPERGLYCEMIC_CRISIS"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.052
+    },
+    {
+      "id": "NCD-021",
+      "domain": "diabetes",
+      "title": "Very high glucose without recorded acute symptoms",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "GLUCOSE_HIGH"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.169
+    },
+    {
+      "id": "NCD-022",
+      "domain": "diabetes",
+      "title": "High glucose unit conversion retains escalation",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "HYPERGLYCEMIC_CRISIS"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.055
+    },
+    {
+      "id": "NCD-023",
+      "domain": "diabetes",
+      "title": "Missing glucose in insulin-treated diabetes",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DATA_COMPLETENESS",
+        "DIABETES_REVIEW"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.056
+    },
+    {
+      "id": "NCD-024",
+      "domain": "diabetes",
+      "title": "Foot ulcer prompts NCD complication review",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "FOOT_ULCER"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.052
+    },
+    {
+      "id": "NCD-025",
+      "domain": "diabetes",
+      "title": "Raised HbA1c without autonomous titration",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DIABETES_REVIEW"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.072
+    },
+    {
+      "id": "NCD-026",
+      "domain": "diabetes",
+      "title": "Normal glucose expressed in mg per decilitre",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "routine",
+      "rules": [
+        "DIABETES_REVIEW"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.318
+    },
+    {
+      "id": "NCD-027",
+      "domain": "kidney",
+      "title": "Severely reduced renal function",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "RENAL_SEVERE"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.06
+    },
+    {
+      "id": "NCD-028",
+      "domain": "kidney",
+      "title": "Metformin with eGFR below thirty",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "METFORMIN_RENAL",
+        "RENAL_SEVERE"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.055
+    },
+    {
+      "id": "NCD-029",
+      "domain": "kidney",
+      "title": "Metformin with moderately impaired renal function",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "CKD_REVIEW",
+        "DIABETES_REVIEW",
+        "METFORMIN_REVIEW"
+      ],
+      "recommendation_count": 3,
+      "status": "passed",
+      "duration_seconds": 0.091
+    },
+    {
+      "id": "NCD-030",
+      "domain": "kidney",
+      "title": "Metformin without renal observation",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DATA_COMPLETENESS",
+        "DIABETES_REVIEW"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.058
+    },
+    {
+      "id": "NCD-031",
+      "domain": "kidney",
+      "title": "Severe hyperkalaemia",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "DATA_COMPLETENESS",
+        "POTASSIUM_HIGH"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.056
+    },
+    {
+      "id": "NCD-032",
+      "domain": "kidney",
+      "title": "Moderate hyperkalaemia",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "DATA_COMPLETENESS",
+        "POTASSIUM_HIGH"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.055
+    },
+    {
+      "id": "NCD-033",
+      "domain": "kidney",
+      "title": "Severe hypokalaemia",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "POTASSIUM_LOW"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.076
+    },
+    {
+      "id": "NCD-034",
+      "domain": "kidney",
+      "title": "Moderate hypokalaemia",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "POTASSIUM_LOW"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.065
+    },
+    {
+      "id": "NCD-035",
+      "domain": "kidney",
+      "title": "Known CKD requires longitudinal assessment",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "CKD_REVIEW",
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.086
+    },
+    {
+      "id": "NCD-036",
+      "domain": "kidney",
+      "title": "One low eGFR does not prove chronicity",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "CKD_REVIEW",
+        "DATA_COMPLETENESS",
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 3,
+      "status": "passed",
+      "duration_seconds": 0.075
+    },
+    {
+      "id": "NCD-037",
+      "domain": "kidney",
+      "title": "NSAID RAS inhibitor and diuretic combination",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DIABETES_CONFIRM",
+        "NSAID_RENAL"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.056
+    },
+    {
+      "id": "NCD-038",
+      "domain": "kidney",
+      "title": "ACE inhibitor and ARB combination",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DIABETES_CONFIRM",
+        "DUAL_RAS"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.411
+    },
+    {
+      "id": "NCD-039",
+      "domain": "respiratory",
+      "title": "Low oxygen saturation",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.058
+    },
+    {
+      "id": "NCD-040",
+      "domain": "respiratory",
+      "title": "Asthma low oxygen near severe boundary",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.427
+    },
+    {
+      "id": "NCD-041",
+      "domain": "respiratory",
+      "title": "Borderline oxygenation needs review",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.057
+    },
+    {
+      "id": "NCD-042",
+      "domain": "respiratory",
+      "title": "Rapid respiration with asthma",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "RESP_TACHYPNEA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.058
+    },
+    {
+      "id": "NCD-043",
+      "domain": "respiratory",
+      "title": "Wheeze with preserved oxygenation",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "RESP_WHEEZE"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.096
+    },
+    {
+      "id": "NCD-044",
+      "domain": "respiratory",
+      "title": "Acute breathlessness despite normal oximetry",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.057
+    },
+    {
+      "id": "NCD-045",
+      "domain": "respiratory",
+      "title": "Chronic asthma review",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DIABETES_CONFIRM",
+        "RESP_CHRONIC_REVIEW"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.338
+    },
+    {
+      "id": "NCD-046",
+      "domain": "respiratory",
+      "title": "COPD and current tobacco use",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DIABETES_CONFIRM",
+        "RESP_CHRONIC_REVIEW",
+        "TOBACCO_SUPPORT"
+      ],
+      "recommendation_count": 3,
+      "status": "passed",
+      "duration_seconds": 0.059
+    },
+    {
+      "id": "NCD-047",
+      "domain": "respiratory",
+      "title": "Haemoptysis demands assessment beyond NCD assumption",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "HEMOPTYSIS"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.376
+    },
+    {
+      "id": "NCD-048",
+      "domain": "respiratory",
+      "title": "Respiratory symptoms without oxygen measurements",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "DATA_COMPLETENESS",
+        "RESP_WHEEZE"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.456
+    },
+    {
+      "id": "NCD-049",
+      "domain": "cancer_referral",
+      "title": "Breast lump requires diagnostic pathway",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.431
+    },
+    {
+      "id": "NCD-050",
+      "domain": "cancer_referral",
+      "title": "Unexplained weight loss",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.058
+    },
+    {
+      "id": "NCD-051",
+      "domain": "cancer_referral",
+      "title": "Persistent cough requires differential assessment",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.058
+    },
+    {
+      "id": "NCD-052",
+      "domain": "cancer_referral",
+      "title": "Abnormal bleeding with severity not established",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "CANCER_WARNING"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.059
+    },
+    {
+      "id": "NCD-053",
+      "domain": "cancer_referral",
+      "title": "Known cancer needs treating-team coordination",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "CANCER_SCOPE",
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.071
+    },
+    {
+      "id": "NCD-054",
+      "domain": "cancer_referral",
+      "title": "Cancer warning signs with haemoptysis",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "CANCER_WARNING",
+        "HEMOPTYSIS"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.057
+    },
+    {
+      "id": "NCD-055",
+      "domain": "multimorbidity",
+      "title": "Pregnancy with severe blood pressure",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "DATA_COMPLETENESS",
+        "PREGNANCY_SCOPE",
+        "PREGNANCY_SEVERE_BP"
+      ],
+      "recommendation_count": 3,
+      "status": "passed",
+      "duration_seconds": 0.06
+    },
+    {
+      "id": "NCD-056",
+      "domain": "multimorbidity",
+      "title": "Pregnancy outside routine adult NCD treatment scope",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "PREGNANCY_SCOPE"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.056
+    },
+    {
+      "id": "NCD-057",
+      "domain": "multimorbidity",
+      "title": "Pregnancy with ACE inhibitor",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "PREGNANCY_SCOPE",
+        "RAS_PREGNANCY"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.068
+    },
+    {
+      "id": "NCD-058",
+      "domain": "multimorbidity",
+      "title": "Pregnancy with ARB",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "PREGNANCY_SCOPE",
+        "RAS_PREGNANCY"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.056
+    },
+    {
+      "id": "NCD-059",
+      "domain": "multimorbidity",
+      "title": "Documented exact medication allergy conflict",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "ALLERGY_CONFLICT"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.059
+    },
+    {
+      "id": "NCD-060",
+      "domain": "multimorbidity",
+      "title": "Unknown medication and allergy lists",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DATA_COMPLETENESS",
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.059
+    },
+    {
+      "id": "NCD-061",
+      "domain": "multimorbidity",
+      "title": "Older adult with diabetes CKD and hypertension",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "DATA_COMPLETENESS",
+        "METFORMIN_RENAL",
+        "RENAL_SEVERE"
+      ],
+      "recommendation_count": 3,
+      "status": "passed",
+      "duration_seconds": 0.07
+    },
+    {
+      "id": "NCD-062",
+      "domain": "multimorbidity",
+      "title": "Emergency danger retains priority over multiple chronic findings",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "EMERGENCY_SYMPTOMS",
+        "METFORMIN_REVIEW",
+        "RESP_WHEEZE"
+      ],
+      "recommendation_count": 3,
+      "status": "passed",
+      "duration_seconds": 0.059
+    },
+    {
+      "id": "NCD-063",
+      "domain": "multimorbidity",
+      "title": "Limited medicines are visible context",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DIABETES_CONFIRM",
+        "HTN_FOLLOWUP"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.058
+    },
+    {
+      "id": "NCD-064",
+      "domain": "multimorbidity",
+      "title": "Unknown sex and reproductive status remain explicit",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DATA_COMPLETENESS",
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.061
+    },
+    {
+      "id": "NCD-065",
+      "domain": "multimorbidity",
+      "title": "Patient note injection cannot suppress red flags",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.071
+    },
+    {
+      "id": "NCD-066",
+      "domain": "multimorbidity",
+      "title": "Patient note cannot create a prescription",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.059
+    }
+  ]
+}

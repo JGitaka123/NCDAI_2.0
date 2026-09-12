@@ -1,0 +1,53 @@
+{
+  "checked_at": "2026-09-12T19:38:22.208079+00:00",
+  "deployment_commit": "dac1187d76238368a71c1a5bb7c11b23cfe52c6b",
+  "deployment_id": "dpl_EcgLxsryt2z2wTsEYGonTUXSyS4B",
+  "url": "https://ncdai-2.vercel.app",
+  "api_region_verified": "fra1",
+  "clinical_care_activation_complete": false,
+  "real_patient_data_enabled": false,
+  "owner_confirmed_approvals": true,
+  "ci_url": "https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34714529987",
+  "ci_jobs": {
+    "backend": "passed",
+    "frontend": "passed",
+    "postgres": "passed"
+  },
+  "backend": {
+    "passed": 381,
+    "skipped": 10,
+    "failed": 0,
+    "skip_note": "Eight optional live-provider tests; two PostgreSQL-specific tests executed in the PostgreSQL job."
+  },
+  "frontend": {
+    "passed": 28,
+    "failed": 0,
+    "production_build": "passed"
+  },
+  "case_workflows": {
+    "general_sqlite": 66,
+    "general_postgres": 66,
+    "dose_sqlite": 75,
+    "dose_postgres": 75,
+    "failed": 0
+  },
+  "database_checks": {
+    "passed": 19,
+    "failed": 0
+  },
+  "hosted_browser": {
+    "passed": 5,
+    "failed": 0,
+    "accessibility_scans": 23,
+    "reported_violations": 0
+  },
+  "hosted_acceptance": "hosted-clinical-readiness-acceptance.json",
+  "hosted_recovery": "hosted-recovery-rehearsal.json",
+  "limitations": [
+    "Engineering tests and authored scenarios are not independent clinical adjudication.",
+    "Automated operational alert delivery, backup retention and cloud failover are not verified.",
+    "Facility/clinical lead/administrator/incident contacts and the approved hosting/provider arrangement are pending configuration.",
+    "Current release still restricts records to fictional cases; selected adult NCD scope and four dose references only.",
+    "No full RAG, custom fine-tuning or live-patient outcome evaluation completed."
+  ]
+}

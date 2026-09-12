@@ -1,5 +1,7 @@
 # NCDAI 2.0
 
+Latest: [clinical deployment status and verified release](docs/clinical-deployment-status.md). Owner-confirmed approvals are recorded; real-patient activation is not yet complete.
+
 **A standalone clinician workspace for coordinated adult NCD care.**
 
 NCDAI 2.0 brings patient history, structured assessment, evidence-linked safety checks, clinician decisions and referral follow-through into one workflow. Its major domains are cardiovascular disease, diabetes, chronic respiratory disease, kidney disease, cancer warning signs and multimorbidity. It preserves the familiar NCDAI consultation sequence with a redesigned responsive interface.

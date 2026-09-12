@@ -33,3 +33,8 @@ The public application's technical readiness endpoint is not a clinical readines
 [UK Kidney Association, July 2026 guideline](https://www.ukkidney.org/health-professionals/guidelines/treatment-acute-hyperkalaemia-adults-0), sections 1.2.1–1.2.3 and 4.1–4.2, rechecked on 12 September 2026: unexpected mild hyperkalaemia calls for repeat testing within three days; moderate elevations within one day; severe elevations require urgent hospital assessment. Acute illness or kidney injury changes hospital-referral consideration at lower concentrations. This is an international supplement, not a claim that it is Kenya national policy.
 
 NCDAI uses contiguous numeric intervals 5.5 to <6, 6 to <6.5 and >=6.5 mmol/L. Same-day routing for recorded acute illness or suspected AKI is a conservative implementation choice for local clinical acceptance. Unknown acute context is explicitly flagged for assessment, not assumed absent. These are referral/assessment prompts, with no electrolyte-treatment dosing generated.
+
+
+## Published verification result
+
+The update is live at [NCDAI 2.0](https://ncdai-2.vercel.app), commit `dac1187d76238368a71c1a5bb7c11b23cfe52c6b`, deployment `dpl_EcgLxsryt2z2wTsEYGonTUXSyS4B`, with the API function confirmed in Frankfurt. All three cloud jobs passed: 381 backend tests, 28 frontend tests, 19 database checks, both complete-case sets on both database engines. Five public-browser workflows and 23 accessibility scans passed with zero reported violations. Live DeepSeek and the new acute-potassium review workflow passed. See [the release summary](test-results/clinical-readiness-release-summary.json) for skips and limits. These completed engineering checks do not change the activation dependencies above.

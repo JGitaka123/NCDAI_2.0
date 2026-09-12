@@ -1,0 +1,38 @@
+{
+  "checked_at": "2026-09-12T19:36:30.761608+00:00",
+  "origin": "https://ncdai-2.vercel.app",
+  "kind": "Hosted synthetic engineering acceptance; not clinical validation",
+  "checks": [
+    "ready database/rules; unauthenticated records denied",
+    "authenticated session with secure HttpOnly Strict cookie",
+    "persisted fictional encounter; emergency findings and evidence retained",
+    "live provider request preserves all original findings and urgency",
+    "clinician decisions persisted; reviewed record rejects alteration",
+    "identified referral completed; reviewed FHIR export retrieved",
+    "dose catalogue verified; emergency dose withheld; eligible reference persisted, reviewed and immutable",
+    "potassium 5.7 with suspected AKI: urgent hospital advice, dose withheld, persisted review immutable",
+    "audit chain valid; logout revokes access"
+  ],
+  "dosing": {
+    "version": "ncdai-dose-reference-0.1.1",
+    "manifest_sha256": "903b0947230c11e4555745ac9846130842ff58042c7533ea76a06d005b151aac"
+  },
+  "ai": {
+    "status": "ready",
+    "reason_code": null,
+    "provider": "deepseek",
+    "model": "deepseek-v4-pro",
+    "prompt_version": "ncdai-briefing-select-v1.4",
+    "usage": {
+      "input_tokens": 337,
+      "output_tokens": 47,
+      "total_tokens": 384
+    },
+    "latency_ms": 1606
+  },
+  "audit": {
+    "valid": true,
+    "events": 126
+  },
+  "passed": true
+}

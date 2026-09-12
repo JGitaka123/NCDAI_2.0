@@ -9,28 +9,36 @@
 | Item | Recorded value |
 |---|---|
 | Vercel account/project | `jessegitaka-7527s-projects / ncdai-2` |
-| Deployed application commit | `d8cc6e3d246d65fd794494a2b2f77170f703b6d8` |
-| Deployment | `dpl_3gL1v8fjJtzmBTtG2qZL7z3UFDp9` |
-| Vercel inspection | [Deployment details](https://vercel.com/jessegitaka-7527s-projects/ncdai-2/3gL1v8fjJtzmBTtG2qZL7z3UFDp9) |
+| Deployed application commit | `dac1187d76238368a71c1a5bb7c11b23cfe52c6b` |
+| Deployment | `dpl_EcgLxsryt2z2wTsEYGonTUXSyS4B` |
+| Vercel inspection | [Deployment details](https://vercel.com/jessegitaka-7527s-projects/ncdai-2/EcgLxsryt2z2wTsEYGonTUXSyS4B) |
 | Runtime | Vite frontend and Python 3.12 FastAPI services; API function inspected in `fra1` |
 | Database | Dedicated Neon `ncdai-2-db`, Free plan, Frankfurt requested at provisioning; server reports PostgreSQL `18.6 (2078fcb)` |
 | Schema revision | `20260912_guards` |
 | Application database role | `ncdai_app`, separate from the migration owner |
-| Clinical rules | `ncdai-2-rules-0.1.1` |
+| Clinical rules | `ncdai-2-rules-0.1.2` |
 | AI provider/model | DeepSeek / `deepseek-v4-pro` |
-| Prompt contract | `ncdai-briefing-select-v1.3` |
+| Prompt contract | `ncdai-briefing-select-v1.4` |
 
 The existing `aifya-web` project was not replaced. NCDAI has its own project, database and canonical domain. Repository changes were pushed to `codex/ncdai-2-platform`; deployment is explicit through the Vercel CLI, rather than automatically publishing every push.
 
-## Current dose-reference release
+## Current clinical-deployment preparation release
 
-The hosted version adds four bounded Kenya medicine references and contextual withholding, account password/status operations and a pinned Frankfurt API region. The new [release verification](dose-release-verification.md) records 351 passing backend CI tests, 27 frontend tests, 75 full dose-case workflows and the 66 general NCD workflows. Both case sets pass PostgreSQL and SQLite. The application remains a synthetic engineering preview under the owner-confirmed DHA/ethics scope.
+The latest release corrects potassium follow-up and acute kidney injury escalation, requires explicit acute negatives for dose references, and verifies a read-only snapshot recovery from the hosted database. **Clinical care activation remains incomplete**, with first-facility and operating details requested; see [the status and remaining dependencies](clinical-deployment-status.md).
 
-The final Frankfurt deployment passed [hosted API/dose/AI acceptance](test-results/hosted-dose-acceptance.json): emergency dose withheld, eligible amlodipine reference preserved through review, FHIR export and immutable-record controls, valid audit and secure session lifecycle. Its DeepSeek request returned ready with 379 tokens in 1.341 seconds; this is transport/contract evidence, not clinical accuracy.
+Verification on the deployed application commit passed: **381 backend tests**, **28 frontend tests**, **66 general cases and 75 dosing cases on SQLite and PostgreSQL**, **19 database checks**, and **5 hosted browser workflows with 23 accessibility scans and zero reported violations**. Ten backend skips are documented separately from the successful PostgreSQL and live-provider checks. All three [cloud jobs passed](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34714529987).
+
+The [hosted acceptance](test-results/hosted-clinical-readiness-acceptance.json) passed emergency and eligible-dose workflows plus the new suspected-AKI/potassium case. DeepSeek returned a constrained response in 1.606 seconds using 384 tokens. The [hosted browser result](test-results/clinical-readiness-browser.json) covers desktop, tablet, phone, keyboard and administrator navigation. [Machine-readable release evidence](test-results/clinical-readiness-release-summary.json).
+
+## Prior dose-reference release (historical)
+
+The prior version added four bounded Kenya medicine references and contextual withholding, account password/status operations and a pinned Frankfurt API region. The new [release verification](dose-release-verification.md) records 351 passing backend CI tests, 27 frontend tests, 75 full dose-case workflows and the 66 general NCD workflows. Both case sets pass PostgreSQL and SQLite. The application remains a synthetic engineering preview under the owner-confirmed DHA/ethics scope.
+
+That prior Frankfurt deployment passed [hosted API/dose/AI acceptance](test-results/hosted-dose-acceptance.json): emergency dose withheld, eligible amlodipine reference preserved through review, FHIR export and immutable-record controls, valid audit and secure session lifecycle. Its DeepSeek request returned ready with 379 tokens in 1.341 seconds; this is transport/contract evidence, not clinical accuracy.
 
 The region is now declared as `fra1` in `vercel.json`; use `vercel deploy --prod --yes --regions fra1` and inspect the resulting function location. Build machines may still be in `iad1`, which is separate from the verified API execution region. The initial update used the default US API region for fictional acceptance records before this configuration correction. The current deployment uses Frankfurt. No patient-care data was introduced during these checks.
 
-Final hosted browser verification passed all five workflows in 108 seconds, with 23 accessibility scans reporting zero violations. Desktop, tablet and 375px phone layouts passed, along with keyboard and administrator boundaries. [Hosted browser report](quality/hosted-dose-browser-summary.json). All three jobs also passed on the [exact deployed configuration commit](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34713562013).
+That prior hosted browser verification passed all five workflows in 108 seconds, with 23 accessibility scans reporting zero violations. Desktop, tablet and 375px phone layouts passed, along with keyboard and administrator boundaries. [Hosted browser report](quality/hosted-dose-browser-summary.json). All three jobs also passed on the [exact deployed configuration commit](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34713562013).
 
 ## Baseline hosted acceptance (prior branded release)
 
