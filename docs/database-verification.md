@@ -2,7 +2,9 @@
 
 The reproducible database checks use an isolated, loopback-only PostgreSQL instance and synthetic records. Results belong to this local engineering environment; they do not establish clinical validity, national deployment capacity, or a certified recovery objective.
 
-**Current result: incomplete.** The initial PostgreSQL 18.4 run completed eleven migration, integrity and rollback assertions. It exposed an audit timestamp canonicalization defect; that defect was fixed and a focused regression test passed. Subsequent host Python failures prevented completion of the full rerun. Backup clients are installed, but backup/restore, controlled restart persistence, post-fix concurrent chain verification and the newly added timeout assertions remain unverified. The machine-readable status explicitly distinguishes observed results from pending checks.
+**Cloud verification passed: 19/19 checks, plus 66/66 complete case workflows.** The isolated PostgreSQL 18.4 job at commit `6415fed12a8efa817705b653776794f3af512725` verified migrations, constraints, atomic rollback, concurrent audit writes, four database timezones, bounded waits, logical backup/restore and restart persistence. See the [successful GitHub run](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34709332691), [database result](test-results/ci-postgres-verification.json) and [case results](test-results/ci-cases-postgres.json). These are ephemeral CI recovery checks, not recovery measurements for the hosted Vercel/Neon deployment.
+
+The initial Windows run remains honestly recorded as incomplete in its original result: it exposed an audit timestamp canonicalization defect and encountered host Python failures during recovery work. A later [local PostgreSQL performance check](performance.md) separately verified 40 reads, 32 audited writes, a four-way stale-update race and audit integrity across four timezones after the fix. The cloud evidence completes the engineering recovery checks without rewriting the earlier failed/incomplete history.
 
 ## Reproduce on Windows
 
@@ -26,7 +28,7 @@ Random credentials, initialized database files, server logs and logical backups 
 
 ## Checks and evidence
 
-The verifier writes [a machine-readable result](../tests/database/postgres-verification.json) containing the server version, migration revision, named checks, timings, row counts and SHA256 snapshot fingerprints. An automated success result is emitted only after every required assertion succeeds; the script exits with an error on the first failure. Until that run completes, the current file is a manually recorded incomplete status based on observed tool outputs.
+The Windows verifier writes [its machine-readable result](../tests/database/postgres-verification.json); the initial file is a manually recorded incomplete status based on observed tool outputs. The successful cloud verifier writes [a separate result](test-results/ci-postgres-verification.json) with server version, migration revision, named checks, timings and table fingerprints. It emits success only after every required assertion succeeds and exits with an error on failure. Preserve each result's environment and commit when assessing coverage.
 
 - Upgrade to Alembic head and verify no difference from SQLAlchemy metadata.
 - Upgrade, downgrade, and re-upgrade in a separate uniquely named database.

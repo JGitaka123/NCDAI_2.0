@@ -38,3 +38,5 @@ th,td{color:#50654f}th{font-size:11px}.badge-completed,.badge-reviewed,.badge-ac
 .audit-intro strong,.audit-table td strong,.audit-table td small{color:#4d664c}
 
 .skip-link:not(:focus){clip-path:inset(50%);width:1px;height:1px;padding:0;overflow:hidden}
+
+.loading{color:#50654f}

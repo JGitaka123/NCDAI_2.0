@@ -1,0 +1,49 @@
+{
+  "generated_at": "2026-09-12T17:44:56.496711+00:00",
+  "run_status": "passed",
+  "synthetic_only": true,
+  "workers": 4,
+  "transport": "in-process Starlette TestClient ASGI; real PostgreSQL TCP",
+  "database_target": "dedicated loopback PostgreSQL test service",
+  "checks": [
+    "40_concurrent_reads",
+    "32_concurrent_audited_patient_creates",
+    "four_competing_updates_one_winner",
+    "audit_chain_across_four_database_timezones"
+  ],
+  "measurements": {
+    "40_concurrent_reads": {
+      "requests": 40,
+      "p50_ms": 75.48,
+      "p95_ms": 103.76,
+      "maximum_ms": 299.67,
+      "status_counts": {
+        "200": 40
+      }
+    },
+    "32_concurrent_audited_patient_creates": {
+      "requests": 32,
+      "p50_ms": 102.81,
+      "p95_ms": 222.93,
+      "maximum_ms": 229.49,
+      "status_counts": {
+        "201": 32
+      }
+    },
+    "four_competing_updates_one_winner": {
+      "requests": 4,
+      "p50_ms": 91.07,
+      "p95_ms": 113.76,
+      "maximum_ms": 113.76,
+      "status_counts": {
+        "200": 1,
+        "409": 3
+      }
+    }
+  },
+  "server_version": "18.4",
+  "migration": "20260912_guards",
+  "statement_timeout": "15s",
+  "lock_timeout": "5s",
+  "final_audit_events": 37
+}

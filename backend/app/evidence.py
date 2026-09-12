@@ -126,7 +126,7 @@ SOURCES = {
     "NCDAI_SAFETY_SPEC": {
         "source_id": "NCDAI_SAFETY_SPEC",
         "title": "NCDAI 2.0 clinical safety specification (proposed engineering policy)",
-        "url": "https://github.com/JGitaka123/NCDAI_2.0/blob/codex/ncdai-2-platform/docs/clinical-safety-spec.md",
+        "url": "https://github.com/JGitaka123/NCDAI_2.0/blob/6415fed12a8efa817705b653776794f3af512725/docs/clinical-safety-spec.md",
         "section": "Input semantics, conservative triage adaptations, scope, and release gates",
         "version": "0.1; 2026-09-12; NOT clinician approved",
     },

@@ -99,7 +99,14 @@ def create_app(settings: Settings | None = None):
         if not raw or len(raw) > 256:
             raise HTTPException(401, "Sign in required")
         stored = db.get(AuthSession, token_hash(raw))
-        if stored is None or stored.expires_at.replace(tzinfo=timezone.utc) <= utcnow():
+        if stored is None:
+            raise HTTPException(401, "Session expired or invalid")
+        # PostgreSQL returns timestamptz in its session timezone; preserve the
+        # represented instant. SQLite stores our UTC timestamp without an offset.
+        expires_at = stored.expires_at
+        expires_at = (expires_at.replace(tzinfo=timezone.utc) if expires_at.tzinfo is None
+                      else expires_at.astimezone(timezone.utc))
+        if expires_at <= utcnow():
             raise HTTPException(401, "Session expired or invalid")
         user = db.get(User, stored.user_id)
         if user is None or not user.active:

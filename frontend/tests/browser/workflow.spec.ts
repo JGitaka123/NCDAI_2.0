@@ -25,6 +25,7 @@ async function login(page: Page) {
 }
 
 async function audit(page: Page, label: string, info: TestInfo) {
+  await expect(page.locator('.loading')).toHaveCount(0)
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()
   const safeReport = { label, viewport: page.viewportSize(), violations: results.violations, passes: results.passes.length, incomplete: results.incomplete.map(item => ({ id: item.id, impact: item.impact, description: item.description, nodes: item.nodes.length })) }
   writeFileSync(resolve(artifactDir, `${label}-axe.json`), JSON.stringify(safeReport, null, 2))

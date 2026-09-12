@@ -1,0 +1,145 @@
+{
+  "generated_at": "2026-09-12T17:49:05.374285+00:00",
+  "synthetic_only": true,
+  "kind": "Isolated CI database engineering checks, not clinical validation",
+  "checks": [
+    {
+      "check": "migration_upgrade_head",
+      "passed": true,
+      "seconds": 0.146
+    },
+    {
+      "check": "migration_metadata_no_drift",
+      "passed": true,
+      "seconds": 0.148
+    },
+    {
+      "check": "bounded_statement_and_lock_waits",
+      "passed": true,
+      "seconds": 0.015
+    },
+    {
+      "check": "audit_update_blocked",
+      "passed": true,
+      "seconds": 0.002
+    },
+    {
+      "check": "audit_delete_blocked",
+      "passed": true,
+      "seconds": 0.001
+    },
+    {
+      "check": "reviewed_update_blocked",
+      "passed": true,
+      "seconds": 0.001
+    },
+    {
+      "check": "reviewed_delete_blocked",
+      "passed": true,
+      "seconds": 0.001
+    },
+    {
+      "check": "invalid_referral_transition_blocked",
+      "passed": true,
+      "seconds": 0.001
+    },
+    {
+      "check": "real_record_blocked",
+      "passed": true,
+      "seconds": 0.001
+    },
+    {
+      "check": "cross_facility_encounter_blocked",
+      "passed": true,
+      "seconds": 0.002
+    },
+    {
+      "check": "cross_facility_referral_blocked",
+      "passed": true,
+      "seconds": 0.002
+    },
+    {
+      "check": "record_and_audit_rollback_atomicity",
+      "passed": true,
+      "seconds": 0.009
+    },
+    {
+      "check": "32_concurrent_audit_appends_without_forks",
+      "passed": true,
+      "seconds": 0.095
+    },
+    {
+      "check": "audit_integrity_across_four_timezones",
+      "passed": true,
+      "seconds": 0.022
+    },
+    {
+      "check": "valid_referral_lifecycle",
+      "passed": true,
+      "seconds": 0.002
+    },
+    {
+      "check": "isolated_migration_upgrade_downgrade_reupgrade",
+      "passed": true,
+      "seconds": 0.582
+    },
+    {
+      "check": "logical_dump_restore_records_chain_triggers_migration",
+      "passed": true,
+      "seconds": 0.367
+    },
+    {
+      "check": "service_restart_record_persistence",
+      "passed": true,
+      "seconds": 1.328
+    },
+    {
+      "check": "separate_migrated_database_for_full_case_workflows",
+      "passed": true,
+      "seconds": 0.364
+    }
+  ],
+  "limits": [
+    "Single ephemeral PostgreSQL service; no production-scale or high-availability claim.",
+    "Logical recovery and one restart do not certify RPO, RTO or offsite backup.",
+    "Superusers can bypass database triggers; production privileges must be restricted."
+  ],
+  "server_version": "18.4 (Debian 18.4-1.pgdg13+1)",
+  "migration": "20260912_guards",
+  "snapshot": {
+    "facilities": {
+      "count": 2,
+      "sha256": "e5f60306447ea4396b3afcb6335e74e2dcd27b302dd57c7d0afcb012682c84b5"
+    },
+    "users": {
+      "count": 1,
+      "sha256": "83730581f89e6a2ccf56e5a03911f95c9128efc0292c1ab46b1f13ce29f2579b"
+    },
+    "auth_sessions": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "login_attempts": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "patients": {
+      "count": 1,
+      "sha256": "4f7dd06f8e67bd5bcdc6244f2bacbda4dce0b6fc956c1e3e4b49fea6bc97e9d7"
+    },
+    "encounters": {
+      "count": 1,
+      "sha256": "d68c007493b6e07e835df783fb21efecf6a763e575977771fd69b8abc6d03db2"
+    },
+    "referrals": {
+      "count": 1,
+      "sha256": "a4d90d5af1b78b9daf4bf13037a7cea0639d568dbf55ad82ea3692736129bbcf"
+    },
+    "audit_events": {
+      "count": 34,
+      "sha256": "93f8ce999c4445b1d058fce42de0a4beb09ad7645e3d5d30e3138d3b82f4e162"
+    }
+  },
+  "passed": 19,
+  "failed": 0
+}

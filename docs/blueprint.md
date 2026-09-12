@@ -59,8 +59,8 @@ flowchart LR
     API --> DB[(PostgreSQL records and audit)]
     API --> RULES[Versioned clinical rules]
     RULES --> EV[Curated evidence registry]
-    API --> AI[Optional OpenAI or DeepSeek synthesis]
-    EV --> AI
+    RULES --> IDS[Validated rule and missing-data IDs]
+    IDS --> AI[Optional OpenAI or DeepSeek ID selection]
     RULES --> REVIEW[Clinician review and referral]
     AI --> REVIEW
     REVIEW --> DB
@@ -85,11 +85,11 @@ Database requirements include foreign keys, unique constraints, appropriate faci
 
 All clinical rules have stable identifiers, source references, version metadata and tests. Proposed thresholds are implementation choices requiring clinician signoff. The engine is conservative about acute danger and explicit about missing information. It must never assert that a normal measurement rules out all serious disease.
 
-OpenAI and DeepSeek adapters use explicit configured model names and timeouts. Provider names are configuration, not authorization to transmit identifiable patient data. Inputs are minimized; names, contacts and external identifiers are excluded from model requests. Retrieved evidence must actually appear in the model input. Sources are controlled registry entries, never fabricated citation strings. Structured output is validated and unknown references are rejected.
+OpenAI and DeepSeek adapters use configured model names and bounded timeouts. Provider names are configuration, not authorization to transmit identifiable patient data. The current model input contains only deterministic urgency, eligible rule/category/severity identifiers, locked critical rule IDs and missing-data IDs. Names, contacts, record identifiers, demographics, numerical measurements, free-text notes, recommendation prose and source documents are excluded. The backend validates each recommendation's evidence against its controlled registry before making a request; it does not ask the model to retrieve or interpret guideline documents.
 
-The model may synthesize supplied facts and supported explanations. It cannot lower deterministic urgency, remove safety findings, finalize encounters, write orders or autonomously prescribe. Refusal, malformed output, timeout, unsupported references and unavailable credentials produce a visible bounded fallback. User-entered notes and retrieved material are data, not instructions for the system. Any generative summary remains clinician-reviewable and is not treated as a validated diagnosis.
+The model selects up to three eligible rule IDs and four missing-data IDs for a short briefing. It returns no clinical prose. The backend validates those selections and displays canonical recommendation text and sources already present in the deterministic assessment; all critical findings stay locked and the complete recommendation list remains available. The model cannot lower urgency, remove findings, finalize encounters, write orders or prescribe. Malformed output, timeout, unsupported references and unavailable credentials produce a visible bounded fallback. This implemented capability is constrained selection, not free-form clinical synthesis. Its usefulness beyond the complete deterministic assessment remains to be demonstrated.
 
-Every saved assessment records the rules/evidence version, provider/model mode, time and input snapshot. Model changes, guideline changes and prompt changes require regression checks and a documented release. No online self-training from clinician agreement clicks is permitted.
+Every assessment records separate rules/evidence versions, deterministic mode and time; its encounter retains clinical input. An optional stored briefing additionally records provider/model, prompt version, status and usage. Final clinician review freezes the input/assessment snapshots. Saving a briefing increments the encounter version; the client must use that returned version to finalize review. Model changes, guideline changes and prompt changes require regression checks and a documented release. No online self-training from clinician agreement clicks is permitted.
 
 ## Interoperability
 
@@ -109,7 +109,7 @@ The institutional data controller, processors, authorized uses, retention schedu
 
 Functional acceptance requires at least 50 distinct complete synthetic case workflows across the supported NCD domains, plus boundary, negative and adversarial tests. A complete workflow creates a patient, captures an encounter, generates and inspects support, records all review decisions, retrieves the immutable record, exercises referral when indicated and validates an authorized export. Persisted data, evidence and audit events must agree.
 
-Safety tests cover acute red flags at normal and abnormal measurements, unit equivalence, missing data, interacting medications, pregnancy, renal impairment, contradictory inputs and unsupported scope. Security tests cover anonymous access, cross-facility reads/writes, CSRF, role restrictions, session revocation, malformed payloads and stale versions. AI tests cover real prompt evidence inclusion, schema/refusal/timeout behavior, citation integrity and attempted urgency downgrades. Browser tests cover complete consultations, validation errors, review decisions, referrals and narrow-screen usability.
+Safety tests cover acute red flags at normal and abnormal measurements, unit equivalence, missing data, interacting medications, pregnancy, renal impairment, contradictory inputs and unsupported scope. Security tests cover anonymous access, cross-facility reads/writes, CSRF, role restrictions, session revocation, malformed payloads and stale versions. AI tests cover minimized identifier-only payloads, evidence/identifier validation, schema/timeout/failure behavior, locked critical findings, prohibited prose and attempted urgency changes. Browser tests cover complete consultations, validation errors, review decisions, referrals and narrow-screen usability.
 
 Targets for local engineering checks: zero known critical/high severity defects in implemented scope; all required safety assertions pass; no serious/critical automated accessibility violations in tested views; core non-AI actions p95 under 1 second at a documented modest concurrent workload. These targets are not claims about untested hosting, national-scale use, real clinical outcomes or model accuracy. Report hardware, dataset size, concurrency and provider mode with results.
 

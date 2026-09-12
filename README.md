@@ -42,6 +42,8 @@ AI is disabled by default. To explicitly enable DeepSeek in the backend process,
 
 ## Inspect the specifications
 
+- [Engineering verification and release evidence](docs/verification.md)
+- [Independent release audit](docs/release-audit.md)
 - [Product and engineering blueprint](docs/blueprint.md)
 - [Current capability benchmarks and limitations](docs/benchmarking.md)
 - [Requirements traceability](docs/requirements-traceability.md)
