@@ -1,0 +1,13 @@
+[project]
+name = "ncdai-platform"
+version = "0.1.0"
+requires-python = ">=3.11"
+description = "Clinician-supervised NCDAI 2.0 clinical decision support"
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

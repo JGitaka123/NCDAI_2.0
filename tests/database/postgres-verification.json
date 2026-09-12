@@ -1,0 +1,49 @@
+{
+  "generated_at": "2026-09-12T17:28:14Z",
+  "run_status": "incomplete",
+  "database": "PostgreSQL",
+  "server_version": "18.4",
+  "migration": "20260912_guards",
+  "synthetic_only": true,
+  "evidence_basis": "Observed assertions from the initial real PostgreSQL verifier run; full completion report was not produced. This status file is manually recorded from tool outputs and must not be interpreted as a successful complete run.",
+  "initial_checks_completed": [
+    "migration_upgrade_head",
+    "migration_metadata_no_drift",
+    "audit_update_blocked",
+    "audit_delete_blocked",
+    "reviewed_update_blocked",
+    "reviewed_delete_blocked",
+    "referral_invalid_transition_blocked",
+    "encounter_cross_facility_foreign_key",
+    "referral_cross_facility_foreign_key",
+    "real_record_database_guard",
+    "transactional_record_and_audit_rollback"
+  ],
+  "initial_failure": {
+    "check": "32_concurrent_audit_appends_no_fork",
+    "observed": "All 32 concurrent writes committed; the facility had 34 events including its two baseline events. Hash verification failed because PostgreSQL returned timestamps in Africa/Nairobi while canonicalization discarded offsets without converting to UTC.",
+    "fix": "backend/app/audit.py now converts aware timestamps to UTC before hashing.",
+    "regression": "tests/database/test_audit_timezone.py: 1 passed, comparing UTC, +03:00, -05:00, +05:30 and naive UTC timestamps.",
+    "live_postgresql_reverification": "pending"
+  },
+  "pending_checks": [
+    "postgres_sessions_have_bounded_statement_and_lock_waits",
+    "32_concurrent_audit_appends_no_fork_after_fix",
+    "audit_hashes_invariant_across_four_postgres_timezones",
+    "referral_valid_lifecycle",
+    "isolated_migration_upgrade_downgrade_reupgrade",
+    "pg_dump_custom_backup",
+    "pg_restore_separate_database",
+    "restored_record_hashes_audit_chain_and_triggers",
+    "server_restart_persistence"
+  ],
+  "blocker": "Subsequent local Python runs stalled or produced Windows exceptions 0x8007000e in WMI and 0xc000070a during import/random seeding. Extra verifier processes were stopped. No successful backup/restore or controlled restart verification is claimed.",
+  "test_server_last_observation": "Dedicated native PostgreSQL reported running on 127.0.0.1:15432; server log confirmed ready after local recovery at 20:25:42 EAT. No unrelated Docker containers or applications were stopped.",
+  "backup_tools": "Official version-pinned PostgreSQL 18.4 pg_dump, pg_restore and createdb clients are prepared in ignored .runtime, but recovery execution remains pending.",
+  "next_action": "Rerun scripts/verify_postgres.py when host capacity permits, or run equivalent PostgreSQL service checks in CI. The verifier overwrites this status file with an automated all-assertions-passed report only on complete success.",
+  "limits": [
+    "Synthetic engineering evidence only; no clinical validation.",
+    "Local single-node tests do not establish production capacity or RPO/RTO.",
+    "Test account is privileged; production database roles and offsite recovery controls remain to be provisioned."
+  ]
+}

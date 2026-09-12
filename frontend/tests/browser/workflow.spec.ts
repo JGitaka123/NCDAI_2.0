@@ -1,0 +1,196 @@
+import { test, expect, type Page, type TestInfo } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+
+const artifactDir = resolve('../.runtime/browser')
+const imageDir = resolve('../docs/images')
+mkdirSync(artifactDir, { recursive: true })
+mkdirSync(imageDir, { recursive: true })
+
+function credentials() {
+  if (process.env.NCDAI_BROWSER_EMAIL && process.env.NCDAI_BROWSER_PASSWORD) {
+    return { email: process.env.NCDAI_BROWSER_EMAIL, password: process.env.NCDAI_BROWSER_PASSWORD }
+  }
+  return JSON.parse(readFileSync(resolve('../.runtime/demo-access.json'), 'utf8')) as { email: string; password: string }
+}
+
+async function login(page: Page) {
+  const access = credentials()
+  await page.goto('/')
+  await page.getByLabel('Email address').fill(access.email)
+  await page.getByLabel('Password', { exact: true }).fill(access.password)
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'A clearer view of care.' })).toBeVisible()
+}
+
+async function audit(page: Page, label: string, info: TestInfo) {
+  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()
+  const safeReport = { label, viewport: page.viewportSize(), violations: results.violations, passes: results.passes.length, incomplete: results.incomplete.map(item => ({ id: item.id, impact: item.impact, description: item.description, nodes: item.nodes.length })) }
+  writeFileSync(resolve(artifactDir, `${label}-axe.json`), JSON.stringify(safeReport, null, 2))
+  await info.attach(`${label}-accessibility`, { body: JSON.stringify(safeReport, null, 2), contentType: 'application/json' })
+  expect.soft(results.violations.filter(item => ['serious', 'critical'].includes(item.impact || '')).map(item => ({ id: item.id, targets: item.nodes.map(node => node.target) })), `${label}: serious/critical accessibility issues`).toEqual([])
+  const layout = await page.evaluate(() => ({ width: window.innerWidth, scrollWidth: document.documentElement.scrollWidth, outside: [...document.querySelectorAll('body *')].filter(node => node.getBoundingClientRect().right > window.innerWidth + 1 && !node.closest('[inert]')).slice(0, 12).map(node => ({ tag: node.tagName, className: node.className, right: node.getBoundingClientRect().right })) })); writeFileSync(resolve(artifactDir, `${label}-layout.json`), JSON.stringify(layout, null, 2)); expect.soft(layout.scrollWidth, `${label}: page must fit viewport without horizontal page scrolling`).toBeLessThanOrEqual(layout.width + 1)
+}
+
+async function navigate(page: Page, name: string) {
+  const toggle = page.getByRole('button', { name: 'Open navigation', exact: true })
+  if (await toggle.isVisible()) await toggle.click()
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name, exact: true }).click()
+}
+
+for (const viewport of [{ name: 'desktop', width: 1366, height: 900 }, { name: 'tablet', width: 768, height: 1024 }, { name: 'mobile', width: 375, height: 812 }]) {
+  test(`${viewport.name}: complete synthetic care workflow and accessible views`, async ({ page }, info) => {
+    await page.setViewportSize(viewport)
+    await page.goto('/')
+    await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible()
+    await audit(page, `${viewport.name}-login`, info)
+    await page.screenshot({ path: resolve(imageDir, `${viewport.name}-login.png`), fullPage: true })
+    await login(page)
+    await audit(page, `${viewport.name}-dashboard`, info)
+    await page.screenshot({ path: resolve(imageDir, `${viewport.name}-dashboard.png`), fullPage: true })
+    await navigate(page, 'Patients')
+    await page.getByRole('button', { name: 'Register patient', exact: true }).click()
+    await page.getByRole('button', { name: 'Create patient record' }).click()
+    await expect(page.getByLabel('Record ID', { exact: true })).toBeFocused()
+    const run = `${Date.now()}-${viewport.name}`
+    await page.getByLabel('Record ID', { exact: true }).fill(`BROWSER-${run}`)
+    await page.getByLabel('Given name', { exact: true }).fill('Synthetic')
+    await page.getByLabel('Family name', { exact: true }).fill(`Browser${viewport.name}`)
+    await page.getByLabel(/^Date of birth/).fill('1968-03-12')
+    await page.getByLabel('Sex recorded').selectOption('female')
+    await audit(page, `${viewport.name}-registration`, info)
+    await page.getByRole('button', { name: 'Create patient record' }).click()
+    await page.getByRole('button', { name: 'Start first encounter' }).click()
+    await page.getByLabel('Systolic BP (mmHg)', { exact: true }).fill('190')
+    await page.getByLabel('Diastolic BP (mmHg)', { exact: true }).fill('115')
+    await page.getByLabel('Pulse (beats/min)', { exact: true }).fill('92')
+    await page.getByLabel(/^Measurements observed at/).fill(new Date().toISOString().slice(0, 16))
+    await page.getByLabel('Oxygen saturation (%)', { exact: true }).fill('97')
+    await page.getByLabel('Respiratory rate (breaths/min)', { exact: true }).fill('18')
+    await page.getByLabel('Chest pain', { exact: true }).check()
+    await page.getByLabel(/^Symptom assessment completed/).check()
+    await page.locator('summary').filter({ hasText: 'NCD history & context' }).click()
+    for (const label of ['Known hypertension', 'Known diabetes', 'Known asthma', 'Known COPD', 'Known chronic kidney disease', 'Known cancer']) await page.getByLabel(label).selectOption(label === 'Known hypertension' ? 'yes' : 'no')
+    await page.getByLabel('Pregnancy status').selectOption('no')
+    await page.getByLabel('Tobacco use').selectOption('never')
+    await page.locator('summary').filter({ hasText: 'Laboratory results' }).click()
+    await page.getByLabel('HbA1c (%)', { exact: true }).fill('6.4')
+    await page.getByLabel('Blood glucose (mmol/L)', { exact: true }).fill('5.5')
+    await page.getByLabel('eGFR (mL/min/1.73 m²)', { exact: true }).fill('82')
+    await page.getByLabel('Potassium (mmol/L)', { exact: true }).fill('4.1')
+    await page.getByLabel(/^Medication list reviewed/).check()
+    await page.getByLabel(/^Allergy status reviewed/).check()
+    await page.getByLabel('Medicine adherence').selectOption('taking')
+    await page.getByLabel('Medicine availability').selectOption('available')
+    await audit(page, `${viewport.name}-intake`, info)
+    await page.screenshot({ path: resolve(imageDir, `${viewport.name}-intake.png`), fullPage: true })
+    await page.getByRole('button', { name: 'Assess & review', exact: true }).click()
+    await expect(page.getByRole('heading', { name: 'Emergency findings require immediate clinical attention' })).toBeVisible()
+    await expect(page.getByText('Do not delay emergency care to complete this review.')).toBeVisible()
+    await page.getByRole('button', { name: 'Record review & lock encounter' }).click()
+    await expect(page.getByRole('alert')).toContainText('decision')
+    const recommendations = page.locator('article.recommendation')
+    expect(await recommendations.count()).toBeGreaterThan(0)
+    for (const card of await recommendations.all()) {
+      await card.locator('summary').click()
+      expect(await card.locator('.evidence-list a').count()).toBeGreaterThan(0)
+      await card.getByRole('radio', { name: 'Accept', exact: true }).check()
+    }
+    await expect(page.getByRole('alert')).toHaveCount(0)
+    await page.getByLabel('Overall review note (optional)').fill('Synthetic browser workflow: clinician has reviewed each evidence-linked action.')
+    await audit(page, `${viewport.name}-assessment`, info)
+    await page.screenshot({ path: resolve(imageDir, `${viewport.name}-assessment.png`), fullPage: true })
+    await page.getByRole('button', { name: 'Record review & lock encounter' }).click()
+    await expect(page.getByText('Clinician review recorded.', { exact: true })).toBeVisible()
+    await expect(page.getByRole('radio', { name: 'Accept', exact: true }).first()).toBeDisabled()
+    await page.getByRole('button', { name: 'Refer', exact: true }).click()
+    const destination = `Synthetic referral ${run}`
+    await page.getByLabel('Receiving facility / service').fill(destination)
+    await page.getByLabel('Referral reason', { exact: true }).fill('Synthetic emergency workflow: arrange receiving clinician assessment.')
+    await page.getByRole('button', { name: 'Record referral request' }).click()
+    await expect(page.getByText(/^Referral request recorded/)).toBeVisible()
+    const downloadPromise = page.waitForEvent('download')
+    await page.getByRole('button', { name: 'Export FHIR record' }).click()
+    const download = await downloadPromise
+    const downloadPath = resolve(artifactDir, `${viewport.name}-encounter.fhir.json`)
+    await download.saveAs(downloadPath)
+    const bundle = JSON.parse(readFileSync(downloadPath, 'utf8'))
+    expect(bundle.resourceType).toBe('Bundle')
+    expect(bundle.entry.some((entry: { resource: { resourceType: string } }) => entry.resource.resourceType === 'Patient')).toBeTruthy()
+    await navigate(page, 'Referrals')
+    const referral = page.locator('article.referral-card').filter({ has: page.getByRole('heading', { name: destination, exact: true }) })
+    await referral.getByLabel('Update referral status').selectOption('accepted')
+    await referral.getByRole('button', { name: 'Save status' }).click()
+    await referral.getByLabel('Update referral status').selectOption('completed')
+    await referral.getByLabel('Outcome / context (required)').fill('Synthetic receiving clinician assessment completed; follow-up plan recorded.')
+    await referral.getByRole('button', { name: 'Save status' }).click()
+    await expect(referral).toHaveCount(0)
+    await page.getByLabel('Filter referrals').selectOption('closed')
+    await expect(referral.getByText('completed', { exact: true })).toBeVisible()
+    await expect(referral.getByText(`Synthetic Browser${viewport.name}`, { exact: true })).toBeVisible()
+    await expect(referral.getByText(`Record ID: BROWSER-${run}`, { exact: true })).toBeVisible()
+    await audit(page, `${viewport.name}-referrals`, info)
+    await page.screenshot({ path: resolve(imageDir, `${viewport.name}-referrals.png`), fullPage: true })
+  })
+}
+
+test('keyboard-only login, mobile menu, focus restoration and required-field validation', async ({ page }, info) => {
+  const access = credentials()
+  await page.setViewportSize({ width: 375, height: 812 })
+  await page.goto('/')
+  await page.getByLabel('Email address').focus()
+  await page.keyboard.type(access.email)
+  await page.keyboard.press('Tab')
+  await expect(page.getByLabel('Password', { exact: true })).toBeFocused()
+  await page.keyboard.type(access.password)
+  await page.keyboard.press('Tab')
+  await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeFocused()
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('heading', { name: 'A clearer view of care.' })).toBeVisible()
+  const menu = page.getByRole('button', { name: 'Open navigation', exact: true })
+  await menu.focus()
+  await page.keyboard.press('Enter')
+  const dialog = page.getByRole('dialog', { name: 'Workspace navigation' })
+  await expect(dialog).toBeVisible()
+  await expect(dialog.getByRole('button', { name: 'NCDAI 2.0 overview' })).toBeFocused()
+  await page.keyboard.press('Shift+Tab')
+  await expect(dialog.getByRole('button', { name: 'Sign out', exact: true })).toBeFocused()
+  await page.keyboard.press('Tab')
+  await expect(dialog.getByRole('button', { name: 'NCDAI 2.0 overview' })).toBeFocused()
+  await audit(page, 'mobile-navigation', info)
+  await page.keyboard.press('Escape')
+  await expect(menu).toBeFocused()
+  await expect(page.getByRole('navigation', { name: 'Main navigation' })).toHaveCount(0)
+  await page.keyboard.press('Enter')
+  await dialog.getByRole('button', { name: 'Patients', exact: true }).focus()
+  await page.keyboard.press('Enter')
+  await expect(page.locator('#main-content')).toBeFocused()
+  await page.getByRole('button', { name: 'Register patient', exact: true }).focus()
+  await page.keyboard.press('Enter')
+  await expect(page.getByLabel('Record ID', { exact: true })).toBeFocused()
+  await page.getByRole('button', { name: 'Create patient record' }).focus()
+  await page.keyboard.press('Enter')
+  await expect(page.getByLabel('Record ID', { exact: true })).toBeFocused()
+  expect(await page.getByLabel('Record ID', { exact: true }).evaluate((input: HTMLInputElement) => input.validity.valueMissing)).toBeTruthy()
+})
+
+test('administrator navigation exposes audit only without making clinical API requests', async ({ page }, info) => {
+  const requested: string[] = []
+  await page.route('**/api/**', async route => {
+    const path = new URL(route.request().url()).pathname
+    requested.push(path)
+    if (path === '/api/auth/session') return route.fulfill({ json: { user: { id: 'synthetic-admin', email: 'synthetic-admin@example.invalid', display_name: 'Synthetic administrator', role: 'admin', facility_id: 'synthetic-facility', facility_name: 'Synthetic facility' }, csrf_token: 'synthetic-ui-test-token' } })
+    if (path === '/api/audit') return route.fulfill({ json: [] })
+    return route.fulfill({ status: 403, json: { detail: 'Clinical access is unavailable for this role.' } })
+  })
+  await page.goto('/')
+  const nav = page.getByRole('navigation', { name: 'Main navigation' })
+  await expect(nav.getByRole('button', { name: 'Audit trail', exact: true })).toBeVisible()
+  await expect(nav.getByRole('button')).toHaveCount(1)
+  await expect(page.getByRole('button', { name: 'Find a patient' })).toHaveCount(0)
+  await page.getByRole('button', { name: 'NCDAI 2.0 overview' }).click()
+  await expect(nav.getByRole('button')).toHaveCount(1)
+  expect(requested.filter(path => !['/api/auth/session', '/api/audit'].includes(path))).toEqual([])
+  await audit(page, 'desktop-admin-audit', info)
+})

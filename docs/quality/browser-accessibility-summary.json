@@ -1,0 +1,269 @@
+{
+  "checked_on": "2026-09-12",
+  "browser": "Playwright bundled Chromium 153",
+  "scope": "Synthetic local standalone application; engineering verification, not clinical validation or WCAG certification",
+  "views": [
+    {
+      "view": "desktop-admin-audit",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 17,
+      "manual_review_checks": []
+    },
+    {
+      "view": "desktop-assessment",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 28,
+      "manual_review_checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": 4
+        }
+      ]
+    },
+    {
+      "view": "desktop-dashboard",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 22,
+      "manual_review_checks": []
+    },
+    {
+      "view": "desktop-intake",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 26,
+      "manual_review_checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": 3
+        }
+      ]
+    },
+    {
+      "view": "desktop-login",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 14,
+      "manual_review_checks": []
+    },
+    {
+      "view": "desktop-referrals",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 18,
+      "manual_review_checks": []
+    },
+    {
+      "view": "desktop-registration",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 23,
+      "manual_review_checks": []
+    },
+    {
+      "view": "mobile-assessment",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 28,
+      "manual_review_checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": 9
+        }
+      ]
+    },
+    {
+      "view": "mobile-dashboard",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 22,
+      "manual_review_checks": []
+    },
+    {
+      "view": "mobile-intake",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 27,
+      "manual_review_checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": 3
+        }
+      ]
+    },
+    {
+      "view": "mobile-login",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 14,
+      "manual_review_checks": []
+    },
+    {
+      "view": "mobile-navigation",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 20,
+      "manual_review_checks": []
+    },
+    {
+      "view": "mobile-referrals",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 19,
+      "manual_review_checks": []
+    },
+    {
+      "view": "mobile-registration",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 24,
+      "manual_review_checks": []
+    },
+    {
+      "view": "tablet-assessment",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 28,
+      "manual_review_checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": 3
+        }
+      ]
+    },
+    {
+      "view": "tablet-dashboard",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 22,
+      "manual_review_checks": []
+    },
+    {
+      "view": "tablet-intake",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 26,
+      "manual_review_checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "view": "tablet-login",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 14,
+      "manual_review_checks": []
+    },
+    {
+      "view": "tablet-referrals",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 18,
+      "manual_review_checks": []
+    },
+    {
+      "view": "tablet-registration",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "violations": 0,
+      "serious_or_critical": 0,
+      "automated_checks_passed": 24,
+      "manual_review_checks": []
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+name: NCDAI quality and recovery
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install backend and audit tools
+        run: |
+          python -m pip install --upgrade pip==26.2.1
+          python -m pip install -r backend/requirements.txt pip-audit==2.10.1
+      - name: Backend, security and regression tests
+        env:
+          PYTHONPATH: backend
+        run: python -m pytest backend/tests tests/database/test_audit_timezone.py -q --junitxml=.runtime/ci/backend.xml
+      - name: Dependency vulnerability audit
+        run: python -m pip_audit --progress-spinner off
+      - name: Frozen synthetic cases using SQLite
+        run: python scripts/run_case_workflows.py docs/test-results/ci-cases-sqlite.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: backend-verification
+          path: |
+            .runtime/ci/backend.xml
+            docs/test-results/ci-cases-sqlite.json
+          include-hidden-files: true
+          retention-days: 14
+
+  frontend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.18.0'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --audit-level=high
+
+  postgres:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18.4
+        env:
+          POSTGRES_USER: ncdai_ci
+          # Ephemeral synthetic CI fixture, never a deployment credential.
+          POSTGRES_PASSWORD: ci_synthetic_database_only
+          POSTGRES_DB: ncdai_ci_checks
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ncdai_ci -d ncdai_ci_checks"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      NCDAI_CI_DATABASE_URL: postgresql+psycopg://ncdai_ci:ci_synthetic_database_only@127.0.0.1:5432/ncdai_ci_checks
+      NCDAI_CASE_DATABASE_URL: postgresql+psycopg://ncdai_ci:ci_synthetic_database_only@127.0.0.1:5432/ncdai_ci_cases
+      NCDAI_CI_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - run: python -m pip install -r backend/requirements.txt
+      - name: Migration, constraints, concurrency and recovery
+        run: python scripts/cloud_postgres_checks.py
+      - name: Full cases on migrated PostgreSQL
+        run: python scripts/run_case_workflows.py docs/test-results/ci-cases-postgres.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: postgres-verification
+          path: |
+            docs/test-results/ci-postgres-verification.json
+            docs/test-results/ci-cases-postgres.json
+          retention-days: 14
