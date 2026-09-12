@@ -1,0 +1,32 @@
+{
+  "checked_at": "2026-09-12T18:13:43.602007+00:00",
+  "origin": "https://ncdai-2.vercel.app",
+  "kind": "Hosted synthetic engineering acceptance; not clinical validation",
+  "checks": [
+    "ready database/rules; unauthenticated records denied",
+    "authenticated session with secure HttpOnly Strict cookie",
+    "persisted fictional encounter; emergency findings and evidence retained",
+    "live provider request preserves all original findings and urgency",
+    "clinician decisions persisted; reviewed record rejects alteration",
+    "identified referral completed; reviewed FHIR export retrieved",
+    "audit chain valid; logout revokes access"
+  ],
+  "ai": {
+    "status": "ready",
+    "reason_code": null,
+    "provider": "deepseek",
+    "model": "deepseek-v4-pro",
+    "prompt_version": "ncdai-briefing-select-v1.2",
+    "usage": {
+      "input_tokens": 312,
+      "output_tokens": 35,
+      "total_tokens": 347
+    },
+    "latency_ms": 3124
+  },
+  "audit": {
+    "valid": true,
+    "events": 11
+  },
+  "passed": true
+}

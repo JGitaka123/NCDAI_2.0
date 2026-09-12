@@ -42,6 +42,8 @@ uploaded. Artifacts contain sanitized verification summaries and synthetic case
 results, retained for 14 days. Service credentials are deliberately public,
 ephemeral test fixtures and must never become deployment credentials.
 
+The [quality run at 9900aca](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34710140027) passed all three jobs, including backend package construction for Vercel and the PostgreSQL transaction-timeout regression. The package explicitly discovers `app*`; migrations remain deployment source files rather than an accidentally discovered second Python distribution.
+
 CI workflow files and syntax checks are not evidence of a completed CI run.
 Only a successful run and its artifacts establish those checks passed at its
 recorded commit. Browser and accessibility testing are separately reported;

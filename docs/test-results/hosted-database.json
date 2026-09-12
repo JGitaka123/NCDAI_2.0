@@ -1,0 +1,12 @@
+{
+  "server_version": "18.6 (2078fcb)",
+  "migration": "20260912_guards",
+  "runtime_role": "ncdai_app",
+  "statement_timeout": "15s",
+  "lock_timeout": "5s",
+  "schema_create_allowed": false,
+  "audit_update_allowed": false,
+  "pooler_to_database_ssl_reported": false,
+  "client_to_neon_tls_in_use": true,
+  "transport_note": "libpq confirms client TLS. pg_stat_ssl describes the pooler-to-database backend session, not the client-to-Neon TLS connection."
+}

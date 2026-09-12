@@ -6,6 +6,8 @@ NCDAI 2.0 brings patient history, structured assessment, evidence-linked safety 
 
 This release is **research software for synthetic cases only**. It is not approved for patient care. It does not autonomously diagnose, prescribe or calculate medication doses. The selected medication checks are not a complete drug-interaction service. Engineering tests do not establish clinical accuracy, effectiveness or adoption.
 
+**Hosted demonstration:** [ncdai-2.vercel.app](https://ncdai-2.vercel.app). Use the privately provided account. See the [deployment and acceptance record](docs/deployment.md).
+
 ## What is implemented
 
 - Patient registration and search, encounter history, current observations with explicit units and unknown states.

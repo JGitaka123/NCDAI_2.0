@@ -1,6 +1,6 @@
 # Browser and accessibility verification
 
-Checked 12 September 2026 against the standalone local application, with the actual backend and a synthetic test account. The interface keeps the NCDAI patient-and-encounter workflow while improving readable clinical content, explicit review, and referral follow-through.
+Checked 12 September 2026 against the standalone local application, with the actual backend and a synthetic test account. The interface keeps the NCDAI patient-and-encounter workflow while improving readable clinical content, explicit review, and referral follow-through. The latest run includes the [restored original coral branding and logo](branding-provenance.md).
 
 ## Observed results
 

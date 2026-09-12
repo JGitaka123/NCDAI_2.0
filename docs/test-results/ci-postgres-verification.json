@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-09-12T17:49:05.374285+00:00",
+  "generated_at": "2026-09-12T18:05:55.097832+00:00",
   "synthetic_only": true,
   "kind": "Isolated CI database engineering checks, not clinical validation",
   "checks": [
     {
       "check": "migration_upgrade_head",
       "passed": true,
-      "seconds": 0.146
+      "seconds": 0.111
     },
     {
       "check": "migration_metadata_no_drift",
       "passed": true,
-      "seconds": 0.148
+      "seconds": 0.116
     },
     {
       "check": "bounded_statement_and_lock_waits",
       "passed": true,
-      "seconds": 0.015
+      "seconds": 0.009
     },
     {
       "check": "audit_update_blocked",
@@ -51,52 +51,52 @@
     {
       "check": "cross_facility_encounter_blocked",
       "passed": true,
-      "seconds": 0.002
+      "seconds": 0.001
     },
     {
       "check": "cross_facility_referral_blocked",
       "passed": true,
-      "seconds": 0.002
+      "seconds": 0.001
     },
     {
       "check": "record_and_audit_rollback_atomicity",
       "passed": true,
-      "seconds": 0.009
+      "seconds": 0.008
     },
     {
       "check": "32_concurrent_audit_appends_without_forks",
       "passed": true,
-      "seconds": 0.095
+      "seconds": 0.075
     },
     {
       "check": "audit_integrity_across_four_timezones",
       "passed": true,
-      "seconds": 0.022
+      "seconds": 0.018
     },
     {
       "check": "valid_referral_lifecycle",
       "passed": true,
-      "seconds": 0.002
+      "seconds": 0.004
     },
     {
       "check": "isolated_migration_upgrade_downgrade_reupgrade",
       "passed": true,
-      "seconds": 0.582
+      "seconds": 0.528
     },
     {
       "check": "logical_dump_restore_records_chain_triggers_migration",
       "passed": true,
-      "seconds": 0.367
+      "seconds": 0.313
     },
     {
       "check": "service_restart_record_persistence",
       "passed": true,
-      "seconds": 1.328
+      "seconds": 1.567
     },
     {
       "check": "separate_migrated_database_for_full_case_workflows",
       "passed": true,
-      "seconds": 0.364
+      "seconds": 0.293
     }
   ],
   "limits": [
@@ -109,11 +109,11 @@
   "snapshot": {
     "facilities": {
       "count": 2,
-      "sha256": "e5f60306447ea4396b3afcb6335e74e2dcd27b302dd57c7d0afcb012682c84b5"
+      "sha256": "89598229f3467f2067935290192a0cb8961f1d633edda61b1feed62a63efa611"
     },
     "users": {
       "count": 1,
-      "sha256": "83730581f89e6a2ccf56e5a03911f95c9128efc0292c1ab46b1f13ce29f2579b"
+      "sha256": "e5c4b5d913897975a20175badc248ba1a65508e68d119cc31c7287ec853eb4e5"
     },
     "auth_sessions": {
       "count": 0,
@@ -125,19 +125,19 @@
     },
     "patients": {
       "count": 1,
-      "sha256": "4f7dd06f8e67bd5bcdc6244f2bacbda4dce0b6fc956c1e3e4b49fea6bc97e9d7"
+      "sha256": "e227770d0a97c619930cb564c1781294fabef09d42b3033af76cc8b93de0a5bc"
     },
     "encounters": {
       "count": 1,
-      "sha256": "d68c007493b6e07e835df783fb21efecf6a763e575977771fd69b8abc6d03db2"
+      "sha256": "387ee7747bface87a1eebb96a31ed738c1c145a78055b48b1475b5638fabc405"
     },
     "referrals": {
       "count": 1,
-      "sha256": "a4d90d5af1b78b9daf4bf13037a7cea0639d568dbf55ad82ea3692736129bbcf"
+      "sha256": "d9fb4c0e467402af4254811d47b36cc6f760a98b373bc6bb071f7b558b5bef78"
     },
     "audit_events": {
       "count": 34,
-      "sha256": "93f8ce999c4445b1d058fce42de0a4beb09ad7645e3d5d30e3138d3b82f4e162"
+      "sha256": "5ad40964f9f1b09d127f436d3cac61ef70f4d45b510624799546f621a70807b7"
     }
   },
   "passed": 19,
