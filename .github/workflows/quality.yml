@@ -33,6 +33,8 @@ jobs:
         env:
           PYTHONPATH: backend
         run: python -m pytest backend/tests tests/database/test_audit_timezone.py -q --junitxml=.runtime/ci/backend.xml
+      - name: Backend deployment package
+        run: python -m pip wheel --no-deps --wheel-dir .runtime/wheels ./backend
       - name: Dependency vulnerability audit
         run: python -m pip_audit --progress-spinner off
       - name: Frozen synthetic cases using SQLite
@@ -102,6 +104,11 @@ jobs:
         run: python scripts/cloud_postgres_checks.py
       - name: Full cases on migrated PostgreSQL
         run: python scripts/run_case_workflows.py docs/test-results/ci-cases-postgres.json
+      - name: Transaction-pooler timeout regression
+        env:
+          PYTHONPATH: backend
+          NCDAI_DATABASE_TEST_URL: ${{ env.NCDAI_CI_DATABASE_URL }}
+        run: python -m pytest backend/tests/test_postgres_transaction_limits.py -q
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:

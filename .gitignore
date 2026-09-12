@@ -9,6 +9,8 @@
 **/htmlcov/
 **/node_modules/
 **/dist/
+**/build/
+**/*.egg-info/
 **/*.tsbuildinfo
 **/*.db
 **/*.db-*
@@ -26,6 +28,8 @@ playwright-report/
 .DS_Store
 Thumbs.db
 .vercel/
+.agents/
+skills-lock.json
 
 .vercel
 .env*
