@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import { ArrowRight, HeartPulse, LoaderCircle, LockKeyhole, ShieldCheck } from 'lucide-react'
 import { api, message } from './api'
 import type { Session } from './types'
+import { BrandLogo } from './Brand'
 import { Field, Notice } from './components'
 
 export default function Login({ onLogin, expired }: { onLogin: (session: Session) => void; expired: boolean }) {
@@ -13,7 +14,7 @@ export default function Login({ onLogin, expired }: { onLogin: (session: Session
   }
   return <div className="login-page">
     <div className="login-story">
-      <a className="brand brand-light" href="#main"><span className="brand-symbol"><HeartPulse size={26} /></span><span>NCDAI <em>2.0</em></span></a>
+      <a className="brand brand-light" href="#main"><BrandLogo /><span>NCDAI <em>2.0</em></span></a>
       <div className="login-story-content"><div className="eyebrow">A MORE CONNECTED CARE JOURNEY</div><h1>Clearer decisions.<br />Continuity of care.</h1><p>A clinical workspace for adult noncommunicable disease care. Built around the patient, guided by evidence, reviewed by you.</p><div className="login-points"><span><ShieldCheck size={20} /> Clinician review at every decision</span><span><HeartPulse size={20} /> One longitudinal patient record</span><span><LockKeyhole size={20} /> Access within your facility</span></div></div>
       <div className="login-footnote">NCDAI 2.0 · Kenya-first NCD care</div>
     </div>

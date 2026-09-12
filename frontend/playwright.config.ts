@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test'
+import { resolve } from 'node:path'
 
 export default defineConfig({
   testDir: './tests/browser',
@@ -7,7 +8,7 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: 0,
-  reporter: [['list'], ['json', { outputFile: '../.runtime/browser/results.json' }], ['html', { open: 'never' }]],
+  reporter: [['list'], ['json', { outputFile: resolve(process.env.NCDAI_BROWSER_ARTIFACT_DIR || '../.runtime/browser', 'results.json') }], ['html', { open: 'never' }]],
   use: {
     baseURL: process.env.NCDAI_BROWSER_URL || 'http://127.0.0.1:5173',
     browserName: 'chromium',

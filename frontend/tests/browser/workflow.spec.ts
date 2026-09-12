@@ -3,8 +3,8 @@ import AxeBuilder from '@axe-core/playwright'
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const artifactDir = resolve('../.runtime/browser')
-const imageDir = resolve('../docs/images')
+const artifactDir = resolve(process.env.NCDAI_BROWSER_ARTIFACT_DIR || '../.runtime/browser')
+const imageDir = resolve(process.env.NCDAI_BROWSER_IMAGE_DIR || '../docs/images')
 mkdirSync(artifactDir, { recursive: true })
 mkdirSync(imageDir, { recursive: true })
 
@@ -45,10 +45,14 @@ for (const viewport of [{ name: 'desktop', width: 1366, height: 900 }, { name: '
     await page.setViewportSize(viewport)
     await page.goto('/')
     await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible()
+    await expect(page.locator('.brand-logo')).toHaveAttribute('src', '/brand/ncdai-logo.png')
+    await expect(page.locator('.login-submit')).toHaveCSS('background-color', 'rgb(255, 87, 87)')
     await audit(page, `${viewport.name}-login`, info)
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
     await page.screenshot({ path: resolve(imageDir, `${viewport.name}-login.png`), fullPage: true })
     await login(page)
     await audit(page, `${viewport.name}-dashboard`, info)
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
     await page.screenshot({ path: resolve(imageDir, `${viewport.name}-dashboard.png`), fullPage: true })
     await navigate(page, 'Patients')
     await page.getByRole('button', { name: 'Register patient', exact: true }).click()
@@ -85,6 +89,7 @@ for (const viewport of [{ name: 'desktop', width: 1366, height: 900 }, { name: '
     await page.getByLabel('Medicine adherence').selectOption('taking')
     await page.getByLabel('Medicine availability').selectOption('available')
     await audit(page, `${viewport.name}-intake`, info)
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
     await page.screenshot({ path: resolve(imageDir, `${viewport.name}-intake.png`), fullPage: true })
     await page.getByRole('button', { name: 'Assess & review', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Emergency findings require immediate clinical attention' })).toBeVisible()
@@ -101,6 +106,7 @@ for (const viewport of [{ name: 'desktop', width: 1366, height: 900 }, { name: '
     await expect(page.getByRole('alert')).toHaveCount(0)
     await page.getByLabel('Overall review note (optional)').fill('Synthetic browser workflow: clinician has reviewed each evidence-linked action.')
     await audit(page, `${viewport.name}-assessment`, info)
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
     await page.screenshot({ path: resolve(imageDir, `${viewport.name}-assessment.png`), fullPage: true })
     await page.getByRole('button', { name: 'Record review & lock encounter' }).click()
     await expect(page.getByText('Clinician review recorded.', { exact: true })).toBeVisible()
@@ -132,6 +138,7 @@ for (const viewport of [{ name: 'desktop', width: 1366, height: 900 }, { name: '
     await expect(referral.getByText(`Synthetic Browser${viewport.name}`, { exact: true })).toBeVisible()
     await expect(referral.getByText(`Record ID: BROWSER-${run}`, { exact: true })).toBeVisible()
     await audit(page, `${viewport.name}-referrals`, info)
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
     await page.screenshot({ path: resolve(imageDir, `${viewport.name}-referrals.png`), fullPage: true })
   })
 }

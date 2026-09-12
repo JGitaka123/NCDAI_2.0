@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync, statSync, mkdirSync, writeFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 
-const input = resolve('../.runtime/browser')
+const input = resolve(process.env.NCDAI_BROWSER_ARTIFACT_DIR || '../.runtime/browser')
 const run = JSON.parse(readFileSync(resolve(input, 'results.json'), 'utf8'))
 const started = Date.parse(run.stats.startTime)
 if (run.stats.unexpected || run.stats.skipped || run.stats.flaky || run.stats.expected !== 5) {
@@ -21,10 +21,11 @@ const views = readdirSync(input).filter(name => name.endsWith('-axe.json')).map(
   }
 })
 if (views.length !== 20) throw new Error('Expected 20 audits from this browser run.')
-const destination = resolve('../docs/quality')
-mkdirSync(destination, { recursive: true })
-writeFileSync(resolve(destination, 'browser-accessibility-summary.json'), JSON.stringify({
+const destination = resolve(process.env.NCDAI_BROWSER_SUMMARY_PATH || '../docs/quality/browser-accessibility-summary.json')
+mkdirSync(dirname(destination), { recursive: true })
+writeFileSync(destination, JSON.stringify({
   checked_on: run.stats.startTime,
+  target_url: process.env.NCDAI_BROWSER_URL || 'http://127.0.0.1:5173',
   playwright_version: run.config.version,
   browser: process.env.NCDAI_BROWSER_CHANNEL || 'Bundled Chromium',
   scope: 'Synthetic standalone application; engineering verification, not clinical validation or WCAG certification',

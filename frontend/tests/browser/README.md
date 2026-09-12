@@ -2,6 +2,8 @@
 
 Start the local backend and Vite frontend using the repository setup guide. Tests target `http://127.0.0.1:5173` by default; set `NCDAI_BROWSER_URL` for an alternative test deployment. The service must contain a synthetic clinician or supervisor account.
 
+To preserve separate deployment evidence, set `NCDAI_BROWSER_ARTIFACT_DIR` (raw JSON and downloads), `NCDAI_BROWSER_IMAGE_DIR` (screenshots) and `NCDAI_BROWSER_SUMMARY_PATH` (published summary JSON). Relative paths resolve from `frontend`; for example `../.runtime/browser-hosted`, `../docs/images-hosted` and `../docs/quality/browser-accessibility-hosted.json`. The summary generator requires all five tests and all 20 audits from the current run to complete successfully, and rejects stale audit files.
+
 Supply `NCDAI_BROWSER_EMAIL` and `NCDAI_BROWSER_PASSWORD` in the process environment. For local development the runner also supports the ignored `.runtime/demo-access.json` fixture at repository root. Never commit this fixture or place credentials in a test source file.
 
 From `frontend`, run:
@@ -12,7 +14,7 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-The suite performs one complete synthetic emergency scenario at desktop 1366×900, tablet 768×1024 and mobile 375×812 viewports. It registers a patient, records current findings, inspects evidence, rejects incomplete review, reviews every recommendation, verifies locking, records and completes a referral, checks recognizable patient identifiers, and downloads/inspects a FHIR Bundle. Additional tests exercise keyboard-only interaction and administrator navigation. The administrator test simulates API responses to isolate UI authorization behavior; backend access-control tests are separate.
+The suite performs one complete synthetic emergency scenario at desktop 1366×900, tablet 768×1024 and mobile 375×812 viewports. It registers a patient, records current findings, inspects evidence, rejects incomplete review, reviews every recommendation, verifies locking, records and completes a referral, checks recognizable patient identifiers, and downloads/inspects a FHIR Bundle. It also verifies the original NCDAI image path and exact coral primary colour. Additional tests exercise keyboard-only interaction and administrator navigation. The administrator test simulates API responses to isolate UI authorization behavior; backend access-control tests are separate.
 
 Axe checks the login, overview, registration, intake, assessment, referral and mobile navigation views against WCAG A/AA rules supported by axe. Serious or critical violations fail the suite. Layout assertions fail on horizontal **page** overflow; patient tables may scroll within their bounded container. These automated checks are not a WCAG certification or a substitute for screen-reader testing with clinicians.
 
