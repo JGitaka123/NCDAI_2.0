@@ -1,0 +1,42 @@
+{
+  "application_commit": "26de2b6cee2fbc5d3d54e0516181a6fa72e17ced",
+  "ci_run": "https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34713293828",
+  "ci_all_jobs": "passed",
+  "backend": {
+    "collected": 361,
+    "passed": 351,
+    "skipped": 10,
+    "failures": 0,
+    "errors": 0
+  },
+  "frontend_component_tests": 27,
+  "general_case_workflows": {
+    "sqlite": 66,
+    "postgres": 66
+  },
+  "dose_case_workflows": {
+    "sqlite": 75,
+    "postgres": 75
+  },
+  "postgres_database_checks": 19,
+  "browser": {
+    "workflows": 5,
+    "audits": 23,
+    "reported_violations": 0
+  },
+  "clinical_validation": false,
+  "fine_tuning_performed": false,
+  "full_rag_implemented": false,
+  "deployed_commit": "d8cc6e3d246d65fd794494a2b2f77170f703b6d8",
+  "deployment": "dpl_3gL1v8fjJtzmBTtG2qZL7z3UFDp9",
+  "api_region": "fra1",
+  "hosted_acceptance": "passed",
+  "hosted_live_ai": "ready",
+  "deployed_ci_run": "https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34713562013",
+  "deployed_ci_all_jobs": "passed",
+  "hosted_browser": {
+    "workflows": 5,
+    "audits": 23,
+    "reported_violations": 0
+  }
+}

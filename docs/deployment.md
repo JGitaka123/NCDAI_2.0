@@ -9,20 +9,30 @@
 | Item | Recorded value |
 |---|---|
 | Vercel account/project | `jessegitaka-7527s-projects / ncdai-2` |
-| Deployed application commit | `4622c43d36804b5438a93abad1b89a2ffecc6c57` |
-| Deployment | `dpl_GxFjBPcpspWfggDKsnHtjsXr7AgJ` |
-| Vercel inspection | [Deployment details](https://vercel.com/jessegitaka-7527s-projects/ncdai-2/GxFjBPcpspWfggDKsnHtjsXr7AgJ) |
+| Deployed application commit | `d8cc6e3d246d65fd794494a2b2f77170f703b6d8` |
+| Deployment | `dpl_3gL1v8fjJtzmBTtG2qZL7z3UFDp9` |
+| Vercel inspection | [Deployment details](https://vercel.com/jessegitaka-7527s-projects/ncdai-2/3gL1v8fjJtzmBTtG2qZL7z3UFDp9) |
 | Runtime | Vite frontend and Python 3.12 FastAPI services; API function inspected in `fra1` |
 | Database | Dedicated Neon `ncdai-2-db`, Free plan, Frankfurt requested at provisioning; server reports PostgreSQL `18.6 (2078fcb)` |
 | Schema revision | `20260912_guards` |
 | Application database role | `ncdai_app`, separate from the migration owner |
 | Clinical rules | `ncdai-2-rules-0.1.1` |
 | AI provider/model | DeepSeek / `deepseek-v4-pro` |
-| Prompt contract | `ncdai-briefing-select-v1.2` |
+| Prompt contract | `ncdai-briefing-select-v1.3` |
 
 The existing `aifya-web` project was not replaced. NCDAI has its own project, database and canonical domain. Repository changes were pushed to `codex/ncdai-2-platform`; deployment is explicit through the Vercel CLI, rather than automatically publishing every push.
 
-## Hosted acceptance results
+## Current dose-reference release
+
+The hosted version adds four bounded Kenya medicine references and contextual withholding, account password/status operations and a pinned Frankfurt API region. The new [release verification](dose-release-verification.md) records 351 passing backend CI tests, 27 frontend tests, 75 full dose-case workflows and the 66 general NCD workflows. Both case sets pass PostgreSQL and SQLite. The application remains a synthetic engineering preview under the owner-confirmed DHA/ethics scope.
+
+The final Frankfurt deployment passed [hosted API/dose/AI acceptance](test-results/hosted-dose-acceptance.json): emergency dose withheld, eligible amlodipine reference preserved through review, FHIR export and immutable-record controls, valid audit and secure session lifecycle. Its DeepSeek request returned ready with 379 tokens in 1.341 seconds; this is transport/contract evidence, not clinical accuracy.
+
+The region is now declared as `fra1` in `vercel.json`; use `vercel deploy --prod --yes --regions fra1` and inspect the resulting function location. Build machines may still be in `iad1`, which is separate from the verified API execution region. The initial update used the default US API region for fictional acceptance records before this configuration correction. The current deployment uses Frankfurt. No patient-care data was introduced during these checks.
+
+Final hosted browser verification passed all five workflows in 108 seconds, with 23 accessibility scans reporting zero violations. Desktop, tablet and 375px phone layouts passed, along with keyboard and administrator boundaries. [Hosted browser report](quality/hosted-dose-browser-summary.json). All three jobs also passed on the [exact deployed configuration commit](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34713562013).
+
+## Baseline hosted acceptance (prior branded release)
 
 - Public HTTPS readiness returned 200 with the database connected and rules loaded; patient access without a session returned 401.
 - An actual hosted consultation registered a fictional patient, saved and assessed an encounter, retained emergency findings and evidence, requested a live DeepSeek briefing, recorded all clinician decisions, retrieved the immutable review, rejected alteration, completed an identified referral and exported reviewed FHIR resources.
@@ -33,7 +43,7 @@ The existing `aifya-web` project was not replaced. NCDAI has its own project, da
 
 Evidence: [hosted API/AI workflow](test-results/hosted-acceptance.json), [hosted database checks](test-results/hosted-database.json), [hosted browser summary](quality/hosted-browser-summary.json), [hosted desktop screenshot](images-hosted/desktop-dashboard.png), [hosted mobile screenshot](images-hosted/mobile-dashboard.png). Detailed local browser artifacts remain private because diagnostics can contain session-related material; published screenshots contain fictional records only.
 
-The [quality workflow at the deployed application commit](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34710484479) passed all three jobs. Broader evidence includes 240 backend tests, 21 frontend tests, 19 PostgreSQL recovery/integrity checks, a separate transaction-pooling regression, and all 66 complete synthetic cases on both PostgreSQL and SQLite. Counts and conditional skips are explained in [engineering verification](verification.md); repeated runs do not increase the number of distinct clinical cases.
+The [quality workflow at the prior branded application commit](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34710484479) passed all three jobs. Broader evidence includes 240 backend tests, 21 frontend tests, 19 PostgreSQL recovery/integrity checks, a separate transaction-pooling regression, and all 66 complete synthetic cases on both PostgreSQL and SQLite. Counts and conditional skips are explained in [engineering verification](verification.md); repeated runs do not increase the number of distinct clinical cases.
 
 ## Deployment protections and operations
 
@@ -47,4 +57,4 @@ Use the [operations runbook](operations.md) for migrations, account administrati
 
 ## Release boundary
 
-This is **synthetic-only research software, not approved for patient care**. It implements selected adult major NCD workflows, not every NCD or comprehensive prescribing. The source and clinical-review gaps in [the evidence review](evidence-review.md) remain open. Aifya EMR and QAfya integration awaits their APIs. Independent clinical validation, the pilot protocol and the grant concept remain the next phase; deployment and engineering test success do not replace them.
+The owner confirms DHA and ethics approvals held in office files cover care and medication recommendations. This hosted build remains a **synthetic engineering preview** with selected adult pathways and four bounded medicine references. Independent clinical/pharmacy adjudication, broader source and medicine coverage and operational evaluation remain evidence work. The [validation, pilot and grant package](evaluation/README.md) is drafted; the study has not been conducted or submitted. Aifya EMR and QAfya integration awaits their APIs. The model has not been fine-tuned, and complete guideline RAG remains to be implemented and evaluated as described in the [knowledge strategy](knowledge-and-training-strategy.md).

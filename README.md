@@ -47,6 +47,7 @@ AI is disabled by default. To explicitly enable DeepSeek in the backend process,
 ## Inspect the specifications
 
 - [Engineering verification and release evidence](docs/verification.md)
+- [Dose-reference release verification](docs/dose-release-verification.md)
 - [Kenya knowledge, RAG and model-training strategy](docs/knowledge-and-training-strategy.md)
 - [Validation, pilot, analysis plan and grant concept](docs/evaluation/README.md)
 - [Independent release audit](docs/release-audit.md)
