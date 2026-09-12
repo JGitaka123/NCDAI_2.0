@@ -88,12 +88,19 @@ for (const viewport of [{ name: 'desktop', width: 1366, height: 900 }, { name: '
     await page.getByLabel(/^Allergy status reviewed/).check()
     await page.getByLabel('Medicine adherence').selectOption('taking')
     await page.getByLabel('Medicine availability').selectOption('available')
+    await page.locator('summary').filter({ hasText: 'Medicine reference checks' }).click()
+    await page.getByRole('combobox', { name: 'Catalogue medicine', exact: true }).selectOption('amlodipine_tablet')
+    await page.getByRole('button', { name: 'Check selected medicine', exact: true }).click()
+    await expect(page.getByLabel('Hepatic impairment')).toHaveValue('unknown')
+    await expect(page.getByLabel(/No unresolved contraindications/)).not.toBeChecked()
     await audit(page, `${viewport.name}-intake`, info)
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
     await page.screenshot({ path: resolve(imageDir, `${viewport.name}-intake.png`), fullPage: true })
     await page.getByRole('button', { name: 'Assess & review', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Emergency findings require immediate clinical attention' })).toBeVisible()
     await expect(page.getByText('Do not delay emergency care to complete this review.')).toBeVisible()
+    await expect(page.locator('.dose-result').getByText('Reference withheld', { exact: true })).toBeVisible()
+    await expect(page.locator('.dose-reference')).toHaveCount(0)
     await page.getByRole('button', { name: 'Record review & lock encounter' }).click()
     await expect(page.getByRole('alert')).toContainText('decision')
     const recommendations = page.locator('article.recommendation')
@@ -140,6 +147,10 @@ for (const viewport of [{ name: 'desktop', width: 1366, height: 900 }, { name: '
     await audit(page, `${viewport.name}-referrals`, info)
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
     await page.screenshot({ path: resolve(imageDir, `${viewport.name}-referrals.png`), fullPage: true })
+    await navigate(page, 'Account')
+    await expect(page.getByRole('heading', { name: 'Change password', exact: true })).toBeVisible()
+    await audit(page, `${viewport.name}-account`, info)
+    await page.screenshot({ path: resolve(imageDir, `${viewport.name}-account.png`), fullPage: true })
   })
 }
 
@@ -183,7 +194,7 @@ test('keyboard-only login, mobile menu, focus restoration and required-field val
   expect(await page.getByLabel('Record ID', { exact: true }).evaluate((input: HTMLInputElement) => input.validity.valueMissing)).toBeTruthy()
 })
 
-test('administrator navigation exposes audit only without making clinical API requests', async ({ page }, info) => {
+test('administrator navigation exposes audit and account controls without clinical API requests', async ({ page }, info) => {
   const requested: string[] = []
   await page.route('**/api/**', async route => {
     const path = new URL(route.request().url()).pathname
@@ -195,10 +206,10 @@ test('administrator navigation exposes audit only without making clinical API re
   await page.goto('/')
   const nav = page.getByRole('navigation', { name: 'Main navigation' })
   await expect(nav.getByRole('button', { name: 'Audit trail', exact: true })).toBeVisible()
-  await expect(nav.getByRole('button')).toHaveCount(1)
+  await expect(nav.getByRole('button')).toHaveCount(3)
   await expect(page.getByRole('button', { name: 'Find a patient' })).toHaveCount(0)
   await page.getByRole('button', { name: 'NCDAI 2.0 overview' }).click()
-  await expect(nav.getByRole('button')).toHaveCount(1)
+  await expect(nav.getByRole('button')).toHaveCount(3)
   expect(requested.filter(path => !['/api/auth/session', '/api/audit'].includes(path))).toEqual([])
   await audit(page, 'desktop-admin-audit', info)
 })

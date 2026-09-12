@@ -108,7 +108,9 @@ jobs:
         env:
           PYTHONPATH: backend
           NCDAI_DATABASE_TEST_URL: ${{ env.NCDAI_CI_DATABASE_URL }}
-        run: python -m pytest backend/tests/test_postgres_transaction_limits.py -q
+        run: python -m pytest backend/tests/test_postgres_transaction_limits.py backend/tests/test_account_lifecycle.py -k 'postgres' -q
+      - name: Full dose-reference workflows using PostgreSQL
+        run: python scripts/run_dose_workflows.py docs/test-results/ci-dose-cases-postgres.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
@@ -116,4 +118,5 @@ jobs:
           path: |
             docs/test-results/ci-postgres-verification.json
             docs/test-results/ci-cases-postgres.json
+            docs/test-results/ci-dose-cases-postgres.json
           retention-days: 14

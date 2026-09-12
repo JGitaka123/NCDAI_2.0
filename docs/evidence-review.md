@@ -6,6 +6,8 @@ Reviewed `backend/app/clinical.py`, `backend/app/evidence.py` and `docs/clinical
 
 ## Findings and disposition
 
+**Subsequent update, 12 September 2026:** the owner confirms DHA and ethics approval in office files covers care and medication recommendations. This is accepted as approval-scope confirmation; the exact clinical-rule implementation still needs independent validation. The official Kenya PDF has now been downloaded and hashed, and printed pages16,35,41 were visually inspected. EV-03's adult source-access question is resolved: section4.8 explicitly uses the inclusive3.9mmol/L threshold. The PDF's opening pages do not establish an edition date. [Dose/source verification](dosing-engine.md) records the file hash and new dose-source conflicts. EV-01's broader source licensing, supersession and clinical adjudication work and EV-02's incomplete potassium pathway remain substantive evidence tasks. The original review below is retained as a dated record, not a statement that the owner has no approvals.
+
 | ID / priority | Finding | Required disposition / owner |
 |---|---|---|
 | EV-01 / clinical-release blocker | Bibliographic IDs, sections, access dates and evidence/rule versions are present, but permitted source snapshots, content hashes, exact excerpt/page verification and signed local clinical approval are not held in a release manifest. A live URL and an `is_ready()` metadata check cannot establish reproducible clinical evidence. | Clinical/content owner: freeze permitted evidence artifacts or an approved access record, document license, edition, page/section, supersession and sign-off. Keep synthetic-only status until the actual release is approved. |

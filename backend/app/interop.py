@@ -47,6 +47,10 @@ def encounter_bundle(patient, encounter):
         else:
             # FHIR effective[x] is optional. Record entry time is not collection time.
             item["note"] = [{"text": "Measurement time was not recorded; record creation time must not be interpreted as measurement time."}]
+        dated_lab = data.get("dosing_context", {}).get({"egfr": "renal_observed_at", "potassium": "potassium_observed_at"}.get(suffix, ""))
+        if dated_lab:
+            item["effectiveDateTime"] = dated_lab
+            item.pop("note", None)
         if suffix == "bp-repeat":
             item.setdefault("note", []).append({"text": "Repeat blood pressure; a distinct repeat measurement time was not captured."})
         return item
@@ -94,6 +98,8 @@ def encounter_bundle(patient, encounter):
                  f"Assessment: {encounter.review['assessment_id']}; input version: {encounter.review['input_version']}",
                  f"Evidence version: {assessment.get('evidence_version', 'not recorded')}"]
         decisions = {d["recommendation_id"]: d for d in encounter.review["decisions"]}
+        if assessment.get("dosing", {}).get("results"):
+            lines.append(f"Dose engine: {assessment['dosing']['version']}; manifest: {assessment['dosing']['manifest_sha256']}")
         for recommendation in assessment["recommendations"]:
             decision = decisions[recommendation["id"]]
             lines.append(f"{decision['action'].upper()}: {recommendation['title']} — {decision.get('modified_text') or recommendation['detail']}")

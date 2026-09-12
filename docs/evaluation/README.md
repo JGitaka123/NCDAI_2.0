@@ -1,0 +1,30 @@
+# NCDAI 2.0 evaluation and application package
+
+Draft 0.1 · 12 September 2026 · Prepared for principal investigator and institutional review. No study has been registered, recruited, submitted to a funder or represented as completed by this package.
+
+The project owner confirms that DHA approval and all ethical approvals are already in place and cover care and medication recommendations; the records are held in office files. This package accepts that confirmation and proceeds with the requested planning. Capturing certificate/reference numbers, institutional/site scope, protocol versions and validity dates is an administrative record task, not missing permission. The certificates have not been independently inspected in preparing these drafts, and the drafts themselves are not signed approval records.
+
+The proposed evaluation follows a single coherent design: independently adjudicated validation of a frozen release, then a 12-month implementation evaluation in **12 proposed facilities across three contrasting Kenyan counties**, with usual care, rules-only and rules-plus-AI groups. These counties, facilities, research personnel and partnerships are design assumptions, not confirmed commitments. The user now requests plans alongside the bounded Kenya-guideline dose-support expansion; that expansion requires its own versioned evidence and validation, and does not inherit the existing application's test results automatically.
+
+| Document | Decision it supports |
+|---|---|
+| [Intended use](intended-use.md) | Freeze users, scope, treatment-support boundaries and version-specific approval mapping |
+| [Validation protocol](validation-protocol.md) | Determine whether the exact rules, dose-support and AI briefing implementation performs as specified on new independently labelled cases |
+| [Statistical analysis plan](statistical-analysis-plan.md) | Define denominators, estimands, clustering, missingness and uncertainty before results are inspected |
+| [Pilot protocol](pilot-protocol.md) | Evaluate workflow fit, medication/triage safety, adoption, burden and the incremental value of AI in practice |
+| [Implementation budget](implementation-budget.md) | Reconcile one transparent 12-month evaluation scenario: **USD 403,920**, plus a separate illustrative pre-application readiness budget |
+| [Grant concept](grant-concept.md) | Explain the proposed contribution and a Pathway-A-style evaluation, conditional on the next actual call |
+
+The supplied Spring 2026 EVAH call is closed and is used only as a planning analogue, as requested. Its historic Pathway A ceiling was USD 1 million over 3–12 months, with deployment-ready interventions, regional leadership, at least 80% of funds flowing to eligible regions, and evaluation rather than product development. The actual future call, allowable costs, indirect-cost rules, dates and required attachments must be reconciled before submission. This package makes no claim that a new call is open or that eligibility is confirmed. [EVAH materials portal](https://www.povertyactionlab.org/initiative/evidence-ai-health-evah-rfp).
+
+## Evidence and readiness record
+
+Keep four states distinct: original NCDAI published evidence; completed engineering checks of the current build; new dose-module verification; independent clinical/live evaluation. The original supplied publication reports 300 expert case reviews with 67.0% full and 26.3% partial agreement. These are not diagnostic accuracy or evidence of patient benefit. The owner reports no routine NCDAI use since that study. Do not import evidence from the separate maternal/newborn Aifya application into NCDAI. [Original NCDAI study, supplied version 1](https://doi.org/10.12688/openresafrica.16362.1), [engineering verification](../verification.md), [evidence review](../evidence-review.md).
+
+Complete the evaluation release record: **release commit and database migration; evidence/rules/dose/prompt versions; configured provider/model and processing region; owner-confirmed approval references and scope; accepted clinical hazard log; independent validation result; participating-site records; data controller/processor agreements; user training and incident contacts; registry record; PI/statistician sign-off and date**. Existing approvals should be cross-referenced through their institutional records. If the team later changes the confirmed scope, record that change through the established process. Do not publish credentials, patient data, certificate scans containing private identifiers, or confidential reviewer correspondence.
+
+## Reporting framework
+
+The package is structured for SPIRIT 2025 plus relevant SPIRIT-AI items, CONSORT 2025 with applicable AI/cluster/pilot extensions, DECIDE-AI for early live evaluation, and CHEERS 2022 for economic reporting. These are reporting guides, not certificates, study-design substitutes or Kenya regulatory classifications. A manuscript checklist with document/page mappings should be completed at registration and reporting. NICE's evidence framework informs the proportional evidence discussion, without claiming UK or Kenyan certification. [SPIRIT 2025](https://www.nature.com/articles/s41591-025-03668-w), [SPIRIT-AI](https://www.nature.com/articles/s41591-020-1037-7), [CONSORT 2025](https://www.nature.com/articles/s41591-025-03635-5), [CONSORT-AI](https://www.nature.com/articles/s41591-020-1034-x), [randomised pilot extension](https://www.bmj.com/content/355/bmj.i5239), [DECIDE-AI](https://www.bmj.com/content/377/bmj-2022-070904), [CHEERS 2022](https://www.bmj.com/content/376/bmj-2021-067975), [NICE evidence framework](https://www.nice.org.uk/corporate/ecd7).
+
+PI review priorities are the exact dose-support manifest, administrative approval-reference capture, independent evaluator appointments, county/site selection, feasible recruitment and consent procedures, progression thresholds, locally defensible unit costs and ownership/Global Access arrangements. The remaining entries are decisions to complete, not invitations to restart the design from scratch.

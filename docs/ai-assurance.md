@@ -64,4 +64,6 @@ The final live responses passed the **selection-safety contract**, not a clinici
 
 ## Required evidence before clinical deployment
 
+Update12 September2026: dose-reference integration advances the selection contract to `ncdai-briefing-select-v1.3`, adding four canonical dose-card identifiers and the `dosing` category. Dose values, input notes and medicine-check text are still not sent to the model; the server renders the original validated card. Source records remain exact registry matches. The four dose cards have mocked selection/invented-dose rejection checks; newer hosted-run evidence is recorded separately. The owner's DHA/ethics approval confirmation covers care/medication recommendations and is accepted; independent implementation validation is a separate evidence task. [Knowledge and training strategy](knowledge-and-training-strategy.md), [dose-engine scope](dosing-engine.md).
+
 Independent clinical approval of the underlying rules; clinician assessment of shortlist usefulness and omitted context; repeated-run provider stability and multilingual evaluation; prospective human-factors testing; privacy and cross-border processing review for the chosen provider contract; operational rate/spend limits and monitoring; and prospective clinical validation remain separate release gates. Synthetic engineering tests do not satisfy those gates.

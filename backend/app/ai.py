@@ -21,7 +21,7 @@ from pydantic import BaseModel, ConfigDict, Field, StrictStr, ValidationError
 from .evidence import EVIDENCE_VERSION, registry
 
 
-PROMPT_VERSION = "ncdai-briefing-select-v1.2"
+PROMPT_VERSION = "ncdai-briefing-select-v1.3"
 MAX_RESPONSE_BYTES = 65536
 RULE_IDS = frozenset("""
 EMERGENCY_SYMPTOMS LOW_BP PULSE_EXTREME RESP_SLOW BP_CRISIS BP_SEVERE
@@ -34,6 +34,7 @@ POTASSIUM_MEDICATION_RISK NSAID_RENAL ALLERGY_CONFLICT DUPLICATE_MEDICATION
 MEDICATION_UNSUPPORTED BP_HIGH BP_REVIEW HTN_FOLLOWUP DIABETES_CONFIRM
 DIABETES_REVIEW CKD_REVIEW RESP_CHRONIC_REVIEW CANCER_SCOPE TOBACCO_SUPPORT
 ADHERENCE_REVIEW DATA_COMPLETENESS CLINICIAN_REVIEW
+DOSE_AMLODIPINE_TABLET DOSE_LOSARTAN_TABLET DOSE_LISINOPRIL_TABLET DOSE_METFORMIN_IR_TABLET
 """.split())
 GAP_IDS = frozenset("""
 current_glucose_for_symptoms egfr_for_metformin_review
@@ -43,7 +44,7 @@ glycaemic_measurement egfr oxygen_saturation respiratory_rate pregnancy_status
 known_hypertension known_diabetes known_asthma known_copd known_ckd known_cancer
 medications_reviewed allergies_reviewed symptoms_reviewed observed_at current_observations
 """.split())
-CATEGORIES = frozenset("acute_safety hypertension scope medication_safety respiratory referral kidney diabetes continuity prevention data_quality".split())
+CATEGORIES = frozenset("acute_safety hypertension scope medication_safety respiratory referral kidney diabetes continuity prevention data_quality dosing".split())
 SEVERITY = {"critical": 0, "warning": 1, "info": 2}
 SYSTEM_PROMPT = """You organize an adult NCD clinician consultation briefing.
 The input is a synthetic, deterministic assessment represented only by identifiers.

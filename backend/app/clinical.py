@@ -351,4 +351,5 @@ def assess(data: dict, age: int, sex: str) -> dict:
         "soon": "Clinician review and completion of identified checks are advised; timing needs clinical confirmation.",
         "routine": "Complete the supervised NCD review and agree follow-up; this result does not provide clinical clearance.",
     }[result["urgency"]]
-    return result
+    from .dosing import attach_dosing
+    return attach_dosing(result, data, age, sex)

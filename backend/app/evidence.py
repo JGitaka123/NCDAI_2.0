@@ -6,7 +6,7 @@ redistributed. See docs/clinical-safety-spec.md for operational adaptations.
 
 from copy import deepcopy
 
-EVIDENCE_VERSION = "ncdai-2026-09-12.1"
+EVIDENCE_VERSION = "ncdai-2026-09-12.2"
 REVIEW_STATUS = "proposed_requires_independent_clinician_signoff"
 REVIEWED_ON = "2026-09-12"
 
@@ -30,7 +30,7 @@ SOURCES = {
         "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
         "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf",
         "section": "4.2 diagnosis (p32); 4.5 management (p35); 4.8 acute complications (p41); 5 cancer early detection (p52)",
-        "version": "MOH July 2025 hosted copy; accessed 2026-09-12; edition date requires verification",
+        "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8",
     },
     "WHO_HEARTS_MEDS_2018": {
         "source_id": "WHO_HEARTS_MEDS_2018",
@@ -80,6 +80,20 @@ SOURCES = {
         "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=03a497fe-fb09-4b2c-8ee0-2019600192b8",
         "section": "5.1 fetal toxicity; 5.3 renal impairment; 5.5 potassium; 7.1, 7.3, 7.4 interactions",
         "version": "Label updated 2025-04-11; accessed 2026-09-12",
+    },
+    "AMLODIPINE_LABEL": {
+        "source_id": "AMLODIPINE_LABEL",
+        "title": "DailyMed: Amlodipine besylate tablets prescribing information",
+        "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=090f3e51-8129-4b5d-97f9-ab410e14df2d",
+        "section": "2.1 adult dosing; 5 warnings; 7 interactions; 8 special populations",
+        "version": "Set ID 090f3e51-8129-4b5d-97f9-ab410e14df2d; accessed 2026-09-12",
+    },
+    "LOSARTAN_LABEL": {
+        "source_id": "LOSARTAN_LABEL",
+        "title": "DailyMed: Losartan potassium prescribing information",
+        "url": "https://www.dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=1bf520a2-a50e-a6ae-0fdf-9be4e69729c0",
+        "section": "2 dosing; 4 contraindications; 5 warnings; 7 interactions",
+        "version": "Set ID 1bf520a2-a50e-a6ae-0fdf-9be4e69729c0; accessed 2026-09-12",
     },
     "UKKA_POTASSIUM_2026": {
         "source_id": "UKKA_POTASSIUM_2026",
@@ -131,6 +145,13 @@ SOURCES = {
         "version": "0.1; 2026-09-12; NOT clinician approved",
     },
 }
+
+
+for _key, _section in {
+    "KENYA_DOSES_HTN": "Table 4, printed page 16 (PDF page 25); selected oral antihypertensive starting and maximum doses",
+    "KENYA_DOSES_DM": "4.5, printed page 35 (PDF page 44); metformin initial dose and titration ceiling; renal scope restricted by NCDAI policy",
+}.items():
+    SOURCES[_key] = {**SOURCES["KENYA_NCD_PROTOCOLS"], "source_id": _key, "section": _section}
 
 
 def evidence(*source_ids: str) -> list[dict]:

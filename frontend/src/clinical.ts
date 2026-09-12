@@ -1,4 +1,8 @@
-import type { ClinicalData, Decision, Encounter, Recommendation } from './types'
+import type { ClinicalData, Decision, DosingContext, Encounter, Recommendation } from './types'
+
+export function emptyDosingContext(): DosingContext {
+  return { hepatic_impairment: 'unknown', breastfeeding: 'unknown', acute_illness: 'unknown', dialysis: 'unknown', frailty: 'unknown', contraindications_reviewed: false, interactions_reviewed: false, renal_observed_at: null, potassium_observed_at: null }
+}
 
 export function emptyClinicalData(): ClinicalData {
   return {
@@ -9,6 +13,7 @@ export function emptyClinicalData(): ClinicalData {
     oxygen_saturation: null, respiratory_rate: null, tobacco_use: 'unknown',
     medications: [], medications_reviewed: false, allergies: [], allergies_reviewed: false, symptoms: [], symptoms_reviewed: false,
     adherence: 'unknown', notes: '', observed_at: null, medicine_availability: 'unknown',
+    dosing_requests: [], dosing_context: emptyDosingContext(),
   }
 }
 

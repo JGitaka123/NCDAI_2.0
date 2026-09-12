@@ -20,7 +20,7 @@ const views = readdirSync(input).filter(name => name.endsWith('-axe.json')).map(
     manual_review_checks: result.incomplete,
   }
 })
-if (views.length !== 20) throw new Error('Expected 20 audits from this browser run.')
+if (views.length !== 23) throw new Error('Expected 23 audits from this browser run.')
 const destination = resolve(process.env.NCDAI_BROWSER_SUMMARY_PATH || '../docs/quality/browser-accessibility-summary.json')
 mkdirSync(dirname(destination), { recursive: true })
 writeFileSync(destination, JSON.stringify({

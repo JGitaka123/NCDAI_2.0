@@ -141,7 +141,8 @@ def create_app(settings: Settings | None = None):
 
     def user_json(db, user):
         return {"id": user.id, "email": user.email, "display_name": user.display_name,
-                "role": user.role, "facility_id": user.facility_id, "facility_name": db.get(Facility, user.facility_id).name}
+                "role": user.role, "active": user.active, "facility_id": user.facility_id,
+                "facility_name": db.get(Facility, user.facility_id).name}
 
     def patient_json(patient):
         return {field: getattr(patient, field) for field in ["id", "facility_id", "external_id", "given_name", "family_name", "date_of_birth", "sex", "female_pregnancy_status", "phone", "synthetic"]}
@@ -215,7 +216,9 @@ def create_app(settings: Settings | None = None):
                 raise HTTPException(429, "Too many sign-in attempts; wait ten minutes", headers={"Retry-After": "600"})
         db.add_all([LoginAttempt(key=key) for key, _ in keys])
         db.execute(delete(LoginAttempt).where(LoginAttempt.created_at < utcnow() - timedelta(days=1)))
-        user = db.scalar(select(User).where(User.email == email))
+        # Serialize credential verification and session issuance with password
+        # changes/deactivation, so a racing old-password sign-in cannot survive.
+        user = db.scalar(select(User).where(User.email == email).with_for_update())
         valid = verify_password(payload.password, user.password_hash if user else dummy_password)
         if not user or not valid or not user.active:
             db.commit()
@@ -302,6 +305,11 @@ def create_app(settings: Settings | None = None):
         change_encounter(db, user, encounter, payload.expected_version, data=payload.data.model_dump(mode="json"), assessment=None, review=None)
         commit_change(db, user, "encounter.update", "encounter", encounter.id)
         return encounter_json(encounter)
+
+    @api.get("/api/dosing/catalogue")
+    def dosing_catalogue(user: CLINICAL):
+        from .dosing import catalogue
+        return catalogue()
 
     @api.post("/api/encounters/{encounter_id}/assess")
     def assess_encounter(encounter_id: str, db: DB, user: CLINICAL):
@@ -427,6 +435,9 @@ def create_app(settings: Settings | None = None):
         commit_change(db, user, "export.fhir_bundle", "encounter", encounter.id)
         return JSONResponse(output, media_type="application/fhir+json")
 
+    from .account_routes import install_account_routes
+    install_account_routes(api, get_db=get_db, authenticated=authenticated,
+                           commit_change=commit_change, user_json=user_json, settings=settings)
     return api
 
 

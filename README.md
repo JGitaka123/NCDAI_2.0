@@ -4,7 +4,7 @@
 
 NCDAI 2.0 brings patient history, structured assessment, evidence-linked safety checks, clinician decisions and referral follow-through into one workflow. Its major domains are cardiovascular disease, diabetes, chronic respiratory disease, kidney disease, cancer warning signs and multimorbidity. It preserves the familiar NCDAI consultation sequence with a redesigned responsive interface.
 
-This release is **research software for synthetic cases only**. It is not approved for patient care. It does not autonomously diagnose, prescribe or calculate medication doses. The selected medication checks are not a complete drug-interaction service. Engineering tests do not establish clinical accuracy, effectiveness or adoption.
+This hosted release remains **research software for synthetic cases only**. The project owner confirms DHA and ethics approvals cover care and medication recommendations, with records held in office files. Selected dose references are now calculated deterministically for clinician review; the application does not autonomously diagnose or prescribe. The selected medication checks are not a complete drug-interaction service. Engineering tests do not establish clinical accuracy, effectiveness or adoption.
 
 **Hosted demonstration:** [ncdai-2.vercel.app](https://ncdai-2.vercel.app). Use the privately provided account. See the [deployment and acceptance record](docs/deployment.md).
 
@@ -12,11 +12,13 @@ This release is **research software for synthetic cases only**. It is not approv
 
 - Patient registration and search, encounter history, current observations with explicit units and unknown states.
 - Deterministic safety and referral prompts with stable rule IDs and inspectable source/version references.
+- Four bounded Kenya starting-dose references, proposed-dose range checks, contraindication/context withholding and immutable review provenance. See [dose-engine scope](docs/dosing-engine.md).
 - Optional DeepSeek-first AI review focus, with an OpenAI adapter option. AI selects established items; it cannot create advice, change urgency or remove critical findings.
 - Mandatory clinician review of every action: accept, modify, defer or reject, with rationale for changes.
 - Version checks and immutable reviewed records, including exact input and assessment snapshots.
 - Referral request, acceptance, completion/cancellation and outcome tracking.
 - Facility isolation, clinical/administrative roles, revocable cookie sessions, CSRF protection and hash-linked audit events.
+- Password changes with other-session revocation and administrator account activation/deactivation with lockout protection.
 - PostgreSQL-ready schema and migrations, with SQLite for isolated local development.
 - FHIR R4-oriented exports. Aifya and QAfya integration is deferred until their APIs are supplied; no live EMR connection is claimed.
 
@@ -45,6 +47,8 @@ AI is disabled by default. To explicitly enable DeepSeek in the backend process,
 ## Inspect the specifications
 
 - [Engineering verification and release evidence](docs/verification.md)
+- [Kenya knowledge, RAG and model-training strategy](docs/knowledge-and-training-strategy.md)
+- [Validation, pilot, analysis plan and grant concept](docs/evaluation/README.md)
 - [Independent release audit](docs/release-audit.md)
 - [Product and engineering blueprint](docs/blueprint.md)
 - [Current capability benchmarks and limitations](docs/benchmarking.md)
@@ -72,6 +76,6 @@ The frozen [66-case catalogue](tests/cases/clinical_cases.json) exercises the si
 
 Vercel configuration routes the frontend and Python API under one origin. A hosted PostgreSQL database, migrations, secure cookies, a strong session secret and explicitly provisioned clinical accounts are required. SQLite and development seeding are refused in production mode. The mandatory synthetic-only gate remains enabled in hosted demonstrations.
 
-No human clinical approvals, national interoperability certification, independent penetration test or clinical-impact evidence are implied by this repository. Guideline approval, clinical validation, privacy decisions, operational ownership and staff training are prerequisites for patient care. The validation protocol, pilot and grant concept are the next phase, after the engineering delivery, as requested by the project owner.
+The owner's confirmation of DHA and ethics approval is recorded separately from independent validation of this exact software and source manifest. National interoperability certification, an independent penetration test and clinical-impact evidence are not claimed. The evaluation package is drafted; it has not been submitted or conducted. The hosted synthetic restriction remains a release control while clinical/pharmacy adjudication and operational validation proceed.
 
 The code is a new implementation; old NCDAI source and private grant documents are not copied here. A project-owner licensing decision remains pending; no open-source license is granted by this README. Dependency licenses remain applicable.

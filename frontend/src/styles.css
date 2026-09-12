@@ -40,3 +40,24 @@ th,td{color:#50654f}th{font-size:11px}.badge-completed,.badge-reviewed,.badge-ac
 .skip-link:not(:focus){clip-path:inset(50%);width:1px;height:1px;padding:0;overflow:hidden}
 
 .loading{color:#50654f}
+/* Medicine-reference and account controls share the existing NCDAI palette. */
+.dosing-picker,.dose-request-heading,.user-access-row { display:flex; align-items:center; gap:1rem; justify-content:space-between; flex-wrap:wrap; }
+.dosing-picker .field { flex:1; min-width:0; }
+.dose-request,.dose-context { margin:1rem 0; padding:1rem; border:1px solid #d9dce4; border-radius:12px; min-width:0; }
+.dose-request legend,.dose-context legend { padding:0 .4rem; font-weight:650; }
+.dosing-results { margin-bottom:1.5rem; }
+.encounter-main,.encounter-sidebar,.evidence-list { min-width:0; }
+.evidence-list { overflow-wrap:anywhere; }
+.evidence-list a { max-width:100%; }
+.dose-result { padding:1rem; margin:.8rem 0; border:1px solid #d9dce4; border-left:4px solid #FF5757; border-radius:10px; overflow-wrap:anywhere; }
+.dose-result h3 { margin-top:0; }
+.dose-result ul { padding-left:1.3rem; }
+.dose-reference,.account-details { display:grid; gap:.75rem; margin:1rem 0; }
+.dose-reference dt,.account-details dt { font-size:.85rem; color:#566174; }
+.dose-reference dd,.account-details dd { margin:0; font-weight:600; }
+.account-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.5fr); gap:1.5rem; }
+.account-form fieldset { border:0; padding:0; display:grid; gap:1rem; min-width:0; }
+.user-access-row { padding:1rem 0; border-bottom:1px solid #e4e7ed; overflow-wrap:anywhere; }
+.user-access-row h3,.user-access-row p { margin:.2rem 0; }
+.access-confirmation { padding:1.25rem; border:2px solid #FF5757; border-radius:12px; margin-top:1rem; }
+@media (max-width:760px) { .account-layout { grid-template-columns:1fr; } .dosing-picker { align-items:stretch; flex-direction:column; } .dose-request { padding:.75rem; } }

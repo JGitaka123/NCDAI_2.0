@@ -2,6 +2,7 @@ import { Plus, Trash2 } from 'lucide-react'
 import type { ClinicalData, Medication, TriState } from './types'
 import { medicineNames, numericInput, symptoms } from './clinical'
 import { Field } from './components'
+import DoseSupport from './DoseSupport'
 
 export default function ClinicalIntake({ data, onChange, disabled }: { data: ClinicalData; onChange: (data: ClinicalData) => void; disabled: boolean }) {
   const change = <K extends keyof ClinicalData>(key: K, value: ClinicalData[K]) => onChange({ ...data, [key]: value })
@@ -47,7 +48,7 @@ export default function ClinicalIntake({ data, onChange, disabled }: { data: Cli
         <NumberField label="eGFR" unit="mL/min/1.73 m²" value={data.egfr} min={0} max={200} step="0.1" onChange={v => change('egfr', v)} />
         <NumberField label="Potassium" unit="mmol/L" value={data.potassium} min={1} max={10} step="0.1" onChange={v => change('potassium', v)} />
       </div>
-      <p className="field-note">Confirm when each result was obtained. Results with uncertain timing require clinician verification; per-result timestamps are not yet captured in this preview.</p>
+      <p className="field-note">Confirm when each result was obtained. Results with uncertain timing require clinician verification. Record the renal result time below when requesting a medicine reference check.</p>
     </div></details>
     <details className="intake-section" open><summary><span><span className="section-number">05</span> Medicines & allergies</span><span className="summary-tag">Reconciliation</span></summary><div className="intake-section-content">
       <div className="subsection-heading"><div><h3>Current medicines</h3><p>Record what the patient is actually taking.</p></div><button type="button" className="button button-secondary button-small" onClick={() => change('medications', [...data.medications, { code: '', name: '', dose: null, unit: '', frequency: '' }])}><Plus size={16} /> Add medicine</button></div>
@@ -65,7 +66,8 @@ export default function ClinicalIntake({ data, onChange, disabled }: { data: Cli
       <div className="allergy-entry"><Field label="Allergies and reactions" hint="One entry per line. Include the substance and reaction where known."><textarea rows={3} value={data.allergies.join('\n')} onChange={e => change('allergies', e.target.value.split('\n'))} placeholder="e.g. enalapril — angioedema" /></Field><label className="review-checkbox"><input type="checkbox" checked={data.allergies_reviewed} onChange={e => change('allergies_reviewed', e.target.checked)} /><span><strong>Allergy status reviewed</strong><small>Check only after review. An empty, reviewed list means no known allergies were reported.</small></span></label></div>
       <p className="field-note">Medication safety checks cover a limited catalogue. Unlisted medicines, interactions and dose suitability require manual clinical review.</p>
     </div></details>
-    <details className="intake-section"><summary><span><span className="section-number">06</span> Consultation notes</span><span className="summary-tag">Additional context</span></summary><div className="intake-section-content"><Field label="Clinical notes" hint="Notes are retained in the record. Structured fields drive the safety rules; critical findings must be entered above."><textarea rows={5} maxLength={10000} value={data.notes} onChange={e => change('notes', e.target.value)} placeholder="Patient priorities, relevant history, examination, context and follow-up considerations…" /></Field></div></details>
+    <DoseSupport data={data} onChange={onChange} disabled={disabled} />
+    <details className="intake-section"><summary><span><span className="section-number">07</span> Consultation notes</span><span className="summary-tag">Additional context</span></summary><div className="intake-section-content"><Field label="Clinical notes" hint="Notes are retained in the record. Structured fields drive the safety rules; critical findings must be entered above."><textarea rows={5} maxLength={10000} value={data.notes} onChange={e => change('notes', e.target.value)} placeholder="Patient priorities, relevant history, examination, context and follow-up considerations…" /></Field></div></details>
   </fieldset>
 }
 

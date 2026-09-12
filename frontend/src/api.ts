@@ -41,7 +41,7 @@ export async function api<T>(path: string, options: { method?: string; body?: un
   if (!response.ok) {
     const body = await response.json().catch(() => ({}))
     if (response.status === 401 && path !== '/auth/login' && path !== '/auth/session') window.dispatchEvent(new CustomEvent('ncdai-session-expired'))
-    throw new ApiError(response.status, response.status === 409 ? 'This record changed in another session. Reload the latest saved record before continuing. Your unsaved changes have not been applied.' : errorText(body.detail))
+    throw new ApiError(response.status, response.status === 409 && path.startsWith('/encounters/') ? 'This record changed in another session. Reload the latest saved record before continuing. Your unsaved changes have not been applied.' : errorText(body.detail))
   }
   if (response.status === 204) return undefined as T
   return response.json() as Promise<T>

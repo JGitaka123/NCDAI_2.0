@@ -1,6 +1,6 @@
 """Non-destructive acceptance workflow against this synthetic NCDAI deployment.
 
-Adds one fictional record and one completed referral. Uses one optional live AI
+Adds one fictional patient, two encounters and one completed referral. Uses one optional live AI
 request. Credentials are read from a private file and never included in reports.
 """
 from pathlib import Path
@@ -36,6 +36,9 @@ def run():
         assert all(part in cookie for part in ['httponly', 'secure', 'samesite=strict', 'path=/api'])
         client.headers['X-CSRF-Token'] = auth_response.json()['csrf_token']
         report['checks'].append('authenticated session with secure HttpOnly Strict cookie')
+        catalogue = request('GET', '/dosing/catalogue')
+        assert catalogue['version'] == 'ncdai-dose-reference-0.1.0' and len(catalogue['medicines']) == 4
+        report['dosing'] = {'version': catalogue['version'], 'manifest_sha256': catalogue['manifest_sha256']}
 
         record_id = 'HOSTED-' + uuid4().hex[:12]
         patient = request('POST', '/patients', 201, json={'external_id': record_id, 'given_name': 'Synthetic',
@@ -46,13 +49,16 @@ def run():
             'known_copd': 'no', 'known_ckd': 'unknown', 'known_cancer': 'no',
             'pregnancy_status': 'not_applicable', 'symptoms': ['chest_pain'], 'symptoms_reviewed': True,
             'allergies': [], 'allergies_reviewed': True, 'medications': [], 'medications_reviewed': True,
-            'observed_at': datetime.now(timezone.utc).isoformat(), 'notes': 'Fictional deployment acceptance case.'}
+            'observed_at': datetime.now(timezone.utc).isoformat(), 'notes': 'Fictional deployment acceptance case.',
+            'dosing_requests': [{'medicine_id': 'amlodipine_tablet', 'indication': 'hypertension'}]}
         encounter = request('POST', '/encounters', 201, json={'patient_id': patient['id'], 'data': data})
         encounter = request('POST', f"/encounters/{encounter['id']}/assess")
         original = encounter['assessment']
         assert original['urgency'] == 'emergency'
         assert any(item['severity'] == 'critical' for item in original['recommendations'])
         assert all(item['evidence'] for item in original['recommendations'])
+        assert original['dosing']['results'][0]['status'] == 'blocked'
+        assert original['dosing']['results'][0]['reference'] is None
         report['checks'].append('persisted fictional encounter; emergency findings and evidence retained')
 
         if os.getenv('NCDAI_HOSTED_LIVE_AI') == '1':
@@ -86,6 +92,24 @@ def run():
         bundle = request('GET', f"/fhir/Bundle/{encounter['id']}")
         assert {'Patient','Encounter','DocumentReference'} <= {entry['resource']['resourceType'] for entry in bundle['entry']}
         report['checks'].append('identified referral completed; reviewed FHIR export retrieved')
+        now = datetime.now(timezone.utc).isoformat()
+        reference_data = {**data, 'systolic_bp': 150, 'diastolic_bp': 95, 'repeat_systolic_bp': 148, 'repeat_diastolic_bp': 94,
+            'egfr': 85, 'known_ckd': 'no', 'symptoms': [], 'observed_at': now, 'medicine_availability': 'available',
+            'dosing_context': {'hepatic_impairment': 'no', 'acute_illness': 'no', 'dialysis': 'no', 'frailty': 'no',
+                'breastfeeding': 'not_applicable', 'contraindications_reviewed': True, 'interactions_reviewed': True,
+                'renal_observed_at': now, 'potassium_observed_at': now}}
+        second = request('POST', '/encounters', 201, json={'patient_id': patient['id'], 'data': reference_data})
+        second = request('POST', f"/encounters/{second['id']}/assess")
+        result = second['assessment']['dosing']['results'][0]
+        assert result['status'] == 'reference'
+        assert result['reference'] == {'initial_dose_mg': 5, 'frequency_per_day': 1, 'max_daily_mg': 10}
+        second = request('POST', f"/encounters/{second['id']}/review", json={'assessment_id': second['assessment']['id'],
+            'expected_version': second['version'], 'decisions': [{'recommendation_id': item['id'], 'action': 'accept'} for item in second['assessment']['recommendations']],
+            'note': 'Synthetic dose-reference engineering acceptance only.'})
+        assert second['status'] == 'reviewed'
+        request('PATCH', f"/encounters/{second['id']}", 409, json={'expected_version': second['version'], 'data': reference_data})
+        request('GET', f"/fhir/Bundle/{second['id']}")
+        report['checks'].append('dose catalogue verified; emergency dose withheld; eligible reference persisted, reviewed and immutable')
         audit = request('GET', '/audit/verify')
         assert audit['valid']
         report['audit'] = {'valid': audit['valid'], 'events': audit['events']}
@@ -93,7 +117,7 @@ def run():
         request('GET', '/patients', 401)
         report['checks'].append('audit chain valid; logout revokes access')
     report['passed'] = True
-    destination = ROOT / 'docs/test-results/hosted-acceptance.json'
+    destination = ROOT / 'docs/test-results/hosted-dose-acceptance.json'
     destination.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(report, indent=2))
 

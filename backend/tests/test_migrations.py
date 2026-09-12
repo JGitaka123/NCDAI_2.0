@@ -11,11 +11,14 @@ from datetime import date
 
 
 def test_migration_database_guards(tmp_path, monkeypatch):
+    import logging
+    safety_logger = logging.getLogger("ncdai.security")
     url = f"sqlite:///{(tmp_path / 'migrations.db').as_posix()}"
     monkeypatch.setenv("DATABASE_URL", url)
     config = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
     config.set_main_option("script_location", str(Path(__file__).resolve().parents[1] / "migrations"))
     command.upgrade(config, "head")
+    assert not safety_logger.disabled, "Migration configuration must preserve redacted security logging"
     engine = make_engine(url)
     factory = make_sessions(engine)
     with factory() as db:

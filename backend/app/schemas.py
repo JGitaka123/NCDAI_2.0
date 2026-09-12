@@ -2,6 +2,7 @@ from datetime import date, datetime, timezone, timedelta
 from typing import Literal, Annotated
 import re
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StringConstraints, field_validator, model_validator
+from .dosing_schemas import DosingContext, DosingRequest
 
 
 class StrictModel(BaseModel):
@@ -94,6 +95,8 @@ class ClinicalData(StrictModel):
     notes: str = Field(default="", max_length=10000)
     observed_at: datetime | None = None
     medicine_availability: Literal["available", "limited", "unknown"] = "unknown"
+    dosing_requests: list[DosingRequest] = Field(default_factory=list, max_length=5)
+    dosing_context: DosingContext = Field(default_factory=DosingContext)
 
     @field_validator("systolic_bp", "diastolic_bp", "repeat_systolic_bp", "repeat_diastolic_bp", "pulse", "oxygen_saturation", "respiratory_rate", "hba1c", "glucose", "egfr", "potassium", mode="before")
     @classmethod
@@ -121,6 +124,9 @@ class ClinicalData(StrictModel):
 
     @model_validator(mode="after")
     def plausible_pairs(self):
+        medicine_ids = [r.medicine_id for r in self.dosing_requests]
+        if len(medicine_ids) != len(set(medicine_ids)):
+            raise ValueError("Select each dosing medicine once")
         for s, d in [(self.systolic_bp, self.diastolic_bp), (self.repeat_systolic_bp, self.repeat_diastolic_bp)]:
             if s is not None and d is not None and s <= d:
                 raise ValueError("Systolic pressure must exceed diastolic pressure")
