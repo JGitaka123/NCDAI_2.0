@@ -1,6 +1,6 @@
 """Create fresh loopback PostgreSQL databases for two-store workflow verification."""
 from pathlib import Path
-import json,os,sys,time
+import json,os,sys,time,secrets
 from uuid import uuid4
 ROOT=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(ROOT/'backend'),str(ROOT/'backend/tests')]
@@ -43,12 +43,38 @@ def run():
         for email,role in [('clinician@example.test','clinician'),('supervisor@example.test','supervisor')]:
             db.add(User(id=email,facility_id='facility-a',email=email,display_name=role,role=role,password_hash=hashed))
         db.commit()
+    # Exercise the web workflow with the same restricted privileges as hosting.
+    # Owner-only tests would miss PostgreSQL's column UPDATE requirement for row locks.
+    main_role='consult_main_'+token; review_role='consult_review_'+token
+    main_password=secrets.token_urlsafe(32); review_password=secrets.token_urlsafe(32)
+    admin=create_engine(source,isolation_level='AUTOCOMMIT')
+    with admin.connect() as conn:
+        with conn.connection.driver_connection.cursor() as cur:
+            for role,password in [(main_role,main_password),(review_role,review_password)]:
+                cur.execute(sql.SQL('CREATE ROLE {} LOGIN PASSWORD {}').format(sql.Identifier(role),sql.Literal(password)))
+    admin.dispose()
+    for engine,role,is_main in [(app.state.engine,main_role,True),(app.state.consultant_engine,review_role,False)]:
+        with engine.begin() as conn:
+            with conn.connection.driver_connection.cursor() as cur:
+                cur.execute(sql.SQL('GRANT USAGE ON SCHEMA public TO {}').format(sql.Identifier(role)))
+                cur.execute(sql.SQL('GRANT SELECT ON ALL TABLES IN SCHEMA public TO {}').format(sql.Identifier(role)))
+                if is_main:
+                    cur.execute(sql.SQL('GRANT INSERT ON ALL TABLES IN SCHEMA public TO {}').format(sql.Identifier(role)))
+                    cur.execute(sql.SQL('GRANT UPDATE ON facilities,users,auth_sessions,login_attempts,patients,encounters,referrals TO {}').format(sql.Identifier(role)))
+                    cur.execute(sql.SQL('GRANT DELETE ON auth_sessions,login_attempts TO {}').format(sql.Identifier(role)))
+                    cur.execute(sql.SQL('GRANT UPDATE(id) ON consultation_requests TO {}').format(sql.Identifier(role)))
+                else:
+                    cur.execute(sql.SQL('GRANT INSERT ON consultant_cases,consultant_opinions TO {}').format(sql.Identifier(role)))
+    app.state.engine.dispose();app.state.consultant_engine.dispose()
+    app=create_app(Settings(environment='test',
+        database_url=primary.set(username=main_role,password=main_password).render_as_string(hide_password=False),
+        consultant_database_url=consultant.set(username=review_role,password=review_password).render_as_string(hide_password=False)))
     started=time.perf_counter()
     with TestClient(app) as client:
         login(client)
         test_fifty_full_consultation_scenarios(client,app)
     exercise_postgres_consultation_races(app)
-    report={'concurrency_checks':2,'cases':50,'passed':50,'failed':0,'database':'Two isolated PostgreSQL databases','seconds':round(time.perf_counter()-started,2),
+    report={'restricted_runtime_roles':True,'concurrency_checks':2,'cases':50,'passed':50,'failed':0,'database':'Two isolated PostgreSQL databases','seconds':round(time.perf_counter()-started,2),
             'scope':'Fictional workflow verification; not independent clinical adjudication',
             'checks':['request and immutable snapshot','idempotent delivery','independent opinion','primary disposition','unchanged original assessment','FHIR traceability','aggregate evaluation','facility audit']}
     path=Path(sys.argv[1]) if len(sys.argv)>1 else ROOT/'docs/test-results/mary-help-consultant-postgres.json'

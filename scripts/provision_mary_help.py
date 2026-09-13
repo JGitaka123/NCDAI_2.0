@@ -85,6 +85,9 @@ def run():
     with primary_engine.begin() as conn:
         with conn.connection.driver_connection.cursor() as cur:
             cur.execute(sql.SQL('GRANT SELECT,INSERT ON consultation_requests,consultation_dispositions TO {}').format(sql.Identifier(access['role'])))
+            # PostgreSQL row locks require UPDATE privilege on at least one column.
+            # The immutable trigger still rejects every actual UPDATE, including ID.
+            cur.execute(sql.SQL('GRANT UPDATE(id) ON consultation_requests TO {}').format(sql.Identifier(access['role'])))
     pooled=make_url(access['database_url']).set(database=config['consultant_database'],username=config['consultant_role'],password=config['consultant_role_password'])
     config['consultant_database_url']=pooled.render_as_string(hide_password=False)
     config['provisioned_at']=datetime.now(timezone.utc).isoformat()
