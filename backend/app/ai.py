@@ -21,7 +21,7 @@ from pydantic import BaseModel, ConfigDict, Field, StrictStr, ValidationError
 from .evidence import EVIDENCE_VERSION, registry
 
 
-PROMPT_VERSION = "ncdai-briefing-select-v1.4"
+PROMPT_VERSION = "ncdai-briefing-select-v1.5"
 MAX_RESPONSE_BYTES = 65536
 RULE_IDS = frozenset("""
 EMERGENCY_SYMPTOMS LOW_BP PULSE_EXTREME RESP_SLOW BP_CRISIS BP_SEVERE
@@ -48,7 +48,7 @@ medications_reviewed allergies_reviewed symptoms_reviewed observed_at current_ob
 CATEGORIES = frozenset("acute_safety hypertension scope medication_safety respiratory referral kidney diabetes continuity prevention data_quality dosing".split())
 SEVERITY = {"critical": 0, "warning": 1, "info": 2}
 SYSTEM_PROMPT = """You organize an adult NCD clinician consultation briefing.
-The input is a synthetic, deterministic assessment represented only by identifiers.
+The input is a deterministic assessment represented only by identifiers.
 Do not diagnose, prescribe, calculate, generate prose, change urgency, or invent IDs.
 Select at most 3 focus_rule_ids from eligible_focus that best link related clinical issues
 for a short clinician handoff (for example kidney disease and medication safety).
@@ -191,7 +191,7 @@ def _response(body, provider, requested_model):
     return selection, usage, actual_model
 
 
-async def build_briefing(assessment: dict, *, synthetic: bool, settings: AISettings | None = None,
+async def build_briefing(assessment: dict, *, synthetic: bool, allow_real_patient: bool = False, settings: AISettings | None = None,
                          transport: httpx.AsyncBaseTransport | None = None) -> dict:
     """Single bounded request with safe failure; does not mutate its assessment.
 
@@ -208,7 +208,7 @@ async def build_briefing(assessment: dict, *, synthetic: bool, settings: AISetti
               "usage": None, "latency_ms": 0, "generated_at": datetime.now(timezone.utc).isoformat(),
               "disclaimer": "AI selected existing assessment items for a short briefing. Read every recommendation; this is not new clinical advice."}
     try:
-        if synthetic is not True:
+        if synthetic is not True and allow_real_patient is not True:
             result.update(status="blocked", reason_code="synthetic_only")
             return result
         if settings.provider == "disabled":

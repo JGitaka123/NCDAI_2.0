@@ -19,7 +19,7 @@ export default function Login({ onLogin, expired }: { onLogin: (session: Session
       <div className="login-footnote">NCDAI 2.0 · Kenya-first NCD care</div>
     </div>
     <main id="main" className="login-form-wrap"><div className="login-form">
-      <div className="research-label">Research preview • synthetic cases only</div>
+      <div className="research-label">Hospital testing · authorized accounts only</div>
       <div className="eyebrow">CLINICAL WORKSPACE</div><h2>Welcome back</h2><p className="muted">Sign in with your facility account.</p>
       {expired && <Notice tone="warning">Your session ended. Sign in again to continue. Unsaved work may need to be re-entered.</Notice>}
       {error && <Notice tone="error">{error}</Notice>}
@@ -28,8 +28,8 @@ export default function Login({ onLogin, expired }: { onLogin: (session: Session
         <Field label="Password"><input type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required /></Field>
         <button className="button button-primary login-submit" disabled={busy} type="submit">{busy ? <LoaderCircle size={18} className="spin" /> : <>Sign in <ArrowRight size={18} /></>}</button>
       </form>
-      <div className="login-help"><strong>Setting up a local demonstration?</strong><p>An administrator must explicitly create synthetic demo accounts using the setup guide. No account is enabled automatically.</p></div>
-      <p className="fine-print">This research build supports supervised testing. It is not approved for live patient care and does not prescribe treatment.</p>
+      <div className="login-help"><strong>Hospital testing access</strong><p>Use your individually assigned account. Change your temporary password on first sign-in. Contact your facility administrator if access is needed.</p></div>
+      <p className="fine-print">For supervised hospital testing within the enabled clinical scope. A clinician must verify every recommendation; no prescription is created automatically.</p>
     </div></main>
   </div>
 }

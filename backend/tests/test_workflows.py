@@ -16,7 +16,7 @@ def test_unauthenticated_access_and_opaque_cookie(app):
         response = login(client)
         cookie = response.headers["set-cookie"]
         assert "HttpOnly" in cookie and "SameSite=strict" in cookie and "Path=/api" in cookie
-        assert "password" not in response.text
+        assert '"password":' not in response.text and '"password_hash":' not in response.text and PASSWORD not in response.text
         assert client.get("/api/auth/session").json()["user"]["role"] == "clinician"
         raw = client.cookies.get("ncdai_session")
         with app.state.session_factory() as db:
@@ -86,7 +86,7 @@ def test_roles_and_no_client_selected_facility(client, app):
         assert admin.post(f"/api/encounters/{item['id']}/review", json=review_payload(item)).status_code == 403
         response = admin.post("/api/users", json={"email": "new@example.test", "password": "new-test-password-99!", "display_name": "Test user", "role": "clinician"})
         assert response.status_code == 201
-        assert "password" not in response.text
+        assert '"password":' not in response.text and '"password_hash":' not in response.text and PASSWORD not in response.text
     record = {"external_id": "SYN-002", "given_name": "Test", "family_name": "Patient", "date_of_birth": "1975-01-02", "sex": "female", "synthetic": True, "facility_id": "fake"}
     assert client.post("/api/patients", json=record).status_code == 422
 

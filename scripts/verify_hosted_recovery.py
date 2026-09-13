@@ -24,7 +24,7 @@ from app.audit import verify_chain
 from app.models import AuditEvent, Facility
 from app.db import SCHEMA_REVISION
 
-TABLES = ('facilities', 'users', 'auth_sessions', 'login_attempts', 'patients', 'encounters', 'referrals', 'audit_events')
+TABLES = ('facilities', 'users', 'auth_sessions', 'login_attempts', 'patients', 'encounters', 'referrals', 'audit_events', 'consultation_requests', 'consultation_dispositions')
 
 
 def fingerprints(connection):

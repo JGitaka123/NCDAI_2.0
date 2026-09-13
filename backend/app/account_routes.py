@@ -58,6 +58,7 @@ def install_account_routes(api, *, get_db, authenticated, commit_change, user_js
             commit_change(db, user, "user.password_change_failed", "user", user.id)
             raise HTTPException(400, "Current password is incorrect")
         user.password_hash = hash_password(payload.new_password)
+        user.password_change_required = False
         current_session = token_hash(request.cookies[settings.cookie_name])
         revoked = db.execute(delete(AuthSession).where(AuthSession.user_id == user.id,
                                                       AuthSession.id != current_session)).rowcount

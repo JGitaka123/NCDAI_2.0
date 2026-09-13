@@ -13,11 +13,11 @@ function IntakeHarness() { const [data, setData] = useState(emptyClinicalData())
 const encounter = { id: 'encounter', patient_id: 'patient', status: 'draft', version: 3, data: emptyClinicalData(), created_at: '2026-01-01T12:00:00Z', updated_at: '2026-01-01T12:00:00Z', assessment: { id: 'assessment', urgency: 'emergency', summary: 'Emergency red flags require assessment.', recommendations: [{ id: 'rec-1', rule_id: 'URGENT', category: 'cardiovascular', severity: 'critical', title: 'Arrange urgent assessment', detail: 'Follow emergency procedures without waiting for this form.', evidence: [] }], missing_data: ['repeat_systolic_bp'], warnings: [], model_info: { mode: 'deterministic_rules', status: 'clinical_review_required' }, generated_at: '2026-01-01T12:00:00Z', evidence_version: 'v0.1' } } as Encounter
 
 describe('Clinician workflow safeguards', () => {
-  it('requires explicit login and displays the synthetic-use boundary', async () => {
+  it('requires explicit login and displays the authorized hospital-testing boundary', async () => {
     const user = userEvent.setup(); const onLogin = vi.fn(); const fetch = vi.fn().mockResolvedValue(new Response('{"detail":"Invalid credentials"}', { status: 401 })); vi.stubGlobal('fetch', fetch)
     render(<Login onLogin={onLogin} expired={false} />)
     expect(screen.getByLabelText('Email address')).toHaveValue(''); expect(screen.getByLabelText('Password')).toHaveValue('')
-    expect(screen.getByText('Research preview • synthetic cases only')).toBeVisible()
+    expect(screen.getByText('Hospital testing · authorized accounts only')).toBeVisible()
     await user.type(screen.getByLabelText('Email address'), 'clinician@example.test'); await user.type(screen.getByLabelText('Password'), 'synthetic-not-a-secret'); await user.click(screen.getByRole('button', { name: 'Sign in' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Invalid credentials'); expect(onLogin).not.toHaveBeenCalled()
   })

@@ -1,5 +1,5 @@
 export type Role = 'clinician' | 'supervisor' | 'admin'
-export type User = { id: string; email: string; display_name: string; role: Role; facility_id: string; facility_name: string; active?: boolean }
+export type User = { id: string; email: string; display_name: string; role: Role; facility_id: string; facility_name: string; active?: boolean; password_change_required?: boolean; clinical_testing?: boolean; consultant_enabled?: boolean; incident_contact?: string; clinical_lead_contact?: string }
 export type Session = { user: User; csrf_token: string }
 export type Patient = { id: string; external_id: string; given_name: string; family_name: string; date_of_birth: string; sex: 'female' | 'male' | 'other' | 'unknown'; phone?: string; facility_id?: string; synthetic: boolean }
 export type TriState = 'yes' | 'no' | 'unknown'

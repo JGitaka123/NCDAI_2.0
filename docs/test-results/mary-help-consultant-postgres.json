@@ -1,0 +1,19 @@
+{
+  "concurrency_checks": 2,
+  "cases": 50,
+  "passed": 50,
+  "failed": 0,
+  "database": "Two isolated PostgreSQL databases",
+  "seconds": 17.27,
+  "scope": "Fictional workflow verification; not independent clinical adjudication",
+  "checks": [
+    "request and immutable snapshot",
+    "idempotent delivery",
+    "independent opinion",
+    "primary disposition",
+    "unchanged original assessment",
+    "FHIR traceability",
+    "aggregate evaluation",
+    "facility audit"
+  ]
+}

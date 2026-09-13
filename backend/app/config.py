@@ -1,4 +1,4 @@
-"""Explicit environment configuration; clinical release is synthetic-only."""
+"""Explicit environment and facility configuration; defaults remain synthetic-only."""
 from dataclasses import dataclass, field
 import os
 import secrets
@@ -16,13 +16,37 @@ class Settings:
     cookie_name: str = "ncdai_session"
     allow_demo_seed: bool = field(default_factory=lambda: os.getenv("NCDAI_ALLOW_DEMO_SEED", "false").lower() == "true")
     auto_create_schema: bool = False
-    synthetic_only: bool = True
+    synthetic_only: bool = field(default_factory=lambda: os.getenv("NCDAI_SYNTHETIC_ONLY", "true").lower() != "false")
+    clinical_facility_id: str = field(default_factory=lambda: os.getenv("NCDAI_CLINICAL_FACILITY_ID", ""))
+    real_patient_ai: bool = field(default_factory=lambda: os.getenv("NCDAI_REAL_PATIENT_AI", "false").lower() == "true")
+    incident_contact: str = field(default_factory=lambda: os.getenv("NCDAI_INCIDENT_CONTACT", ""))
+    clinical_lead_contact: str = field(default_factory=lambda: os.getenv("NCDAI_CLINICAL_LEAD_CONTACT", ""))
+    consultant_database_url: str = field(default_factory=lambda: os.getenv("NCDAI_CONSULTANT_DATABASE_URL", ""))
 
     def validate(self) -> None:
         if self.environment not in {"local", "test", "production"}:
             raise ValueError("NCDAI_ENV must be local, test or production")
         if not self.synthetic_only:
-            raise ValueError("This release is restricted to synthetic records pending clinical approval")
+            from uuid import UUID
+            try:
+                UUID(self.clinical_facility_id)
+            except (ValueError, TypeError):
+                raise ValueError("An explicit clinical testing facility ID is required") from None
+        if self.real_patient_ai and self.synthetic_only:
+            raise ValueError("Real-patient AI requires an explicitly enabled clinical facility")
+        if self.consultant_database_url:
+            from sqlalchemy.engine import make_url
+            primary, consultant = make_url(self.database_url), make_url(self.consultant_database_url)
+            def database_identity(url):
+                host = (url.host or "").replace("-pooler.", ".")
+                if url.drivername.startswith("sqlite"):
+                    from pathlib import Path
+                    return ("sqlite", str(Path(url.database or ":memory:").resolve()))
+                return (host, url.port or 5432, url.database)
+            if database_identity(primary) == database_identity(consultant):
+                raise ValueError("Consultant records require a separate database")
+            if self.environment == "production" and not self.consultant_database_url.startswith("postgresql"):
+                raise ValueError("The production consultant database must be PostgreSQL")
         if self.public_origin:
             origin = urlsplit(self.public_origin)
             try:

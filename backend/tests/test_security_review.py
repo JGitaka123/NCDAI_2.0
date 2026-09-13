@@ -17,7 +17,7 @@ from conftest import login, encounter, assess
 def test_access_revoked_during_ai_wait_cannot_persist(client, app, monkeypatch, change):
     current = assess(client, encounter(client))
 
-    async def revoke(assessment, *, synthetic):
+    async def revoke(assessment, *, synthetic, allow_real_patient=False):
         with app.state.session_factory() as db:
             if change == "logout":
                 db.execute(delete(AuthSession))

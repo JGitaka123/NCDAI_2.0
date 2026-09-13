@@ -15,6 +15,7 @@ export default function Account({ user }: { user: User }) {
     setBusy(true)
     try {
       const result = await api<{ status: 'password_changed'; other_sessions_revoked: number }>('/auth/change-password', { method: 'POST', body: { current_password: currentPassword, new_password: newPassword } })
+      window.dispatchEvent(new Event('ncdai-account-updated'))
       setCurrentPassword(''); setNewPassword(''); setConfirmation('')
       setSuccess(`Password changed. Your current session remains active. ${result.other_sessions_revoked} other session${result.other_sessions_revoked === 1 ? ' was' : 's were'} signed out.`)
     } catch (error) { setError(message(error)) } finally { setBusy(false) }

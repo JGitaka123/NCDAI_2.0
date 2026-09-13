@@ -1,0 +1,13 @@
+import { useEffect, useState } from 'react'
+import { api, message } from './api'
+import { Notice, PageHeader, Panel } from './components'
+
+type Evaluation = { synthetic: boolean; requests: number; answered: number; pending: number; closed: number; service_unavailable_records: number; agreement: Record<string, number>; actions: Record<string, number>; median_response_minutes: number | null; definition: string }
+export default function ConsultationEvaluation() {
+  const [synthetic, setSynthetic] = useState(true), [report, setReport] = useState<Evaluation | null>(null), [error, setError] = useState(''), [revision, setRevision] = useState(0)
+  useEffect(() => { let active = true; setError(''); setReport(null); api<Evaluation>(`/consultation-evaluation?synthetic=${synthetic}`).then(value => { if (active) setReport(value) }).catch(error => { if (active) setError(message(error)) }); return () => { active = false } }, [synthetic, revision])
+  return <><PageHeader eyebrow="FACILITY EVALUATION" title="Consultation follow-through" description="Track disagreement, consultant response and the action taken. These measures do not establish diagnostic accuracy." />
+    <Panel title="Evaluation population"><div className="panel-body"><label className="review-checkbox"><input type="checkbox" checked={synthetic} onChange={e => setSynthetic(e.target.checked)} />Fictional staff-rehearsal cases only</label><p>{synthetic ? 'Real-patient episodes are excluded.' : 'Only real-patient clinical-testing episodes are included.'}</p><button className="button button-secondary" onClick={() => setRevision(r => r + 1)}>Refresh evaluation</button>{error && <Notice tone="error">{error}</Notice>}
+      {report && <><dl className="account-details">{[['Requests', report.requests], ['Answered', report.answered], ['Awaiting response or delivery', report.pending], ['Final action recorded', report.closed], ['Median response time (minutes)', report.median_response_minutes == null ? 'No completed responses' : report.median_response_minutes.toFixed(1)]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>{report.service_unavailable_records > 0 && <Notice tone="warning">{report.service_unavailable_records} episodes could not be checked in consultant storage. Response statistics are incomplete.</Notice>}<h3>Consultant agreement</h3><ul>{Object.entries(report.agreement).map(([label, value]) => <li key={label}>{label.replaceAll('_', ' ')}: {value}</li>)}</ul><h3>Primary clinician action</h3><ul>{Object.entries(report.actions).map(([label, value]) => <li key={label}>{label.replaceAll('_', ' ')}: {value}</li>)}</ul><p>{report.definition}</p></>}
+    </div></Panel></>
+}

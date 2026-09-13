@@ -11,7 +11,7 @@ def iso(value):
 
 def patient_resource(patient):
     resource = {"resourceType": "Patient", "id": patient.id, "active": True,
-        "meta": {"tag": [{"system": "https://ncdai.example/fhir/CodeSystem/data-classification", "code": "synthetic", "display": "Synthetic test record"}]},
+        "meta": {"tag": [{"system": "https://ncdai.example/fhir/CodeSystem/data-classification", "code": "synthetic" if getattr(patient, "synthetic", True) else "clinical-testing", "display": "Synthetic test record" if getattr(patient, "synthetic", True) else "Real patient: supervised clinical testing"}]},
         "identifier": [{"system": f"urn:ncdai:facility:{patient.facility_id}:patient", "value": patient.external_id}],
         "name": [{"use": "official", "family": patient.family_name, "given": [patient.given_name]}],
         "gender": patient.sex, "birthDate": patient.date_of_birth.isoformat()}
@@ -118,3 +118,27 @@ def encounter_bundle(patient, encounter):
                           "content": [{"attachment": {"contentType": "text/plain", "data": base64.b64encode("\n".join(lines).encode()).decode(), "title": "NCDAI reviewed decisions"}}]})
     return {"resourceType": "Bundle", "id": encounter.id, "type": "collection", "timestamp": iso(datetime.now(timezone.utc)),
             "entry": [{"fullUrl": f"https://ncdai.example/fhir/{r['resourceType']}/{r['id']}", "resource": r} for r in resources]}
+
+
+
+def add_consultation_documents(bundle, requests, dispositions):
+    """Export immutable handoff and acknowledged opinion without a remote dependency."""
+    import json
+    by_request={row.request_id:row for row in dispositions}
+    for request in requests:
+        disposition=by_request.get(request.id)
+        payload={"request_id":request.id,"snapshot_hash":request.snapshot_hash,"snapshot":request.snapshot,
+                 "status":"closed" if disposition else "request_recorded_response_not_acknowledged"}
+        if disposition:
+            payload["consultant_opinion"]=disposition.opinion_snapshot
+            payload["opinion_hash"]=disposition.opinion_hash
+            payload["primary_action"]={"actor_id":disposition.actor_id,"action":disposition.action,"action_taken":disposition.action_taken,
+                                       "recorded_at":iso(disposition.created_at),"snapshot_was_stale":disposition.snapshot_was_stale}
+        resource={"resourceType":"DocumentReference","id":request.id+"-consult","status":"current",
+                  "docStatus":"final" if disposition else "preliminary","date":iso(disposition.created_at if disposition else request.created_at),
+                  "subject":{"reference":"Patient/"+request.patient_id},"context":{"encounter":[{"reference":"Encounter/"+request.encounter_id}]},
+                  "author":[{"identifier":{"system":"urn:ncdai:user","value":disposition.actor_id if disposition else request.requested_by}}],
+                  "description":"Consultant escalation and primary clinician disposition",
+                  "content":[{"attachment":{"contentType":"application/json","data":base64.b64encode(json.dumps(payload,ensure_ascii=False).encode()).decode(),"title":"NCDAI linked consultation record"}}]}
+        bundle['entry'].append({"fullUrl":f"https://ncdai.example/fhir/DocumentReference/{resource['id']}","resource":resource})
+    return bundle

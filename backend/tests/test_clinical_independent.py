@@ -44,7 +44,7 @@ def evaluate(**changes):
 def test_complete_control_is_exactly_routine_without_disease_confirmation():
     result = evaluate()
     assert result["urgency"] == "routine"
-    assert result["rules_version"] == "ncdai-2-rules-0.1.2"
+    assert result["rules_version"] == "ncdai-2-rules-0.1.3"
     assert result["missing_data"] == []
     assert rule_ids(result) == {"CLINICIAN_REVIEW"}
     assert "does not provide clinical clearance" in result["summary"]

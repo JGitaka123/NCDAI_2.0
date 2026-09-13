@@ -38,6 +38,8 @@ def create_app(settings: Settings | None = None):
     async def lifespan(_):
         yield
         engine.dispose()
+        if getattr(api.state, "consultant_engine", None) is not None:
+            api.state.consultant_engine.dispose()
 
     api = FastAPI(title="NCDAI 2.0", version="0.1.0", lifespan=lifespan,
                   docs_url="/api/docs" if settings.environment != "production" else None,
@@ -78,7 +80,7 @@ def create_app(settings: Settings | None = None):
     def get_db(request: Request):
         # Local SQLite mutations must serialize before reads to avoid stale audit chains.
         path = request.scope["path"]
-        lock = write_lock if engine.dialect.name == "sqlite" and not path.endswith("/ai-briefing") and (request.method != "GET" or "/fhir/" in path) else None
+        lock = write_lock if engine.dialect.name == "sqlite" and not path.endswith("/ai-briefing") and (request.method != "GET" or "/fhir/" in path or "/consultations/" in path or "/encounters/" in path or "/patients/" in path) else None
         if lock:
             lock.acquire()
         try:
@@ -115,6 +117,8 @@ def create_app(settings: Settings | None = None):
             supplied = request.headers.get("X-CSRF-Token", "")
             if not hmac.compare_digest(supplied.encode("utf-8"), csrf_token(raw, settings.secret_key).encode("ascii")):
                 raise HTTPException(403, "Valid CSRF token required")
+        if user.password_change_required and request.url.path not in {"/api/auth/session", "/api/auth/logout", "/api/auth/change-password"}:
+            raise HTTPException(403, "Change your temporary password in Account before accessing records")
         return user
 
     AUTH = Annotated[User, Depends(authenticated)]
@@ -142,7 +146,12 @@ def create_app(settings: Settings | None = None):
     def user_json(db, user):
         return {"id": user.id, "email": user.email, "display_name": user.display_name,
                 "role": user.role, "active": user.active, "facility_id": user.facility_id,
-                "facility_name": db.get(Facility, user.facility_id).name}
+                "facility_name": db.get(Facility, user.facility_id).name,
+                "password_change_required": user.password_change_required,
+                "clinical_testing": (not settings.synthetic_only and user.facility_id == settings.clinical_facility_id and db.get(Facility, user.facility_id).record_mode == "clinical_testing"),
+                "consultant_enabled": bool(settings.consultant_database_url),
+                "incident_contact": settings.incident_contact if user.facility_id == settings.clinical_facility_id else "",
+                "clinical_lead_contact": settings.clinical_lead_contact if user.facility_id == settings.clinical_facility_id else ""}
 
     def patient_json(patient):
         return {field: getattr(patient, field) for field in ["id", "facility_id", "external_id", "given_name", "family_name", "date_of_birth", "sex", "female_pregnancy_status", "phone", "synthetic"]}
@@ -192,7 +201,7 @@ def create_app(settings: Settings | None = None):
                 raise RuntimeError("Rules unavailable")
             if not evidence.is_ready():
                 raise RuntimeError("Evidence unavailable")
-            return {"status": "ready", "database": "connected", "rules": "loaded", "synthetic_only": True}
+            return {"status": "ready", "database": "connected", "rules": "loaded", "synthetic_only": settings.synthetic_only}
         except Exception:
             raise HTTPException(503, "Database, migration or clinical evidence unavailable")
 
@@ -254,7 +263,7 @@ def create_app(settings: Settings | None = None):
         if user.role != "admin":
             raise HTTPException(403, "Administrator role required")
         record = User(id=uid(), facility_id=user.facility_id, email=payload.email.lower(), display_name=payload.display_name,
-                      role=payload.role, password_hash=hash_password(payload.password))
+                      role=payload.role, password_hash=hash_password(payload.password), password_change_required=True)
         db.add(record)
         commit_change(db, user, "user.create", "user", record.id)
         return user_json(db, record)
@@ -269,6 +278,9 @@ def create_app(settings: Settings | None = None):
 
     @api.post("/api/patients", status_code=201)
     def create_patient(payload: PatientCreate, db: DB, user: CLINICAL):
+        if not payload.synthetic and (settings.synthetic_only or user.facility_id != settings.clinical_facility_id or
+                                      db.get(Facility, user.facility_id).record_mode != "clinical_testing"):
+            raise HTTPException(422, "Real records are not enabled for this facility")
         patient = Patient(id=uid(), facility_id=user.facility_id, **payload.model_dump())
         db.add(patient)
         commit_change(db, user, "patient.create", "patient", patient.id)
@@ -276,7 +288,9 @@ def create_app(settings: Settings | None = None):
 
     @api.get("/api/patients/{patient_id}")
     def get_patient(patient_id: str, db: DB, user: CLINICAL):
-        return patient_json(scoped(db, Patient, patient_id, user))
+        patient = scoped(db, Patient, patient_id, user)
+        commit_change(db, user, "patient.view", "patient", patient.id)
+        return patient_json(patient)
 
     @api.get("/api/patients/{patient_id}/encounters")
     def patient_encounters(patient_id: str, db: DB, user: CLINICAL, limit: int = Query(default=100, ge=1, le=200)):
@@ -297,7 +311,9 @@ def create_app(settings: Settings | None = None):
 
     @api.get("/api/encounters/{encounter_id}")
     def get_encounter(encounter_id: str, db: DB, user: CLINICAL):
-        return encounter_json(scoped(db, Encounter, encounter_id, user))
+        encounter = scoped(db, Encounter, encounter_id, user)
+        commit_change(db, user, "encounter.view", "encounter", encounter.id)
+        return encounter_json(encounter)
 
     @api.patch("/api/encounters/{encounter_id}")
     def patch_encounter(encounter_id: str, payload: EncounterPatch, db: DB, user: CLINICAL):
@@ -341,7 +357,7 @@ def create_app(settings: Settings | None = None):
         # Never retain a transaction or SQLite writer lock during provider latency.
         db.rollback()
         from .ai import build_briefing
-        briefing = asyncio.run(build_briefing(snapshot, synthetic=synthetic))
+        briefing = asyncio.run(build_briefing(snapshot, synthetic=synthetic, allow_real_patient=settings.real_patient_ai and user.facility_id == settings.clinical_facility_id))
         with write_lock if engine.dialect.name == "sqlite" else nullcontext():
             db.expire_all()
             current_user = authenticated(request, db)
@@ -432,9 +448,18 @@ def create_app(settings: Settings | None = None):
         encounter = scoped(db, Encounter, encounter_id, user)
         patient = scoped(db, Patient, encounter.patient_id, user)
         output = encounter_bundle(patient, encounter)
+        from .models import ConsultationRequest, ConsultationDisposition
+        from .interop import add_consultation_documents
+        requests = list(db.scalars(select(ConsultationRequest).where(ConsultationRequest.encounter_id == encounter.id, ConsultationRequest.facility_id == user.facility_id)))
+        if requests:
+            dispositions = list(db.scalars(select(ConsultationDisposition).where(ConsultationDisposition.request_id.in_([r.id for r in requests]), ConsultationDisposition.facility_id == user.facility_id)))
+            add_consultation_documents(output, requests, dispositions)
         commit_change(db, user, "export.fhir_bundle", "encounter", encounter.id)
         return JSONResponse(output, media_type="application/fhir+json")
 
+    from .consultations import install_consultation_routes
+    install_consultation_routes(api, settings=settings, get_db=get_db, clinical_user=clinical_user,
+                                privileged=privileged, scoped=scoped, commit_change=commit_change, authenticated=authenticated)
     from .account_routes import install_account_routes
     install_account_routes(api, get_db=get_db, authenticated=authenticated,
                            commit_change=commit_change, user_json=user_json, settings=settings)

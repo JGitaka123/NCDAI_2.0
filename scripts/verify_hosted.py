@@ -27,7 +27,8 @@ def run():
             return response.json() if response.content else None
 
         ready = request('GET', '/health/ready')
-        assert ready['synthetic_only'] is True and ready['status'] == 'ready'
+        assert ready['status'] == 'ready'
+        # This account belongs to the isolated synthetic facility even when Mary Help is enabled.
         request('GET', '/patients', 401)
         report['checks'].append('ready database/rules; unauthenticated records denied')
         auth_response = client.post('/api/auth/login', json={'email': access['email'], 'password': access['password']})
@@ -114,7 +115,7 @@ def run():
         acute_data = {**reference_data, 'potassium': 5.7, 'acute_kidney_injury': 'yes'}
         acute = request('POST', '/encounters', 201, json={'patient_id': patient['id'], 'data': acute_data})
         acute = request('POST', f"/encounters/{acute['id']}/assess")
-        assert acute['assessment']['rules_version'] == 'ncdai-2-rules-0.1.2'
+        assert acute['assessment']['rules_version'] == 'ncdai-2-rules-0.1.3'
         assert acute['assessment']['urgency'] == 'urgent'
         assert acute['data']['acute_kidney_injury'] == 'yes'
         potassium = next(item for item in acute['assessment']['recommendations'] if item['rule_id'] == 'POTASSIUM_HIGH')

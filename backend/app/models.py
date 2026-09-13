@@ -17,6 +17,8 @@ class Facility(Base):
     __tablename__ = "facilities"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     name: Mapped[str] = mapped_column(String(200))
+    record_mode: Mapped[str] = mapped_column(String(30), default="synthetic", server_default="synthetic")
+    __table_args__ = (CheckConstraint("record_mode IN ('synthetic', 'clinical_testing')", name="ck_facility_record_mode"),)
 
 
 class User(Base):
@@ -29,6 +31,7 @@ class User(Base):
     role: Mapped[str] = mapped_column(String(30))
     password_hash: Mapped[str] = mapped_column(String(300))
     active: Mapped[bool] = mapped_column(Boolean, default=True)
+    password_change_required: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
 
 
 class AuthSession(Base):
@@ -49,8 +52,7 @@ class LoginAttempt(Base):
 class Patient(Base):
     __tablename__ = "patients"
     __table_args__ = (UniqueConstraint("facility_id", "external_id"), UniqueConstraint("facility_id", "id"),
-                     CheckConstraint("sex IN ('female', 'male', 'other', 'unknown')", name="ck_patient_sex"),
-                     CheckConstraint("synthetic = true", name="ck_patient_synthetic_only"))
+                     CheckConstraint("sex IN ('female', 'male', 'other', 'unknown')", name="ck_patient_sex"))
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     facility_id: Mapped[str] = mapped_column(ForeignKey("facilities.id"), index=True)
     external_id: Mapped[str] = mapped_column(String(80))
@@ -115,3 +117,36 @@ class AuditEvent(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     previous_hash: Mapped[str] = mapped_column(String(64))
     chain_hash: Mapped[str] = mapped_column(String(64))
+
+
+class ConsultationRequest(Base):
+    """Immutable durable outbox; delivery may be safely repeated."""
+    __tablename__ = "consultation_requests"
+    __table_args__ = (ForeignKeyConstraint(["facility_id", "encounter_id", "patient_id"], ["encounters.facility_id", "encounters.id", "encounters.patient_id"]),
+                     UniqueConstraint("requested_by", "idempotency_key"), UniqueConstraint("facility_id", "id"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    facility_id: Mapped[str] = mapped_column(ForeignKey("facilities.id"), index=True)
+    encounter_id: Mapped[str] = mapped_column(String(36), index=True)
+    patient_id: Mapped[str] = mapped_column(String(36))
+    requested_by: Mapped[str] = mapped_column(ForeignKey("users.id"))
+    idempotency_key: Mapped[str] = mapped_column(String(36))
+    payload_hash: Mapped[str] = mapped_column(String(64))
+    snapshot: Mapped[dict] = mapped_column(JSON)
+    snapshot_hash: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class ConsultationDisposition(Base):
+    """Primary clinician's final action; never rewrites an earlier assessment."""
+    __tablename__ = "consultation_dispositions"
+    request_id: Mapped[str] = mapped_column(ForeignKey("consultation_requests.id"), primary_key=True)
+    facility_id: Mapped[str] = mapped_column(ForeignKey("facilities.id"), index=True)
+    actor_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
+    opinion_hash: Mapped[str] = mapped_column(String(64))
+    opinion_snapshot: Mapped[dict] = mapped_column(JSON)
+    action: Mapped[str] = mapped_column(String(20))
+    action_taken: Mapped[str] = mapped_column(Text)
+    current_encounter_version: Mapped[int] = mapped_column(Integer)
+    snapshot_was_stale: Mapped[bool] = mapped_column(Boolean)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    __table_args__ = (ForeignKeyConstraint(["facility_id", "request_id"], ["consultation_requests.facility_id", "consultation_requests.id"]), CheckConstraint("action IN ('accepted', 'modified', 'not_followed')", name="ck_consult_disposition_action"),)

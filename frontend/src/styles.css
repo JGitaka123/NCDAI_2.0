@@ -61,3 +61,8 @@ th,td{color:#50654f}th{font-size:11px}.badge-completed,.badge-reviewed,.badge-ac
 .user-access-row h3,.user-access-row p { margin:.2rem 0; }
 .access-confirmation { padding:1.25rem; border:2px solid #FF5757; border-radius:12px; margin-top:1rem; }
 @media (max-width:760px) { .account-layout { grid-template-columns:1fr; } .dosing-picker { align-items:stretch; flex-direction:column; } .dose-request { padding:.75rem; } }
+.consultation-list { display: grid; gap: 12px; margin: 18px 0; }
+.consultation-card { display: grid; gap: 8px; padding: 16px; text-align: left; background: #fff; border: 1px solid #e6e0e0; border-radius: 12px; color: inherit; cursor: pointer; overflow-wrap: anywhere; }
+.consultation-card:focus-visible { outline: 3px solid #FF5757; outline-offset: 2px; }
+.consultation-snapshot { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 100%; font-size: 13px; padding: 12px; background: #faf7f7; }
+.consultation-hash { overflow-wrap: anywhere; }

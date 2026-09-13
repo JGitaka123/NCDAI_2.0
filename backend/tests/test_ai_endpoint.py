@@ -14,7 +14,7 @@ def test_ai_briefing_preserves_rules_and_persists_version(client, monkeypatch):
     current = prepared(client)
     snapshot = deepcopy(current["assessment"])
 
-    async def briefing(assessment, *, synthetic):
+    async def briefing(assessment, *, synthetic, allow_real_patient=False):
         assert synthetic is True
         assert assessment == snapshot
         return {"status": "ready", "provider": "test-double", "focus": [assessment["recommendations"][0]], "urgency": assessment["urgency"]}
@@ -36,7 +36,7 @@ def test_ai_briefing_preserves_rules_and_persists_version(client, monkeypatch):
 def test_provider_failure_is_visible_without_losing_assessment(client, monkeypatch):
     current = prepared(client)
 
-    async def unavailable(assessment, *, synthetic):
+    async def unavailable(assessment, *, synthetic, allow_real_patient=False):
         return {"status": "unavailable", "reason_code": "provider_timeout", "focus": []}
 
     monkeypatch.setattr("app.ai.build_briefing", unavailable)
@@ -48,7 +48,7 @@ def test_provider_failure_is_visible_without_losing_assessment(client, monkeypat
 def test_change_during_provider_latency_cannot_overwrite_newer_record(client, app, monkeypatch):
     current = prepared(client)
 
-    async def raced(assessment, *, synthetic):
+    async def raced(assessment, *, synthetic, allow_real_patient=False):
         with app.state.session_factory() as db:
             db.execute(update(Encounter).where(Encounter.id == current["id"]).values(version=current["version"] + 1, assessment=None))
             db.commit()

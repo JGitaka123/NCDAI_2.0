@@ -34,14 +34,7 @@ class PatientCreate(StrictModel):
     sex: Literal["female", "male", "other", "unknown"]
     female_pregnancy_status: Pregnancy | None = None
     phone: str | None = Field(default=None, max_length=40)
-    synthetic: Literal[True]
-
-    @field_validator("synthetic", mode="before")
-    @classmethod
-    def explicitly_synthetic(cls, value):
-        if value is not True:
-            raise ValueError("An explicit synthetic=true marker is required")
-        return value
+    synthetic: StrictBool
 
     @field_validator("date_of_birth")
     @classmethod

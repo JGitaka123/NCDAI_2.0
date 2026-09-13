@@ -13,7 +13,7 @@ from uuid import uuid4
 
 from .evidence import EVIDENCE_VERSION, REVIEW_STATUS, evidence
 
-RULESET_VERSION = "ncdai-2-rules-0.1.2"
+RULESET_VERSION = "ncdai-2-rules-0.1.3"
 
 ACE = {"lisinopril", "enalapril", "ramipril", "captopril", "perindopril"}
 ARB = {"losartan", "valsartan", "candesartan", "telmisartan", "irbesartan"}
@@ -58,7 +58,7 @@ def assess(data: dict, age: int, sex: str) -> dict:
         "id": str(uuid4()), "urgency": "routine", "summary": "",
         "recommendations": [], "missing_data": [],
         "warnings": [
-            "Proposed rules require independent clinician signoff. Synthetic development use only.",
+            "Clinician verification is required; clinical evaluation of this limited implementation is ongoing.",
             "This is a limited advisory screen, not diagnosis, prescribing, or clearance for discharge.",
             "Unstructured notes are not interpreted by these safety rules; enter critical findings in structured fields.",
         ],
