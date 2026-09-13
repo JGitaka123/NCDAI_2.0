@@ -7,7 +7,8 @@
       "framework": "vite",
       "installCommand": "npm ci",
       "buildCommand": "npm run build",
-      "outputDirectory": "dist"
+      "outputDirectory": "dist",
+      "rewrites": [{ "source": "/consultant", "destination": "/index.html" }]
     },
     "clinical_api": {
       "root": "backend/",
@@ -17,7 +18,6 @@
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": { "service": "clinical_api" } },
-    { "source": "/consultant", "destination": { "service": "clinical_frontend", "path": "/index.html" } },
     { "source": "/(.*)", "destination": { "service": "clinical_frontend" } }
   ],
   "headers": [
