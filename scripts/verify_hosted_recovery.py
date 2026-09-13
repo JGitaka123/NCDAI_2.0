@@ -31,7 +31,8 @@ def fingerprints(connection):
     connection.execute(text("SET LOCAL TIME ZONE 'UTC'"))
     result = {}
     for table in TABLES:
-        rows = connection.execute(text(f'SELECT row_to_json(t)::text FROM (SELECT * FROM {table} ORDER BY id) t')).scalars().all()
+        key = 'request_id' if table == 'consultation_dispositions' else 'id'
+        rows = connection.execute(text(f'SELECT row_to_json(t)::text FROM (SELECT * FROM {table} ORDER BY {key}) t')).scalars().all()
         result[table] = dict(count=len(rows), sha256=hashlib.sha256('\n'.join(rows).encode()).hexdigest())
     return result
 

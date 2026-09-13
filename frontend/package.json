@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
-    "test:browser": "playwright test && node tests/browser/summarize.mjs"
+    "test:browser": "playwright test workflow.spec.ts && node tests/browser/summarize.mjs",
+    "test:browser:consultant": "playwright test consultation.spec.ts"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

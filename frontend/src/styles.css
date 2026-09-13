@@ -66,3 +66,4 @@ th,td{color:#50654f}th{font-size:11px}.badge-completed,.badge-reviewed,.badge-ac
 .consultation-card:focus-visible { outline: 3px solid #FF5757; outline-offset: 2px; }
 .consultation-snapshot { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 100%; font-size: 13px; padding: 12px; background: #faf7f7; }
 .consultation-hash { overflow-wrap: anywhere; }
+.badge-soon,.count-pill { color: #725a22; }
