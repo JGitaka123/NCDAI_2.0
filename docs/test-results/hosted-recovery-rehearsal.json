@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-12T19:30:09.930909+00:00",
+  "generated_at": "2026-09-13T05:28:19.045853+00:00",
   "status": "passed",
   "kind": "Hosted synthetic snapshot restored to isolated local PostgreSQL",
   "real_patient_data": false,
@@ -17,42 +17,50 @@
     "Restored database remains local and is not served over the network."
   ],
   "server_version": "18.6 (2078fcb)",
-  "migration": "20260912_guards",
-  "snapshot_at": "2026-09-12T19:30:16.914290+00:00",
+  "migration": "20260913_mary_help",
+  "snapshot_at": "2026-09-13T05:28:23.749057+00:00",
   "tables": {
     "facilities": {
-      "count": 1,
-      "sha256": "febeb51e12cd19947b506bb83f4bcd4f0465bdc6bad71e748476adb006c03382"
+      "count": 3,
+      "sha256": "2526097b6ca7271fc15e5486f155fd0956c8dd27b6284f878542a999fe7c65a4"
     },
     "users": {
-      "count": 1,
-      "sha256": "f2f141f53c3ce22b72790384df0a4b653cd6ac48a8004ed4f5cb85d32a6ce4e4"
+      "count": 6,
+      "sha256": "d5a432b115f6ca3ee6b8794f2af458a5a19df73e994e8df6ca7fc56e5c7019bf"
     },
     "auth_sessions": {
-      "count": 8,
-      "sha256": "7b3704776dd47320895a87d110f8a6c7bbd29794868b42f9c187c8db1b00848a"
+      "count": 4,
+      "sha256": "c31e177b87e5329cfc4892a7fd2e224711dd5ba3fd2d69d711bcf1c7ba60e38f"
     },
     "login_attempts": {
-      "count": 33,
-      "sha256": "c116bda9dc62e164fdb0167000b7377cfba7a2f429df61630e3614579570dd0f"
+      "count": 141,
+      "sha256": "90b5d5a5c311fa3cb8012fef6b4dae9deda75a2aa64d6984cd749a618681dfe4"
     },
     "patients": {
-      "count": 9,
-      "sha256": "4110b41d33d069416e0dc2080659efba4048acc876de32fdb5fb1162454504b6"
+      "count": 30,
+      "sha256": "9af3bb9dfbabb56290b1fd233ca4887925852cf8d31509b6b00c060d842af617"
     },
     "encounters": {
-      "count": 11,
-      "sha256": "bba02c29e324585b06dd17620e23659c1a9f6689402134d169da5fabc5570982"
+      "count": 36,
+      "sha256": "f86de37a88fe76bf20007fc8f7b1fd5ba91368d2945447e83f5daa44ab94c851"
     },
     "referrals": {
-      "count": 9,
-      "sha256": "34ffdb662d983aeeb5c65150adc7c5ee1e1f204676c310359eb7250d38075201"
+      "count": 17,
+      "sha256": "37b9066b72ede29d534bc7bc4cab86eac9ba81bd365a9e39964b6511d116e0cc"
     },
     "audit_events": {
-      "count": 98,
-      "sha256": "825e4b5d876de27f4d0b6337e2a32daf8b32945d41613ee7794b65824e15b902"
+      "count": 315,
+      "sha256": "e162787f023581ef0b8c2ec944303d56031334cbad65c070a218f7ccc5bc5eda"
+    },
+    "consultation_requests": {
+      "count": 10,
+      "sha256": "26cb9f776dcd493a3981ef1b67188a591af675b134e33ba28aa7c6d84bed8c3b"
+    },
+    "consultation_dispositions": {
+      "count": 4,
+      "sha256": "8587447fecee43c8c85ed7a8ff78fb4cc6b4ce2c2ad408acb1e96e5856d60049"
     }
   },
-  "facility_chains_verified": 1,
-  "elapsed_seconds": 44.188
+  "facility_chains_verified": 3,
+  "elapsed_seconds": 41.99
 }

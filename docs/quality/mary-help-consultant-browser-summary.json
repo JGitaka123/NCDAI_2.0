@@ -1,0 +1,89 @@
+{
+  "checked_at": "2026-09-13T05:26:15.140Z",
+  "origin": "https://ncdai-2.vercel.app",
+  "kind": "Fictional consultant browser engineering verification; not clinical validation or WCAG certification",
+  "test_results": {
+    "startTime": "2026-09-13T05:26:15.140Z",
+    "duration": 53314.301999999996,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "views": [
+    {
+      "view": "desktop-request",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0
+    },
+    {
+      "view": "desktop-independent-response",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0
+    },
+    {
+      "view": "desktop-final-action",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0
+    },
+    {
+      "view": "desktop-evaluation",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0
+    },
+    {
+      "view": "mobile-request",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "violations": 0
+    },
+    {
+      "view": "mobile-independent-response",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "violations": 0
+    },
+    {
+      "view": "mobile-final-action",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "violations": 0
+    },
+    {
+      "view": "mobile-evaluation",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "violations": 0
+    }
+  ],
+  "checks": [
+    "Separate primary/consultant accounts",
+    "HTTP 200 direct consultant link",
+    "Preserved original assessment and observations",
+    "Immutable independent opinion",
+    "Changed encounter explicitly acknowledged",
+    "Primary action and reasons retained",
+    "Real versus fictional evaluation separated",
+    "Logout revokes sessions"
+  ]
+}

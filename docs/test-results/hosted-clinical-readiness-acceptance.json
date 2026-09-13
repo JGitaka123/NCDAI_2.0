@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-12T19:36:30.761608+00:00",
+  "checked_at": "2026-09-13T05:11:33.173719+00:00",
   "origin": "https://ncdai-2.vercel.app",
   "kind": "Hosted synthetic engineering acceptance; not clinical validation",
   "checks": [
@@ -22,17 +22,17 @@
     "reason_code": null,
     "provider": "deepseek",
     "model": "deepseek-v4-pro",
-    "prompt_version": "ncdai-briefing-select-v1.4",
+    "prompt_version": "ncdai-briefing-select-v1.5",
     "usage": {
-      "input_tokens": 337,
-      "output_tokens": 47,
-      "total_tokens": 384
+      "input_tokens": 335,
+      "output_tokens": 40,
+      "total_tokens": 375
     },
-    "latency_ms": 1606
+    "latency_ms": 1429
   },
   "audit": {
     "valid": true,
-    "events": 126
+    "events": 163
   },
   "passed": true
 }

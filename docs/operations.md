@@ -1,6 +1,6 @@
 # NCDAI 2.0 operations runbook
 
-This runbook covers the standalone, synthetic-record engineering release. Hosting it with production security settings does not authorize clinical use or establish service availability, recovery objectives, or regulatory compliance. The application does not permit real patient records. Aifya and QAfya integration remains a later, separately tested option.
+This runbook covers the standalone application and the owner-authorized Mary Help supervised-testing configuration. Only that explicitly configured facility can create real records; the demonstration facility remains fictional-only. See the [hospital testing guide](mary-help-testing-guide.md). Engineering readiness does not establish clinical effectiveness or guaranteed availability. Aifya and QAfya integration remains a later, separately tested option.
 
 ## Deployment identity and release record
 
@@ -75,7 +75,7 @@ Prefer a forward corrective migration when retained data exists. Do not run `ale
 
 Maintain encrypted, access-restricted backups outside the application's credentials and verify the hosted provider's retention/PITR configuration. A plan name or database connection does not prove backups are enabled. For a logical rehearsal, use matching PostgreSQL clients, a direct administrative connection and custom-format `pg_dump`; restore with `pg_restore --exit-on-error` into a **new isolated database**. Supply passwords through protected environment/credential files, not command arguments or logs. Do not use `--clean` against the source application database.
 
-Before switching to a restored database, compare migration revision, table counts and canonical row fingerprints; verify all facility audit chains, reviewed encounter snapshots, synthetic-only constraints, referral state constraints and roles/triggers. Test sign-in and a new synthetic workflow. Preserve the original database and stop writes during final reconciliation; do not combine histories by rewriting review/audit rows. Revoke restored sessions before exposing a recovered instance. Record backup time, restored-through time, observed data gap, start/end recovery times and validation evidence. RPO of at most 24 hours and RTO of at most four hours remain proposed targets until measured in the hosted environment.
+Before switching to a restored database, compare migration revision, table counts and canonical row fingerprints; verify all facility audit chains, reviewed encounter snapshots, facility-specific record classification and immutable patient classification constraints, referral state constraints and roles/triggers. Test sign-in and a new synthetic workflow. Preserve the original database and stop writes during final reconciliation; do not combine histories by rewriting review/audit rows. Revoke restored sessions before exposing a recovered instance. Record backup time, restored-through time, observed data gap, start/end recovery times and validation evidence. RPO of at most 24 hours and RTO of at most four hours remain proposed targets until measured in the hosted environment.
 
 The repository's isolated recovery harness and current execution limitations are documented in [database verification](database-verification.md) and [release engineering](release-engineering.md). A local/CI recovery rehearsal is distinct from a completed drill on the eventual hosted service.
 
@@ -89,3 +89,14 @@ Before any later real-care release, require institution-approved data handling, 
 ## Hosted recovery rehearsal, 12 September 2026
 
 A read-only exported PostgreSQL snapshot from the live synthetic Neon database was restored into a fresh loopback database. Table fingerprints, audit chains, schema/triggers and application sign-in/read/logout passed in 44.188 seconds. Restored sessions were revoked before verification. [Measured evidence](test-results/hosted-recovery-rehearsal.json). This establishes this snapshot's logical recoverability, not a recurring backup service or cloud failover SLO. The reproduction tool deliberately refuses real-record sources and never restores into the public database: `scripts/verify_hosted_recovery.py`.
+
+
+## Consultant database and recovery
+
+The consultant workspace shares authentication and deployment with the main application but uses a separate logical PostgreSQL database and restricted role. Run its explicit migration under a maintenance owner, configure `NCDAI_CONSULTANT_DATABASE_URL`, and verify `/api/health/consultant`. The primary runtime role cannot connect to consultant storage. This is logical isolation within the same Frankfurt Neon project, not independent physical infrastructure.
+
+Back up both databases. Main storage retains durable requests, original snapshots and copies of acknowledged opinions. Consultant storage retains delivered cases and all consultant opinions, including those not yet acknowledged by the primary team. Restore each database to a fresh target, verify version, row fingerprints, immutable triggers and snapshot/opinion hashes, then reconcile requests and opinions by stable ID. Retry delivery of retained requests; never overwrite an existing opinion or silently discard an opinion with no corresponding restored request. Keep such records isolated for controlled reconciliation.
+
+The read-only fictional-data rehearsals are `scripts/verify_hosted_recovery.py` and `scripts/verify_consultant_recovery.py`. They deliberately refuse real-patient records and do not implement a clinical-data backup service. Configure and verify managed retention/PITR and encrypted operational backups with the responsible operator before relying on recovery for patient records. Neither a successful local restore nor a plan name establishes cloud RPO/RTO.
+
+The service-health workflow checks the primary and consultant endpoints every five minutes on a best-effort GitHub schedule. It does not itself send email/SMS or guarantee delivery of notifications. The testing team must agree direct incident contact, consultant coverage and downtime documentation.

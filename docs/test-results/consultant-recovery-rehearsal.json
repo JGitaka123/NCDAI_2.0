@@ -1,0 +1,32 @@
+{
+  "checked_at": "2026-09-13T05:29:04.810342+00:00",
+  "status": "passed",
+  "real_patient_data": false,
+  "source_mutations": false,
+  "checks": [
+    "consistent_read_only_fictional_consultant_snapshot_over_TLS",
+    "three_table_counts_and_SHA256_match",
+    "immutable_history_triggers_restored",
+    "all_case_and_opinion_hashes_valid; no_orphan_opinions"
+  ],
+  "limitations": [
+    "Logical snapshot recovery only; no certified RPO/RTO or cloud failover.",
+    "Primary and consultant snapshots are taken separately; reconcile requests/opinions by stable ID and hash.",
+    "No new automatic backup retention or notification delivery is claimed."
+  ],
+  "tables": {
+    "consultant_schema": {
+      "count": 1,
+      "sha256": "2d0536bf99a9714e0700fe49704a8738c1d22a316d738806720c1b0b5deae8b9"
+    },
+    "consultant_cases": {
+      "count": 8,
+      "sha256": "45cfffaacf82a714477d09dbb806b22e9e58baf9946472c247914ea34adefb1a"
+    },
+    "consultant_opinions": {
+      "count": 4,
+      "sha256": "7b9e8ca6655ae45a03027bbd6c41ca120f54a733bd1805b494d436624a323434"
+    }
+  },
+  "elapsed_seconds": 25.975
+}

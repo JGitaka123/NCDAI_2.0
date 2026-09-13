@@ -1,10 +1,11 @@
 {
+  "restricted_runtime_roles": true,
   "concurrency_checks": 2,
   "cases": 50,
   "passed": 50,
   "failed": 0,
   "database": "Two isolated PostgreSQL databases",
-  "seconds": 17.27,
+  "seconds": 26.48,
   "scope": "Fictional workflow verification; not independent clinical adjudication",
   "checks": [
     "request and immutable snapshot",

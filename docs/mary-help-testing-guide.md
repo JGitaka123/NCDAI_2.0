@@ -35,6 +35,10 @@ If a request is saved but consultant storage is unavailable, the main database r
 
 Jesse coordinates service incidents. Check the primary and consultant health endpoints and the **Mary Help service health** GitHub workflow. Scheduled GitHub checks are best effort; their existence does not prove that email notifications are delivered. Set account notifications and verify the team's direct contact/downtime arrangements before the first session.
 
+## Record continuity during testing
+
+Keep the hospital's existing documentation process alongside NCDAI during supervised testing. Both databases passed logical snapshot/restore checks, but actual managed backup/PITR retention has not yet been inspected because Neon requires owner email verification before console access. Complete that verification and confirm retention/recovery arrangements before relying on NCDAI as the sole patient record.
+
 ## Daily evaluation and close-out
 
 Dr Kamau reviews unresolved disagreements, safety concerns, unsupported cases and any opinion that differed from the primary clinician's eventual action. Jesse/Jane check account access, service failures and unresolved delivery. Preserve case IDs, rule/evidence/dose versions and reasoned decisions; do not overwrite an earlier opinion. Further questions require a new linked consultation.

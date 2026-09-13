@@ -1,6 +1,6 @@
 # Hosted NCDAI 2.0 release
 
-12 September 2026 · Controlled synthetic demonstration · Application version 0.1
+13 September 2026 · Mary Help supervised testing · Application version 0.1
 
 **Open the application: [https://ncdai-2.vercel.app](https://ncdai-2.vercel.app).** The original coral `#FF5757` and unchanged NCDAI logo are restored. Sign-in is required for clinical records. Private account details are delivered separately and are not in this repository.
 
@@ -9,26 +9,26 @@
 | Item | Recorded value |
 |---|---|
 | Vercel account/project | `jessegitaka-7527s-projects / ncdai-2` |
-| Deployed application commit | `dac1187d76238368a71c1a5bb7c11b23cfe52c6b` |
-| Deployment | `dpl_EcgLxsryt2z2wTsEYGonTUXSyS4B` |
-| Vercel inspection | [Deployment details](https://vercel.com/jessegitaka-7527s-projects/ncdai-2/EcgLxsryt2z2wTsEYGonTUXSyS4B) |
+| Deployed application commit | `1ded07988c4086ec75bf512e828410993a095e7b` |
+| Deployment | `dpl_BEqK7J126wTCP2QFu3yUrBMYK9M6` |
+| Vercel inspection | [Deployment details](https://vercel.com/jessegitaka-7527s-projects/ncdai-2/BEqK7J126wTCP2QFu3yUrBMYK9M6) |
 | Runtime | Vite frontend and Python 3.12 FastAPI services; API function inspected in `fra1` |
 | Database | Dedicated Neon `ncdai-2-db`, Free plan, Frankfurt requested at provisioning; server reports PostgreSQL `18.6 (2078fcb)` |
-| Schema revision | `20260912_guards` |
+| Schema revision | `20260913_mary_help`; consultant `consultant-20260913-1` |
 | Application database role | `ncdai_app`, separate from the migration owner |
-| Clinical rules | `ncdai-2-rules-0.1.2` |
+| Clinical rules | `ncdai-2-rules-0.1.3` |
 | AI provider/model | DeepSeek / `deepseek-v4-pro` |
-| Prompt contract | `ncdai-briefing-select-v1.4` |
+| Prompt contract | `ncdai-briefing-select-v1.5` |
 
 The existing `aifya-web` project was not replaced. NCDAI has its own project, database and canonical domain. Repository changes were pushed to `codex/ncdai-2-platform`; deployment is explicit through the Vercel CLI, rather than automatically publishing every push.
 
-## Current clinical-deployment preparation release
+## Current Mary Help release
 
-The latest release corrects potassium follow-up and acute kidney injury escalation, requires explicit acute negatives for dose references, and verifies a read-only snapshot recovery from the hosted database. **Clinical care activation remains incomplete**, with first-facility and operating details requested; see [the status and remaining dependencies](clinical-deployment-status.md).
+Mary Help Hospital, Thika is enabled for supervised testing with named accounts, mandatory initial password changes, facility-scoped real-record registration and constrained DeepSeek briefing. The consultant workspace has its own logical database and restricted role, preserving the request, independent opinion and primary action. The demonstration facility remains fictional-only. See [current status and operating handover](clinical-deployment-status.md), [testing guide](mary-help-testing-guide.md), and [release evidence](test-results/mary-help-release-summary.json).
 
-Verification on the deployed application commit passed: **381 backend tests**, **28 frontend tests**, **66 general cases and 75 dosing cases on SQLite and PostgreSQL**, **19 database checks**, and **5 hosted browser workflows with 23 accessibility scans and zero reported violations**. Ten backend skips are documented separately from the successful PostgreSQL and live-provider checks. All three [cloud jobs passed](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34714529987).
+The consultant deep link uses a rewrite inside the frontend service, consistent with [Vercel's service-routing documentation](https://vercel.com/kb/guide/vercel-services). Its live HTTP and browser checks are included in release verification. Hosted deployment is explicit; later documentation-only commits do not change the deployed application revision above.
 
-The [hosted acceptance](test-results/hosted-clinical-readiness-acceptance.json) passed emergency and eligible-dose workflows plus the new suspected-AKI/potassium case. DeepSeek returned a constrained response in 1.606 seconds using 384 tokens. The [hosted browser result](test-results/clinical-readiness-browser.json) covers desktop, tablet, phone, keyboard and administrator navigation. [Machine-readable release evidence](test-results/clinical-readiness-release-summary.json).
+The following sections record earlier release verification and are historical; they do not supersede the current configuration or test results.
 
 ## Prior dose-reference release (historical)
 

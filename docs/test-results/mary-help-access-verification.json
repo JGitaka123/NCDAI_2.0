@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-09-13T05:12:49.376580+00:00",
+  "status": "passed",
+  "checks": [
+    "three_named_accounts_correct_facility_role_and_mandatory_password_change; sessions_revoked",
+    "consultant_database_TLS_version_and_least_privilege; primary_role_cannot_connect",
+    "Mary_Help_configured_for_clinical_testing; no_patient_records_created_during_provisioning",
+    "synthetic_facility_still_rejects_real_record_classification"
+  ],
+  "passwords_changed": false,
+  "messages_sent": false,
+  "real_patient_data_created": false
+}

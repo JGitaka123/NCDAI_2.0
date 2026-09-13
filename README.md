@@ -1,14 +1,14 @@
 # NCDAI 2.0
 
-Latest: [clinical deployment status and verified release](docs/clinical-deployment-status.md). Owner-confirmed approvals are recorded; real-patient activation is not yet complete.
+Latest: [clinical deployment status and verified release](docs/clinical-deployment-status.md). Mary Help Hospital, Thika is configured for supervised testing from 14 September 2026. See the [hospital testing guide](docs/mary-help-testing-guide.md) and [consultant workspace design](docs/consultant-architecture.md).
 
 **A standalone clinician workspace for coordinated adult NCD care.**
 
 NCDAI 2.0 brings patient history, structured assessment, evidence-linked safety checks, clinician decisions and referral follow-through into one workflow. Its major domains are cardiovascular disease, diabetes, chronic respiratory disease, kidney disease, cancer warning signs and multimorbidity. It preserves the familiar NCDAI consultation sequence with a redesigned responsive interface.
 
-This hosted release remains **research software for synthetic cases only**. The project owner confirms DHA and ethics approvals cover care and medication recommendations, with records held in office files. Selected dose references are now calculated deterministically for clinician review; the application does not autonomously diagnose or prescribe. The selected medication checks are not a complete drug-interaction service. Engineering tests do not establish clinical accuracy, effectiveness or adoption.
+This hosted release enables **supervised clinical testing at Mary Help Hospital only**, alongside an isolated fictional demonstration facility. The project owner confirms DHA and ethics approvals cover care and medication recommendations, with records held in office files. Selected dose references are now calculated deterministically for clinician review; the application does not autonomously diagnose or prescribe. The selected medication checks are not a complete drug-interaction service. Engineering tests do not establish clinical accuracy, effectiveness or adoption.
 
-**Hosted demonstration:** [ncdai-2.vercel.app](https://ncdai-2.vercel.app). Use the privately provided account. See the [deployment and acceptance record](docs/deployment.md).
+**Hosted application:** [ncdai-2.vercel.app](https://ncdai-2.vercel.app). Use your individually provisioned account; first-login password change is required. See the [deployment and acceptance record](docs/deployment.md).
 
 ## What is implemented
 
@@ -19,6 +19,8 @@ This hosted release remains **research software for synthetic cases only**. The 
 - Mandatory clinician review of every action: accept, modify, defer or reject, with rationale for changes.
 - Version checks and immutable reviewed records, including exact input and assessment snapshots.
 - Referral request, acceptance, completion/cancellation and outcome tracking.
+- Independent consultant review at `/consultant`, with its own database, preserved case snapshots, signed immutable opinions, primary-team action and facility evaluation.
+- Explicit real/fictional record classification and a facility-specific clinical-testing gate.
 - Facility isolation, clinical/administrative roles, revocable cookie sessions, CSRF protection and hash-linked audit events.
 - Password changes with other-session revocation and administrator account activation/deactivation with lockout protection.
 - PostgreSQL-ready schema and migrations, with SQLite for isolated local development.
@@ -77,7 +79,7 @@ The frozen [66-case catalogue](tests/cases/clinical_cases.json) exercises the si
 
 ## Deployment and governance
 
-Vercel configuration routes the frontend and Python API under one origin. A hosted PostgreSQL database, migrations, secure cookies, a strong session secret and explicitly provisioned clinical accounts are required. SQLite and development seeding are refused in production mode. The mandatory synthetic-only gate remains enabled in hosted demonstrations.
+Vercel configuration routes the frontend and Python API under one origin. A hosted PostgreSQL database, migrations, secure cookies, a strong session secret and explicitly provisioned clinical accounts are required. SQLite and development seeding are refused in production mode. Local and demonstration facilities remain fictional-only. Only the explicitly configured clinical-testing facility can register real records.
 
 The owner's confirmation of DHA and ethics approval is recorded separately from independent validation of this exact software and source manifest. National interoperability certification, an independent penetration test and clinical-impact evidence are not claimed. The evaluation package is drafted; it has not been submitted or conducted. The hosted synthetic restriction remains a release control while clinical/pharmacy adjudication and operational validation proceed.
 

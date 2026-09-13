@@ -1,0 +1,119 @@
+{
+  "generated_at": "2026-09-13T05:29:44.740728+00:00",
+  "status": "deployed_for_supervised_hospital_testing; operational_handover_items_listed",
+  "facility": "Mary Help Hospital, Thika",
+  "planned_testing_date": "2026-09-14",
+  "application_url": "https://ncdai-2.vercel.app",
+  "consultant_url": "https://ncdai-2.vercel.app/consultant",
+  "deployed_commit": "1ded07988c4086ec75bf512e828410993a095e7b",
+  "deployment_id": "dpl_BEqK7J126wTCP2QFu3yUrBMYK9M6",
+  "api_region": "fra1",
+  "primary_schema": "20260913_mary_help",
+  "consultant_schema": "consultant-20260913-1",
+  "clinical_testing_facility_scope": "Only the configured Mary Help facility; demonstration remains fictional-only",
+  "ci": {
+    "url": "https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34740182322",
+    "jobs_passed": 3,
+    "backend_passed": 401,
+    "backend_conditional_skips": 10,
+    "frontend_passed": 30,
+    "postgres_integrity_checks": 19,
+    "postgres_transaction_account_tests": 2,
+    "general_cases_per_database": 66,
+    "general_case_databases": [
+      "SQLite",
+      "PostgreSQL"
+    ],
+    "full_dose_cases_postgres": 75,
+    "full_consultant_cases_two_postgres_databases": 50,
+    "consultant_concurrency_checks": 2,
+    "restricted_consultant_runtime_roles": true,
+    "dependency_audits": "No known vulnerabilities reported at run time"
+  },
+  "browser": {
+    "main_workflows_passed": 5,
+    "main_automated_accessibility_scans": 23,
+    "main_scope": "Same frontend asset build; subsequent change adds consultant deep-link routing only",
+    "consultant_workflows_passed": 2,
+    "consultant_automated_accessibility_scans": 8,
+    "reported_accessibility_violations": 0,
+    "not_WCAG_certification": true
+  },
+  "live_AI": {
+    "status": "ready",
+    "reason_code": null,
+    "provider": "deepseek",
+    "model": "deepseek-v4-pro",
+    "prompt_version": "ncdai-briefing-select-v1.5",
+    "usage": {
+      "input_tokens": 335,
+      "output_tokens": 40,
+      "total_tokens": 375
+    },
+    "latency_ms": 1429
+  },
+  "account_verification": "mary-help-access-verification.json",
+  "temporary_account_closeout": {
+    "checked_at": "2026-09-13T05:28:15.262994+00:00",
+    "accounts_deactivated": 2,
+    "sessions_revoked": true,
+    "fictional_records_and_audit_retained": true,
+    "hospital_accounts_unchanged": true
+  },
+  "recovery": {
+    "primary_status": "passed",
+    "primary_tables": 10,
+    "primary_seconds": 41.99,
+    "consultant_status": "passed",
+    "consultant_tables": 3,
+    "consultant_seconds": 25.975,
+    "source_writes": false,
+    "source_real_patient_records": false,
+    "clinical_RPO_RTO_certified": false
+  },
+  "health": {
+    "checked_at": "2026-09-13T05:29:44.725282+00:00",
+    "checks": [
+      {
+        "endpoint": "/api/health/live",
+        "passed": true,
+        "elapsed_seconds": 0.625
+      },
+      {
+        "endpoint": "/api/health/ready",
+        "passed": true,
+        "elapsed_seconds": 0.578
+      },
+      {
+        "endpoint": "/api/health/consultant",
+        "passed": true,
+        "elapsed_seconds": 0.516
+      },
+      {
+        "endpoint": "/",
+        "passed": true,
+        "elapsed_seconds": 0.328
+      },
+      {
+        "endpoint": "/consultant",
+        "passed": true,
+        "elapsed_seconds": 0.328
+      }
+    ]
+  },
+  "initial_health_workflow": "https://github.com/JGitaka123/NCDAI_2.0/actions/runs/34739686192",
+  "remaining_handover": [
+    "Named primary health worker accounts must be created by Jesse/Jane; names/emails not yet supplied.",
+    "All hospital users must change temporary passwords and rehearse with fictional records.",
+    "Agree consultant coverage and direct escalation/downtime communication; no automated consultant email/SMS alerts.",
+    "Neon console requires owner email verification; actual managed backup/PITR retention remains unverified. Keep existing hospital records during testing.",
+    "Independent clinical/pharmacy adjudication and prospective clinical evaluation are not replaced by engineering tests."
+  ],
+  "limitations": [
+    "Selected adult NCD pathways and four bounded oral starting-dose references, not all NCD treatment.",
+    "Separate consultant logical database uses the same Frankfurt Neon project; no physical fault isolation.",
+    "No live Aifya/QAfya integration.",
+    "No model fine-tuning, comprehensive RAG or clinical-effectiveness claim.",
+    "No actual Mary Help patient data introduced during engineering verification."
+  ]
+}

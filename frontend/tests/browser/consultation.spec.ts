@@ -37,7 +37,7 @@ for (const viewport of [{ name: 'desktop', width: 1366, height: 900 }, { name: '
     const request = async (method: string, path: string, data?: unknown, expected = 200) => {
       const response = await page.request.fetch('/api' + path, { method, headers, data })
       expect(response.status()).toBe(expected)
-      return response.json()
+      return response.status() === 204 ? null : response.json()
     }
     const patient = await request('POST', '/patients', { external_id: run, given_name: 'Fictional', family_name: run, date_of_birth: '1975-01-01', sex: 'male', synthetic: true }, 201)
     let encounter = await request('POST', '/encounters', { patient_id: patient.id, data: { systolic_bp: 154, diastolic_bp: 96, known_hypertension: 'yes', notes: 'Fictional consultant browser verification; no patient care.', observed_at: new Date().toISOString() } }, 201)
@@ -63,11 +63,11 @@ for (const viewport of [{ name: 'desktop', width: 1366, height: 900 }, { name: '
     const consultant = await other.newPage()
     try {
       await login(consultant, 'supervisor')
-      await consultant.goto('/consultant')
+      expect((await consultant.goto('/consultant'))?.status()).toBe(200)
       await consultant.getByRole('button').filter({ hasText: question }).click()
       await expect(consultant.getByRole('heading', { name: 'Independent consultant response' })).toBeVisible()
       await consultant.getByText('Preserved clinical observations', { exact: true }).click()
-      await expect(consultant.getByText('154', { exact: true })).toBeVisible()
+      await expect(consultant.getByText('154 mmHg', { exact: true })).toBeVisible()
       await consultant.getByLabel('Agreement with selected recommendations').selectOption('partly_agree')
       await consultant.getByLabel('assessment', { exact: true }).fill('Fictional independent assessment: verify repeat observations and complete missing history.')
       await consultant.getByLabel('recommended action', { exact: true }).fill('Fictional advice: reassess with the responsible clinical team before taking action.')
@@ -96,10 +96,18 @@ for (const viewport of [{ name: 'desktop', width: 1366, height: 900 }, { name: '
       const artifactDir = resolve(process.env.NCDAI_BROWSER_ARTIFACT_DIR || '../.runtime/consultant-browser')
       mkdirSync(artifactDir, { recursive: true })
       await page.screenshot({ path: resolve(artifactDir, `${viewport.name}-consultant-closed.png`), fullPage: true })
-      await request('POST', '/auth/logout')
+      if (await consultant.getByRole('button', { name: 'Open navigation' }).isVisible()) await consultant.getByRole('button', { name: 'Open navigation' }).click()
+      await consultant.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: 'Evaluation', exact: true }).click()
+      await expect(consultant.getByRole('heading', { name: 'Consultation follow-through' })).toBeVisible()
+      await expect(consultant.getByText('Consultant agreement', { exact: true })).toBeVisible()
+      await audit(consultant, `${viewport.name}-evaluation`)
+      await consultant.getByLabel('Fictional staff-rehearsal cases only').uncheck()
+      await expect(consultant.getByText('Only real-patient clinical-testing episodes are included.')).toBeVisible()
+      await expect(consultant.locator('.account-details > div').filter({ hasText: 'Requests' }).locator('dd')).toHaveText('0')
+      await request('POST', '/auth/logout', undefined, 204)
       const consultantSession = await (await consultant.request.get('/api/auth/session')).json()
       const out = await consultant.request.post('/api/auth/logout', { headers: { Origin: access.url, 'X-CSRF-Token': consultantSession.csrf_token } })
-      expect(out.status()).toBe(200)
+      expect(out.status()).toBe(204)
     } finally { await other.close() }
   })
 }

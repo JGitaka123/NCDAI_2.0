@@ -41,6 +41,8 @@ def run():
     checks.append('consultant_database_TLS_version_and_least_privilege; primary_role_cannot_connect')
     engine = create_engine(make_url(demo['database_url']).set(drivername='postgresql+psycopg'))
     with engine.connect() as conn:
+        assert conn.scalar(text("SELECT has_column_privilege(current_user, 'consultation_requests', 'id', 'UPDATE')"))
+        assert not conn.scalar(text("SELECT has_column_privilege(current_user, 'consultation_requests', 'snapshot', 'UPDATE')"))
         assert conn.scalar(text('SELECT record_mode FROM facilities WHERE id=:f'), {'f':config['facility_id']}) == 'clinical_testing'
         assert conn.scalar(text('SELECT count(*) FROM patients WHERE facility_id=:f'), {'f':config['facility_id']}) == 0
     engine.dispose()
