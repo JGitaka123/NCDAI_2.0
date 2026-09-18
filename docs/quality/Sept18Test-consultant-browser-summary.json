@@ -1,0 +1,82 @@
+{
+  "checked_on": "2026-09-18T16:04:47.098510+00:00",
+  "label": "Sept18Test",
+  "target_url": "http://127.0.0.1:5173",
+  "target_kind": "Local synthetic stack on PostgreSQL 16.13; not the hosted deployment",
+  "playwright_version": "1.63.0",
+  "browser": "Chromium 1194 preinstalled in the verification sandbox",
+  "scope": "Fictional consultant handoff verification; not clinical validation or WCAG certification",
+  "workflows_passed": 2,
+  "workflow_names": [
+    "Independent consultant handoff and closure - desktop 1366x900",
+    "Independent consultant handoff and closure - mobile 390x844"
+  ],
+  "accessibility_audits": 8,
+  "reported_violations": 0,
+  "views": [
+    {
+      "label": "desktop-evaluation",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0
+    },
+    {
+      "label": "desktop-final-action",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0
+    },
+    {
+      "label": "desktop-independent-response",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0
+    },
+    {
+      "label": "desktop-request",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "violations": 0
+    },
+    {
+      "label": "mobile-evaluation",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "violations": 0
+    },
+    {
+      "label": "mobile-final-action",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "violations": 0
+    },
+    {
+      "label": "mobile-independent-response",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "violations": 0
+    },
+    {
+      "label": "mobile-request",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "violations": 0
+    }
+  ]
+}

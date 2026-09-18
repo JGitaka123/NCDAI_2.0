@@ -1,6 +1,8 @@
 # Bounded Kenya medicine-reference engine
 
-Version `ncdai-dose-reference-0.1.0` · 12 September 2026
+Version `ncdai-dose-reference-0.1.1` · 13 September 2026 (supersedes `0.1.0` of 12 September 2026)
+
+Version `0.1.1` changed eligibility only: a starting-dose reference is withheld unless both `acutely_unwell` and `acute_kidney_injury` are explicitly recorded as `no`. The four-medicine catalogue and its manifest hash are unchanged from `0.1.0`.
 
 This extension supplies selected adult oral starting-dose references and checks a clinician-entered dose against the configured reference. It does not select a drug, issue a prescription, prescribe a titration schedule, calculate renal/weight adjustments or establish that a proposed regimen is clinically appropriate. Reviewed output is an immutable decision record; FHIR export remains a document and observations, not a medication order.
 

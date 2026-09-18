@@ -1,0 +1,469 @@
+{
+  "run_id": "819eb55bc8",
+  "label": "Sept18Test",
+  "started_at": "2026-09-18T15:54:04.078839+00:00",
+  "completed_at": "2026-09-18T15:54:06.927833+00:00",
+  "kind": "Synthetic API workflow engineering verification, not clinical validation",
+  "catalogue_total": 66,
+  "catalogue_version": "1.0",
+  "selection": "deterministic round-robin across domains, 20 of 66 cases",
+  "database": "PostgreSQL",
+  "live_ai_enabled": false,
+  "ai_statuses": {
+    "ready": 0,
+    "disabled": 0,
+    "unavailable": 0,
+    "blocked": 0
+  },
+  "emr_connections": 0,
+  "total": 20,
+  "passed": 20,
+  "failed": 0,
+  "dashboard": {
+    "patients": 20,
+    "encounters": 20,
+    "reviewed": 20,
+    "open_referrals": 0,
+    "urgent_assessments": 15
+  },
+  "audit": {
+    "valid": true,
+    "events": 182,
+    "head_hash": "f66a20cdf1a48dacf3131820420d5f202ae5bd9297e45d565ce0e6fbdd67feed",
+    "limitation": "Hash chain detects modification against retained history; external anchoring is required to detect full-history rewrite or tail deletion."
+  },
+  "cases": [
+    {
+      "id": "NCD-001",
+      "domain": "cardiovascular",
+      "title": "Stable treated hypertension review",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "DIABETES_CONFIRM",
+        "HTN_FOLLOWUP"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.143
+    },
+    {
+      "id": "NCD-002",
+      "domain": "cardiovascular",
+      "title": "Severe isolated systolic reading",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "BP_SEVERE",
+        "DATA_COMPLETENESS"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.107
+    },
+    {
+      "id": "NCD-003",
+      "domain": "cardiovascular",
+      "title": "Severe isolated diastolic reading",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "BP_SEVERE",
+        "DATA_COMPLETENESS"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.102
+    },
+    {
+      "id": "NCD-004",
+      "domain": "cardiovascular",
+      "title": "Chest pain despite normal blood pressure",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.098
+    },
+    {
+      "id": "NCD-013",
+      "domain": "diabetes",
+      "title": "Low glucose in mmol per litre",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.1
+    },
+    {
+      "id": "NCD-014",
+      "domain": "diabetes",
+      "title": "Severe low glucose",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.106
+    },
+    {
+      "id": "NCD-015",
+      "domain": "diabetes",
+      "title": "Equivalent low glucose in mg per decilitre",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.095
+    },
+    {
+      "id": "NCD-027",
+      "domain": "kidney",
+      "title": "Severely reduced renal function",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "RENAL_SEVERE"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.102
+    },
+    {
+      "id": "NCD-028",
+      "domain": "kidney",
+      "title": "Metformin with eGFR below thirty",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "METFORMIN_RENAL",
+        "RENAL_SEVERE"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.106
+    },
+    {
+      "id": "NCD-029",
+      "domain": "kidney",
+      "title": "Metformin with moderately impaired renal function",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "CKD_REVIEW",
+        "DIABETES_REVIEW",
+        "METFORMIN_REVIEW"
+      ],
+      "recommendation_count": 3,
+      "status": "passed",
+      "duration_seconds": 0.1
+    },
+    {
+      "id": "NCD-039",
+      "domain": "respiratory",
+      "title": "Low oxygen saturation",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.103
+    },
+    {
+      "id": "NCD-040",
+      "domain": "respiratory",
+      "title": "Asthma low oxygen near severe boundary",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.103
+    },
+    {
+      "id": "NCD-041",
+      "domain": "respiratory",
+      "title": "Borderline oxygenation needs review",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.107
+    },
+    {
+      "id": "NCD-049",
+      "domain": "cancer_referral",
+      "title": "Breast lump requires diagnostic pathway",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.11
+    },
+    {
+      "id": "NCD-050",
+      "domain": "cancer_referral",
+      "title": "Unexplained weight loss",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.112
+    },
+    {
+      "id": "NCD-051",
+      "domain": "cancer_referral",
+      "title": "Persistent cough requires differential assessment",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "soon",
+      "rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.135
+    },
+    {
+      "id": "NCD-052",
+      "domain": "cancer_referral",
+      "title": "Abnormal bleeding with severity not established",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "CANCER_WARNING"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.105
+    },
+    {
+      "id": "NCD-055",
+      "domain": "multimorbidity",
+      "title": "Pregnancy with severe blood pressure",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "emergency",
+      "rules": [
+        "DATA_COMPLETENESS",
+        "PREGNANCY_SCOPE",
+        "PREGNANCY_SEVERE_BP"
+      ],
+      "recommendation_count": 3,
+      "status": "passed",
+      "duration_seconds": 0.114
+    },
+    {
+      "id": "NCD-056",
+      "domain": "multimorbidity",
+      "title": "Pregnancy outside routine adult NCD treatment scope",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "PREGNANCY_SCOPE"
+      ],
+      "recommendation_count": 1,
+      "status": "passed",
+      "duration_seconds": 0.11
+    },
+    {
+      "id": "NCD-057",
+      "domain": "multimorbidity",
+      "title": "Pregnancy with ACE inhibitor",
+      "steps": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ],
+      "urgency": "urgent",
+      "rules": [
+        "PREGNANCY_SCOPE",
+        "RAS_PREGNANCY"
+      ],
+      "recommendation_count": 2,
+      "status": "passed",
+      "duration_seconds": 0.121
+    }
+  ]
+}

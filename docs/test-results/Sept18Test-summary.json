@@ -1,0 +1,399 @@
+{
+  "label": "Sept18Test",
+  "generated_at": "2026-09-18T16:05:10.950890+00:00",
+  "kind": "Local synthetic engineering verification of the NCDAI 2.0 application; not clinical validation, not hosted-deployment acceptance",
+  "application_source_revision": "cae5152f2bd843c05822a0b7031f45e6dd769d6a",
+  "application_source_note": "backend/app and frontend/src are byte-identical to that commit; this run's repository changes touch documentation and the case runner only.",
+  "deployed_revision_at_time_of_run": "1ded07988c4086ec75bf512e828410993a095e7b",
+  "hosted_deployment_verified": false,
+  "environment": {
+    "database": "PostgreSQL 16.13 (local, loopback only)",
+    "python": "3.11",
+    "node_playwright": "Playwright 1.63.0 with preinstalled Chromium build 1194",
+    "ci_reference_environment": "PostgreSQL 18.4, Python 3.12, pinned Chromium - not reproduced here",
+    "live_ai_requests": 0,
+    "real_patient_data": false
+  },
+  "schema": {
+    "primary_migration_head": "20260913_mary_help",
+    "consultant_schema": "consultant-20260913-1",
+    "alembic_check": "no pending model drift"
+  },
+  "versions": {
+    "rules": "ncdai-2-rules-0.1.3",
+    "evidence": "ncdai-2026-09-13.1",
+    "dose_reference": "ncdai-dose-reference-0.1.1",
+    "ai_prompt": "ncdai-briefing-select-v1.5"
+  },
+  "results": {
+    "complete_case_workflows": {
+      "requested": 20,
+      "run": 20,
+      "passed": 20,
+      "failed": 0,
+      "database": "PostgreSQL",
+      "selection": "deterministic round-robin across domains, 20 of 66 cases",
+      "catalogue_total": 66,
+      "evidence": "test-results/Sept18Test.json"
+    },
+    "backend_tests": {
+      "passed": 402,
+      "failed": 0,
+      "skipped": 8
+    },
+    "frontend_unit_tests": {
+      "files": 5,
+      "passed": 30,
+      "failed": 0
+    },
+    "dose_workflows": {
+      "passed": 75,
+      "failed": 0,
+      "database": "PostgreSQL"
+    },
+    "consultant_workflows": {
+      "passed": 50,
+      "failed": 0,
+      "databases": 2,
+      "concurrency_checks": 2,
+      "restricted_runtime_roles": true
+    },
+    "main_browser_workflows": {
+      "passed": 5,
+      "failed": 0,
+      "accessibility_audits": [
+        {
+          "view": "desktop-account",
+          "viewport": {
+            "width": 1366,
+            "height": 900
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 22,
+          "manual_review_checks": []
+        },
+        {
+          "view": "desktop-admin-audit",
+          "viewport": {
+            "width": 1366,
+            "height": 900
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 18,
+          "manual_review_checks": []
+        },
+        {
+          "view": "desktop-assessment",
+          "viewport": {
+            "width": 1366,
+            "height": 900
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 29,
+          "manual_review_checks": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+              "nodes": 3
+            }
+          ]
+        },
+        {
+          "view": "desktop-dashboard",
+          "viewport": {
+            "width": 1366,
+            "height": 900
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 20,
+          "manual_review_checks": []
+        },
+        {
+          "view": "desktop-intake",
+          "viewport": {
+            "width": 1366,
+            "height": 900
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 27,
+          "manual_review_checks": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+              "nodes": 3
+            }
+          ]
+        },
+        {
+          "view": "desktop-login",
+          "viewport": {
+            "width": 1366,
+            "height": 900
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 15,
+          "manual_review_checks": []
+        },
+        {
+          "view": "desktop-referrals",
+          "viewport": {
+            "width": 1366,
+            "height": 900
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 19,
+          "manual_review_checks": []
+        },
+        {
+          "view": "desktop-registration",
+          "viewport": {
+            "width": 1366,
+            "height": 900
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 22,
+          "manual_review_checks": []
+        },
+        {
+          "view": "mobile-account",
+          "viewport": {
+            "width": 375,
+            "height": 812
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 22,
+          "manual_review_checks": []
+        },
+        {
+          "view": "mobile-assessment",
+          "viewport": {
+            "width": 375,
+            "height": 812
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 28,
+          "manual_review_checks": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+              "nodes": 10
+            }
+          ]
+        },
+        {
+          "view": "mobile-dashboard",
+          "viewport": {
+            "width": 375,
+            "height": 812
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 22,
+          "manual_review_checks": []
+        },
+        {
+          "view": "mobile-intake",
+          "viewport": {
+            "width": 375,
+            "height": 812
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 27,
+          "manual_review_checks": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+              "nodes": 3
+            }
+          ]
+        },
+        {
+          "view": "mobile-login",
+          "viewport": {
+            "width": 375,
+            "height": 812
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 15,
+          "manual_review_checks": []
+        },
+        {
+          "view": "mobile-navigation",
+          "viewport": {
+            "width": 375,
+            "height": 812
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 21,
+          "manual_review_checks": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+              "nodes": 2
+            }
+          ]
+        },
+        {
+          "view": "mobile-referrals",
+          "viewport": {
+            "width": 375,
+            "height": 812
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 19,
+          "manual_review_checks": []
+        },
+        {
+          "view": "mobile-registration",
+          "viewport": {
+            "width": 375,
+            "height": 812
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 24,
+          "manual_review_checks": []
+        },
+        {
+          "view": "tablet-account",
+          "viewport": {
+            "width": 768,
+            "height": 1024
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 22,
+          "manual_review_checks": []
+        },
+        {
+          "view": "tablet-assessment",
+          "viewport": {
+            "width": 768,
+            "height": 1024
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 29,
+          "manual_review_checks": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+              "nodes": 4
+            }
+          ]
+        },
+        {
+          "view": "tablet-dashboard",
+          "viewport": {
+            "width": 768,
+            "height": 1024
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 23,
+          "manual_review_checks": []
+        },
+        {
+          "view": "tablet-intake",
+          "viewport": {
+            "width": 768,
+            "height": 1024
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 27,
+          "manual_review_checks": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+              "nodes": 2
+            }
+          ]
+        },
+        {
+          "view": "tablet-login",
+          "viewport": {
+            "width": 768,
+            "height": 1024
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 15,
+          "manual_review_checks": []
+        },
+        {
+          "view": "tablet-referrals",
+          "viewport": {
+            "width": 768,
+            "height": 1024
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 19,
+          "manual_review_checks": []
+        },
+        {
+          "view": "tablet-registration",
+          "viewport": {
+            "width": 768,
+            "height": 1024
+          },
+          "violations": 0,
+          "serious_or_critical": 0,
+          "automated_checks_passed": 25,
+          "manual_review_checks": []
+        }
+      ],
+      "reported_violations": 0,
+      "evidence": "quality/Sept18Test-browser-summary.json"
+    },
+    "consultant_browser_workflows": {
+      "passed": 2,
+      "failed": 0,
+      "accessibility_audits": 8,
+      "reported_violations": 0,
+      "evidence": "quality/Sept18Test-consultant-browser-summary.json"
+    }
+  },
+  "audit_chain": {
+    "valid": true,
+    "events": 182,
+    "limitation": "Hash chain detects modification against retained history; external anchoring is required to detect full-history rewrite or tail deletion."
+  },
+  "dashboard_after_run": {
+    "patients": 20,
+    "encounters": 20,
+    "reviewed": 20,
+    "open_referrals": 0,
+    "urgent_assessments": 15
+  },
+  "not_verified_by_this_run": [
+    "The hosted application at https://ncdai-2.vercel.app: the verification sandbox cannot reach it (proxy denies the host), so no hosted endpoint, deployment or region was exercised.",
+    "Deployment itself: publishing is explicit through the Vercel CLI with the owner's credentials, which this environment does not hold.",
+    "Live DeepSeek briefing: no API key is configured here, so the AI path ran only through its deterministic fallback in the backend suite.",
+    "Managed backup/PITR retention, hosted recovery, RPO and RTO.",
+    "Clinical accuracy, clinical adjudication and patient outcomes. These are engineering workflow tests against frozen synthetic cases only.",
+    "PostgreSQL 18.4 behaviour: this run used 16.13."
+  ]
+}

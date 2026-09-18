@@ -1,7 +1,13 @@
-"""Run every frozen synthetic case through the full persisted API workflow.
+"""Run frozen synthetic cases through the full persisted API workflow.
 
 Use an isolated temporary database by default. NCDAI_CASE_DATABASE_URL can point
 to a dedicated migrated test database; this runner never drops existing tables.
+
+Every case runs the same seven-step workflow. With no options the whole frozen
+catalogue runs, which is what CI records. ``--limit N`` runs a smaller, still
+deterministic subset, selected round-robin across domains in catalogue order so
+a partial run stays clinically spread rather than front-loaded on one domain;
+``--label NAME`` records a name for that run in the report.
 """
 from __future__ import annotations
 
@@ -24,8 +30,24 @@ from app.seed import provision_user
 PRIORITY = {"routine": 0, "soon": 1, "urgent": 2, "emergency": 3}
 
 
-def run(output: Path):
+def select(cases: list, limit: int | None) -> list:
+    """Round-robin across domains, preserving catalogue order inside each domain."""
+    if limit is None or limit >= len(cases):
+        return cases
+    by_domain: dict[str, list] = {}
+    for case in cases:
+        by_domain.setdefault(case["domain"], []).append(case)
+    chosen, queues = [], [by_domain[name] for name in sorted(by_domain)]
+    while len(chosen) < limit:
+        for queue in queues:
+            if queue and len(chosen) < limit:
+                chosen.append(queue.pop(0))
+    return sorted(chosen, key=cases.index)
+
+
+def run(output: Path, limit: int | None = None, label: str | None = None):
     catalogue = json.loads((ROOT / "tests/cases/clinical_cases.json").read_text())
+    selected = select(catalogue["cases"], limit)
     started = datetime.now(timezone.utc)
     run_id = uuid4().hex[:10]
     rows = []
@@ -54,7 +76,7 @@ def run(output: Path):
                 assert response.status_code == expected_status, f"{method} {path}: {response.status_code} {response.text[:500]}"
                 return response.json() if response.content else None
 
-            for case in catalogue["cases"]:
+            for case in selected:
                 begin = time.perf_counter()
                 row = {"id": case["id"], "domain": case["domain"], "title": case["title"], "steps": []}
                 try:
@@ -138,8 +160,12 @@ def run(output: Path):
                 print(f"{case['id']} {row['status']}" + (f" AI={row['ai']['status']}" if "ai" in row else ""), flush=True)
             dashboard = request("GET", "/dashboard")
             final_audit = request("GET", "/audit/verify")
-    report = {"run_id": run_id, "started_at": started.isoformat(), "completed_at": datetime.now(timezone.utc).isoformat(),
+    report = {"run_id": run_id, "label": label, "started_at": started.isoformat(),
+              "completed_at": datetime.now(timezone.utc).isoformat(),
               "kind": "Synthetic API workflow engineering verification, not clinical validation",
+              "catalogue_total": len(catalogue["cases"]), "catalogue_version": catalogue.get("version"),
+              "selection": "complete frozen catalogue" if len(selected) == len(catalogue["cases"])
+                           else f"deterministic round-robin across domains, {len(selected)} of {len(catalogue['cases'])} cases",
               "database": "PostgreSQL" if database.startswith("postgresql") else "SQLite",
               "live_ai_enabled": live_ai,
               "ai_statuses": {status: sum(r.get("ai", {}).get("status") == status for r in rows) for status in ["ready", "disabled", "unavailable", "blocked"]},
@@ -156,4 +182,13 @@ def run(output: Path):
 
 
 if __name__ == "__main__":
-    sys.exit(run(Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "docs/test-results/case-workflows.json"))
+    argv = sys.argv[1:]
+    options = {}
+    for name in ("--limit", "--label"):
+        if name in argv:
+            index = argv.index(name)
+            options[name.lstrip("-")] = argv.pop(index + 1)
+            argv.pop(index)
+    sys.exit(run(Path(argv[0]) if argv else ROOT / "docs/test-results/case-workflows.json",
+                 limit=int(options["limit"]) if "limit" in options else None,
+                 label=options.get("label")))
