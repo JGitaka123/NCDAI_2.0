@@ -1,0 +1,78 @@
+name: Deploy production (manual)
+
+# Manual-only production deploy through the Vercel CLI, matching docs/deployment.md.
+# Nothing deploys on push. Requires the repository secret VERCEL_TOKEN.
+# The checks afterwards are read-only: they never sign in or create records.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit or branch to deploy
+        required: true
+        default: codex/ncdai-2-platform
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vercel-production
+  cancel-in-progress: false
+
+env:
+  VERCEL_SCOPE: jessegitaka-7527s-projects
+  VERCEL_PROJECT: ncdai-2
+  SITE: https://ncdai-2.vercel.app
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+      - run: npm install --global vercel@latest
+      - name: Link project
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel link --yes --project "$VERCEL_PROJECT" --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN"
+      - name: Deploy to production (fra1)
+        id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          echo "Deploying commit $(git rev-parse HEAD)"
+          url=$(vercel deploy --prod --yes --regions fra1 --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Deployment: $url"
+      - name: Inspect deployment
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        run: vercel inspect "$DEPLOY_URL" --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN"
+      - name: HTTP checks
+        run: |
+          set -euo pipefail
+          ready=$(curl -sS -w '\n%{http_code}' "$SITE/api/health/ready")
+          echo "ready: $ready"
+          echo "$ready" | tail -1 | grep -qx 200
+          echo "$ready" | grep -q '"rules":"loaded"'
+          for p in /api/health/live /manifest.webmanifest /sw.js /icons/icon-512.png /mobile/ /; do
+            c=$(curl -sS -o /dev/null -w '%{http_code}' "$SITE$p")
+            echo "$p -> $c"
+            test "$c" = 200
+          done
+          curl -sSI "$SITE/sw.js" | grep -i '^cache-control: no-cache'
+          echo "Security headers on /:"
+          curl -sSI "$SITE/" | grep -iE '^(content-security-policy|x-frame-options|x-content-type-options|referrer-policy|permissions-policy|strict-transport-security):'
+      - name: Browser checks at phone width
+        run: |
+          npm --prefix frontend ci --no-audit --no-fund
+          cd frontend
+          npx playwright install --with-deps chromium
+          node tests/browser/live-check.mjs "$SITE"
