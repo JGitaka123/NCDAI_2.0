@@ -1,6 +1,6 @@
 /* Consultant synthesis: reads like a clinic letter; semantic tones match the badge palette. */
 .consultant { --cs-critical:#8d332c; --cs-critical-bg:#fff0ee; --cs-warning:#795914; --cs-warning-bg:#fff8e8; --cs-good:#346741; --cs-good-bg:#eef7ef; --cs-neutral:#52675e; --cs-neutral-bg:#f3f5f2;
-  margin:18px 0 22px; padding:20px; border:1px solid var(--line,#eadfdf); border-radius:11px; background:#fff; display:grid; gap:16px; min-width:0; }
+  margin:18px 0 22px; padding:20px; border:1px solid var(--line,#eadfdf); border-radius:11px; background:#fff; display:grid; grid-template-columns:minmax(0,1fr); gap:16px; min-width:0; }
 .cs-head { display:flex; gap:14px; align-items:flex-start; }
 .cs-head-icon { flex:0 0 auto; width:40px; height:40px; border-radius:10px; display:grid; place-items:center; background:var(--brand-soft,#fff0f0); color:var(--brand-link,#a12d2d); }
 .cs-head-text { flex:1; min-width:0; }
@@ -50,6 +50,14 @@
 @media (max-width:760px) {
   .consultant { padding:15px; margin-left:0; margin-right:0; }
   .cs-head { flex-wrap:wrap; } .cs-head .button { width:100%; justify-content:center; }
-  .cs-columns { grid-template-columns:1fr; }
+  .cs-columns { grid-template-columns:minmax(0,1fr); }
   .cs-derived { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
+
+/* Install / offline-consult card in the navigation. */
+.install-card { display:flex; gap:9px; align-items:flex-start; flex-wrap:wrap; padding:11px 12px; margin-bottom:10px; border:1px solid var(--line,#eadfdf); border-radius:10px; background:#fffafa; font-size:12px; color:var(--ink,#332929); }
+.install-card>div { flex:1; min-width:0; } .install-card strong { font-size:12.5px; } .install-card p { margin:2px 0 0; color:var(--muted,#685959); }
+.install-card .button { width:100%; justify-content:center; }
+.cs-table th,.cs-table td { white-space:normal; overflow-wrap:anywhere; min-width:0; }
+.consultant .table-wrap { overflow-x:auto; }
+.consultant>*,.cs-block,.cs-head-text { min-width:0; }
