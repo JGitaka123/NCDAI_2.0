@@ -22,12 +22,32 @@ export type ClinicalData = {
   adherence: 'taking' | 'missed' | 'unknown'; notes: string; observed_at?: string | null;
   medicine_availability: 'available' | 'limited' | 'unknown';
   dosing_requests?: DosingRequest[]; dosing_context?: DosingContext;
+  weight_kg?: number | null; height_cm?: number | null; waist_cm?: number | null; creatinine_umol?: number | null; urine_acr_mg_mmol?: number | null;
+  total_cholesterol_mmol?: number | null; hdl_mmol?: number | null; ldl_mmol?: number | null; hemoglobin_g_dl?: number | null;
+  glucose_context?: 'fasting' | 'random' | 'unknown'; known_ascvd?: TriState; prior_stroke_tia?: TriState; known_heart_failure?: TriState; known_atrial_fibrillation?: TriState;
+  exacerbations_past_year?: number | null; reliever_use_per_week?: number | null; hypoglycaemia_episodes_3m?: number | null;
+  eye_screen?: CareInterval; foot_exam?: CareInterval;
+}
+export type CareInterval = 'within_12_months' | 'over_12_months' | 'never' | 'unknown'
+export type ProblemStatus = 'acute' | 'uncontrolled' | 'untreated' | 'above_target' | 'high_risk' | 'review' | 'unconfirmed' | 'needs_confirmation' | 'at_risk' | 'needs_data' | 'established' | 'withheld' | 'at_target'
+export type PlanStep = { text: string; source_ids: string[] }
+export type ConsultantProblem = { id: string; rank: number; title: string; status: ProblemStatus; facts: string[]; assessment: string; plan: PlanStep[]; targets: string[]; source_ids: string[] }
+export type ConsultantSynthesis = {
+  version: string; one_liner: string; impression: string; acute_first: boolean; follow_up: string; summary_text: string; boundary: string
+  derived: { id: string; label: string; value: string; unit: string; interpretation: string; method: string; source_ids: string[] }[]
+  cardiovascular_risk: null | { category: string; basis: string; percent: number | null; method: string | null; statement: string; source_ids: string[] }
+  problems: ConsultantProblem[]
+  medication_review: { id: string; severity: 'high' | 'moderate' | 'low'; finding: string; action: string; source_ids: string[] }[]
+  considerations: { id: string; text: string; source_ids: string[] }[]
+  monitoring: { id: string; test: string; timing: string; reason: string; source_ids: string[] }[]
+  data_gaps: { field: string; why: string }[]
+  sources: Evidence[]
 }
 export type Evidence = { source_id: string; title: string; url: string; section: string; version: string }
 export type Recommendation = { id: string; rule_id: string; category: string; severity: 'info' | 'warning' | 'critical'; title: string; detail: string; evidence: Evidence[] }
 export type Urgency = 'routine' | 'soon' | 'urgent' | 'emergency'
 export type AiBriefing = { status: 'ready' | 'disabled' | 'unavailable' | 'blocked'; reason_code?: string; provider?: string; model?: string; prompt_version?: string; focus?: Recommendation[]; checklist?: string[]; source_ids?: string[] }
-export type Assessment = { id: string; urgency: Urgency; summary: string; recommendations: Recommendation[]; missing_data: string[]; warnings: string[]; model_info: { mode: string; provider?: string; model?: string; status: string }; evidence_version: string; generated_at: string; ai_briefing?: AiBriefing; dosing?: DosingAssessment }
+export type Assessment = { id: string; urgency: Urgency; summary: string; recommendations: Recommendation[]; missing_data: string[]; warnings: string[]; model_info: { mode: string; provider?: string; model?: string; status: string }; evidence_version: string; generated_at: string; ai_briefing?: AiBriefing; dosing?: DosingAssessment; consultant?: ConsultantSynthesis }
 export type DecisionAction = 'accept' | 'modify' | 'defer' | 'reject'
 export type Decision = { recommendation_id: string; action: DecisionAction; reason?: string; modified_text?: string }
 export type Encounter = { id: string; patient_id: string; version: number; status: 'draft' | 'reviewed'; data: ClinicalData; assessment: Assessment | null; created_at: string; updated_at: string; review?: { decisions: Decision[]; note?: string; reviewer_name?: string; reviewed_at?: string } }

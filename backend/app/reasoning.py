@@ -917,7 +917,7 @@ def build(data, age, sex, assessment):
 
     if urgency in ("emergency", "urgent"):
         follow_up = "Same day, per the acute findings; chronic review within 2 weeks of stabilisation."
-    elif any(entry["status"] in ("uncontrolled", "above_target", "unconfirmed", "needs_confirmation") for entry in problems) or med_review:
+    elif any(entry["status"] in ("acute", "uncontrolled", "untreated", "above_target", "high_risk", "review", "unconfirmed", "needs_confirmation") for entry in problems) or med_review:
         follow_up = "2–4 weeks: confirm readings, review changes and blood results."
     elif problems:
         follow_up = "3–6 months, with monitoring as listed."

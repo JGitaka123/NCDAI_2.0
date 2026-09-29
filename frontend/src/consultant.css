@@ -1,0 +1,55 @@
+/* Consultant synthesis: reads like a clinic letter; semantic tones match the badge palette. */
+.consultant { --cs-critical:#8d332c; --cs-critical-bg:#fff0ee; --cs-warning:#795914; --cs-warning-bg:#fff8e8; --cs-good:#346741; --cs-good-bg:#eef7ef; --cs-neutral:#52675e; --cs-neutral-bg:#f3f5f2;
+  margin:18px 0 22px; padding:20px; border:1px solid var(--line,#eadfdf); border-radius:11px; background:#fff; display:grid; gap:16px; min-width:0; }
+.cs-head { display:flex; gap:14px; align-items:flex-start; }
+.cs-head-icon { flex:0 0 auto; width:40px; height:40px; border-radius:10px; display:grid; place-items:center; background:var(--brand-soft,#fff0f0); color:var(--brand-link,#a12d2d); }
+.cs-head-text { flex:1; min-width:0; }
+.cs-head h2 { margin:2px 0 6px; font-size:16px; line-height:1.45; font-weight:650; color:var(--heading,#312525); text-wrap:pretty; }
+.cs-impression { margin:0; color:var(--ink,#332929); font-size:13.5px; }
+.cs-impression-acute { color:var(--cs-critical); font-weight:600; }
+.cs-derived { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
+.cs-measure { display:flex; flex-direction:column; gap:2px; padding:10px 12px; border-radius:9px; background:var(--cs-neutral-bg); min-width:0; }
+.cs-measure span { font-size:11px; letter-spacing:.02em; color:var(--muted,#685959); }
+.cs-measure strong { font-size:19px; font-variant-numeric:tabular-nums; color:var(--heading,#312525); }
+.cs-measure small { font-size:11px; font-weight:500; color:var(--muted,#685959); }
+.cs-measure em { font-style:normal; font-size:11.5px; color:var(--ink,#332929); overflow-wrap:anywhere; }
+.cs-problems { list-style:none; margin:0; padding:0; display:grid; gap:12px; }
+.cs-problem { border:1px solid var(--line,#eadfdf); border-left-width:4px; border-radius:9px; padding:13px 15px; min-width:0; }
+.cs-tone-critical { border-left-color:var(--cs-critical); } .cs-tone-warning { border-left-color:#d6a53a; } .cs-tone-good { border-left-color:#5c9a6a; } .cs-tone-neutral { border-left-color:#b9c4bd; }
+.cs-problem-top { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.cs-problem-top h3 { margin:0; font-size:14.5px; color:var(--heading,#312525); flex:1; min-width:0; }
+.cs-rank { width:24px; height:24px; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:700; background:var(--cs-neutral-bg); color:var(--ink,#332929); }
+.cs-status { font-size:11px; font-weight:650; padding:3px 9px; border-radius:99px; white-space:nowrap; }
+.cs-status-critical { background:var(--cs-critical-bg); color:var(--cs-critical); } .cs-status-warning { background:var(--cs-warning-bg); color:var(--cs-warning); }
+.cs-status-good { background:var(--cs-good-bg); color:var(--cs-good); } .cs-status-neutral { background:var(--cs-neutral-bg); color:var(--cs-neutral); }
+.cs-facts { list-style:none; margin:9px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:6px; }
+.cs-facts li { font-size:12px; padding:3px 8px; border-radius:6px; background:#f7f4f4; color:var(--ink,#332929); font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.cs-assessment { margin:9px 0 0; font-size:13px; color:var(--ink,#332929); }
+.cs-target { margin:7px 0 0; font-size:12.5px; color:var(--ink,#332929); } .cs-target strong { font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:var(--cs-good); margin-right:5px; }
+.cs-plan { margin:10px 0 0; padding-left:20px; display:grid; gap:6px; font-size:13px; color:var(--ink,#332929); }
+.cs-plan li::marker { color:var(--muted,#685959); font-size:12px; }
+.cs-sources { display:inline-flex; flex-wrap:wrap; gap:4px; margin-left:6px; vertical-align:middle; }
+.cs-sources a,.cs-sources span { font-size:10.5px; line-height:1.6; padding:0 6px; border-radius:5px; border:1px solid #eadada; color:var(--brand-link,#a12d2d); text-decoration:none; white-space:nowrap; }
+.cs-sources a:hover { background:var(--brand-soft,#fff0f0); }
+.cs-block h3 { display:flex; align-items:center; gap:7px; margin:0 0 8px; font-size:13.5px; color:var(--heading,#312525); }
+.cs-block h4 { margin:12px 0 6px; font-size:12.5px; color:var(--heading,#312525); }
+.cs-review { list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+.cs-review li { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:8px; background:#fcf9f9; min-width:0; }
+.cs-review li>div { min-width:0; } .cs-review strong { font-size:13px; color:var(--heading,#312525); } .cs-review p { margin:3px 0 0; font-size:12.5px; color:var(--ink,#332929); }
+.cs-sev { flex:0 0 auto; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:2px 7px; border-radius:5px; }
+.cs-sev-high { background:var(--cs-critical-bg); color:var(--cs-critical); } .cs-sev-moderate { background:var(--cs-warning-bg); color:var(--cs-warning); } .cs-sev-low { background:var(--cs-neutral-bg); color:var(--cs-neutral); }
+.cs-list { margin:0; padding-left:18px; display:grid; gap:5px; font-size:12.5px; color:var(--ink,#332929); }
+.cs-columns { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:18px; }
+.cs-table { width:100%; border-collapse:collapse; font-size:12px; } .cs-table th,.cs-table td { text-align:left; padding:6px 8px; border-bottom:1px solid #f0e8e8; vertical-align:top; }
+.cs-followup { margin:0; font-size:13px; font-weight:600; color:var(--heading,#312525); }
+.cs-details summary { cursor:pointer; font-size:12.5px; font-weight:600; color:var(--heading,#312525); }
+.cs-details pre { white-space:pre-wrap; overflow-wrap:anywhere; font-size:12px; line-height:1.5; background:#faf7f7; border-radius:8px; padding:12px; margin:8px 0 0; max-height:420px; overflow:auto; }
+.cs-source-list { margin:8px 0 0; padding:0; list-style:none; display:grid; gap:8px; }
+.cs-source-list li { display:grid; gap:2px; font-size:12px; overflow-wrap:anywhere; } .cs-source-list span,.cs-source-list small { color:var(--muted,#685959); }
+.cs-boundary { margin:0; font-size:11.5px; color:var(--muted,#685959); } .cs-boundary .mono { font-size:10.5px; }
+@media (max-width:760px) {
+  .consultant { padding:15px; margin-left:0; margin-right:0; }
+  .cs-head { flex-wrap:wrap; } .cs-head .button { width:100%; justify-content:center; }
+  .cs-columns { grid-template-columns:1fr; }
+  .cs-derived { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
