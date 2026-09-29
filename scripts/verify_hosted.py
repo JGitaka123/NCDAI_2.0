@@ -115,7 +115,7 @@ def run():
         acute_data = {**reference_data, 'potassium': 5.7, 'acute_kidney_injury': 'yes'}
         acute = request('POST', '/encounters', 201, json={'patient_id': patient['id'], 'data': acute_data})
         acute = request('POST', f"/encounters/{acute['id']}/assess")
-        assert acute['assessment']['rules_version'] == 'ncdai-2-rules-0.1.3'
+        assert acute['assessment']['rules_version'] == 'ncdai-2-rules-0.2.0'
         assert acute['assessment']['urgency'] == 'urgent'
         assert acute['data']['acute_kidney_injury'] == 'yes'
         potassium = next(item for item in acute['assessment']['recommendations'] if item['rule_id'] == 'POTASSIUM_HIGH')

@@ -6,7 +6,7 @@ redistributed. See docs/clinical-safety-spec.md for operational adaptations.
 
 from copy import deepcopy
 
-EVIDENCE_VERSION = "ncdai-2026-09-13.1"
+EVIDENCE_VERSION = "ncdai-2026-09-29.1"
 REVIEW_STATUS = "proposed_requires_independent_clinician_signoff"
 REVIEWED_ON = "2026-09-12"
 
@@ -145,6 +145,98 @@ SOURCES = {
         "version": "0.1; 2026-09-12; NOT clinician approved",
     },
 }
+
+
+# Consultant-reasoning sources (added 2026-09-29). Bibliographic citations with the
+# specific recommendation sections the reasoning engine operationalizes. Like every
+# entry above, they are proposed for independent clinician sign-off.
+_CITED = "bibliographic citation added 2026-09-29; requires clinician sign-off"
+SOURCES.update({item["source_id"]: item for item in [
+    {"source_id": "ISH_HTN_2020", "title": "2020 International Society of Hypertension Global Hypertension Practice Guidelines (Hypertension 2020;75:1334-1357)",
+     "url": "https://www.ahajournals.org/doi/10.1161/HYPERTENSIONAHA.120.15026",
+     "section": "Diagnosis and classification; BP targets (<130/80 if tolerated, <140/90 in older adults); drug-treatment protocol (A+C, then A+C+D, then spironolactone); resistant hypertension",
+     "version": "2020; " + _CITED},
+    {"source_id": "ESC_HTN_2024", "title": "2024 ESC Guidelines for the management of elevated blood pressure and hypertension (Eur Heart J 2024;45:3912-4018)",
+     "url": "https://academic.oup.com/eurheartj/article/45/38/3912/7741010",
+     "section": "Section 8 treatment targets (120-129 mmHg systolic if tolerated); single-pill combination initiation; resistant hypertension and secondary-cause screening; frailty and age 85+",
+     "version": "2024; " + _CITED},
+    {"source_id": "ADA_SOC_2025", "title": "American Diabetes Association Standards of Care in Diabetes-2025 (Diabetes Care 2025;48 Suppl 1)",
+     "url": "https://diabetesjournals.org/care/issue/48/Supplement_1",
+     "section": "Sec 2 diagnosis; Sec 6 glycaemic goals and hypoglycaemia; Sec 9 pharmacological approaches (cardiorenal-protective agents independent of HbA1c); Sec 10 statin and BP; Sec 12 retinopathy and foot care; Sec 13 older adults",
+     "version": "2025; " + _CITED},
+    {"source_id": "KDIGO_DM_CKD_2022", "title": "KDIGO 2022 Clinical Practice Guideline for Diabetes Management in Chronic Kidney Disease (Kidney Int 2022;102(5S))",
+     "url": "https://kdigo.org/wp-content/uploads/2022/10/KDIGO-2022-Clinical-Practice-Guideline-for-Diabetes-Management-in-CKD.pdf",
+     "section": "Chapter 1 RAS inhibition with albuminuria and SGLT2i with eGFR >=20; Chapter 4 metformin dose adjustment by eGFR (reduce at eGFR 30-44; stop below 30)",
+     "version": "2022; " + _CITED},
+    {"source_id": "KDIGO_CKD_2024_TX", "title": "KDIGO 2024 guideline for evaluation and management of CKD: risk, progression and treatment",
+     "url": "https://kdigo.org/wp-content/uploads/2024/03/KDIGO-2024-CKD-Guideline.pdf",
+     "section": "Fig 2 GFR/albuminuria risk heat map and monitoring frequency; Rec 3.6.1 RAS inhibition for albuminuria; Rec 3.7.1 SGLT2i (T2D with eGFR >=20; CKD with ACR >=20 mg/mmol or heart failure); lipid management; 5.1 referral to specialist kidney care",
+     "version": "2024; " + _CITED},
+    {"source_id": "CKD_EPI_2021", "title": "Inker LA et al. New creatinine- and cystatin C-based equations to estimate GFR without race (N Engl J Med 2021;385:1737-1749)",
+     "url": "https://www.nejm.org/doi/full/10.1056/NEJMoa2102953",
+     "section": "2021 CKD-EPI creatinine equation (race-free), adults",
+     "version": "2021; " + _CITED},
+    {"source_id": "FRAMINGHAM_2008", "title": "D'Agostino RB Sr et al. General cardiovascular risk profile for use in primary care: the Framingham Heart Study (Circulation 2008;117:743-753)",
+     "url": "https://www.ahajournals.org/doi/10.1161/CIRCULATIONAHA.107.699579",
+     "section": "Table 2 laboratory-based and office (BMI) sex-specific 10-year general CVD models; validated age 30-74 without prior CVD",
+     "version": "2008; " + _CITED + "; not recalibrated for Kenya"},
+    {"source_id": "WHO_CVD_RISK_2019", "title": "WHO CVD Risk Chart Working Group. World Health Organization cardiovascular disease risk charts: revised models for 21 global regions (Lancet Glob Health 2019;7:e1332-e1345)",
+     "url": "https://doi.org/10.1016/S2214-109X(19)30318-3",
+     "section": "Region-specific laboratory and non-laboratory charts (Eastern sub-Saharan Africa); risk categories <10%, 10-<20%, >=20%",
+     "version": "2019; " + _CITED},
+    {"source_id": "WHO_HEARTS_RISK_2020", "title": "WHO HEARTS technical package: Risk-based CVD management",
+     "url": "https://www.who.int/publications/i/item/9789240001367",
+     "section": "Statin therapy for established CVD, diabetes age 40+, and 10-year CVD risk >=20%; aspirin for secondary prevention only",
+     "version": "2020; " + _CITED},
+    {"source_id": "ESC_LIPIDS_2019", "title": "2019 ESC/EAS Guidelines for the management of dyslipidaemias (Eur Heart J 2020;41:111-188)",
+     "url": "https://academic.oup.com/eurheartj/article/41/1/111/5556353",
+     "section": "Table 4 risk categories (diabetes with organ damage, CKD); LDL-C goals (<1.4 mmol/L very high, <1.8 high, <2.6 moderate risk); statin intensity; add ezetimibe",
+     "version": "2019; " + _CITED},
+    {"source_id": "ESC_DM_CVD_2023", "title": "2023 ESC Guidelines for the management of cardiovascular disease in patients with diabetes (Eur Heart J 2023;44:4043-4140)",
+     "url": "https://academic.oup.com/eurheartj/article/44/39/4043/7238227",
+     "section": "SGLT2 inhibitor and/or GLP-1 RA with proven CV benefit for ASCVD independent of HbA1c; SGLT2i for heart failure and CKD",
+     "version": "2023; " + _CITED},
+    {"source_id": "ESC_HF_2021", "title": "2021 ESC Guidelines for heart failure with 2023 focused update (Eur Heart J 2021;42:3599-3726)",
+     "url": "https://academic.oup.com/eurheartj/article/42/36/3599/6358045",
+     "section": "HFrEF: ACEi/ARNI, evidence-based beta-blocker, MRA and SGLT2i; drugs to avoid (NSAIDs, thiazolidinediones, non-dihydropyridine CCBs); echocardiographic classification",
+     "version": "2021/2023; " + _CITED},
+    {"source_id": "ESC_AF_2024", "title": "2024 ESC Guidelines for the management of atrial fibrillation (Eur Heart J 2024;45:3314-3414)",
+     "url": "https://academic.oup.com/eurheartj/article/45/36/3314/7738779",
+     "section": "CHA2DS2-VA score: oral anticoagulation recommended at >=2, considered at 1; DOAC preferred over VKA except mechanical valve or moderate-severe mitral stenosis; antiplatelets not for stroke prevention",
+     "version": "2024; " + _CITED},
+    {"source_id": "GINA_2025", "title": "Global Initiative for Asthma: Global Strategy for Asthma Management and Prevention, 2025 update",
+     "url": "https://ginasthma.org/reports/",
+     "section": "SABA-only treatment not recommended for adults; ICS-containing controller for all; symptom control and exacerbation-risk assessment; inhaler technique and adherence before step-up",
+     "version": "2025; " + _CITED},
+    {"source_id": "GOLD_2025", "title": "Global Initiative for Chronic Obstructive Lung Disease: 2025 report",
+     "url": "https://goldcopd.org/2025-gold-report/",
+     "section": "Spirometric confirmation; ABE assessment (E: >=2 moderate or >=1 hospitalized exacerbation); LABA+LAMA initial therapy; ICS by eosinophils; smoking cessation, vaccination, pulmonary rehabilitation, oxygen assessment",
+     "version": "2025; " + _CITED},
+    {"source_id": "PULSE_OXIMETRY_BIAS", "title": "Sjoding MW et al. Racial bias in pulse oximetry measurement (N Engl J Med 2020;383:2477-2478)",
+     "url": "https://www.nejm.org/doi/full/10.1056/NEJMc2029240",
+     "section": "Occult hypoxaemia (SaO2 <88% with SpO2 92-96%) more frequent in Black patients",
+     "version": "2020; " + _CITED},
+    {"source_id": "WHO_HBA1C_2011", "title": "WHO: Use of glycated haemoglobin (HbA1c) in the diagnosis of diabetes mellitus",
+     "url": "https://www.who.int/publications/i/item/use-of-glycated-haemoglobin-(-hba1c)-in-diagnosis-of-diabetes-mellitus",
+     "section": "HbA1c 6.5% diagnostic cut-point; conditions affecting reliability (anaemia, haemoglobinopathies, CKD, pregnancy)",
+     "version": "2011; " + _CITED},
+    {"source_id": "WHO_TOBACCO_2024", "title": "WHO clinical treatment guideline for tobacco cessation in adults",
+     "url": "https://iris.who.int/handle/10665/377825",
+     "section": "Brief health-worker advice; behavioural support; varenicline, nicotine replacement, bupropion and cytisine",
+     "version": "2024 (ISBN 978-92-4-009643-1); " + _CITED},
+    {"source_id": "WHO_TB_SCREENING_2021", "title": "WHO consolidated guidelines on tuberculosis: Module 2 screening - systematic screening for tuberculosis disease",
+     "url": "https://www.who.int/publications/i/item/9789240022676",
+     "section": "Screening of people with diabetes and other risk groups; symptom screen and rapid molecular testing",
+     "version": "2021; " + _CITED},
+    {"source_id": "ENDO_PA_2016", "title": "Funder JW et al. Management of primary aldosteronism: Endocrine Society clinical practice guideline (J Clin Endocrinol Metab 2016;101:1889-1916)",
+     "url": "https://academic.oup.com/jcem/article/101/5/1889/2804729",
+     "section": "Screen with aldosterone-renin ratio: resistant hypertension, hypertension with spontaneous or diuretic-induced hypokalaemia, early-onset hypertension",
+     "version": "2016; " + _CITED},
+    {"source_id": "WHO_OBESITY", "title": "WHO: Obesity and overweight fact sheet; waist circumference and waist-hip ratio report (2008)",
+     "url": "https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight",
+     "section": "Adult BMI classification (overweight >=25, obesity >=30); waist circumference risk thresholds",
+     "version": "Live WHO guidance; " + _CITED},
+]})
 
 
 for _key, _section in {
