@@ -15,6 +15,10 @@ export function emptyClinicalData(): ClinicalData {
     medications: [], medications_reviewed: false, allergies: [], allergies_reviewed: false, symptoms: [], symptoms_reviewed: false,
     adherence: 'unknown', notes: '', observed_at: null, medicine_availability: 'unknown',
     dosing_requests: [], dosing_context: emptyDosingContext(),
+    weight_kg: null, height_cm: null, waist_cm: null, creatinine_umol: null, urine_acr_mg_mmol: null,
+    total_cholesterol_mmol: null, hdl_mmol: null, ldl_mmol: null, hemoglobin_g_dl: null, glucose_context: 'unknown',
+    known_ascvd: 'unknown', prior_stroke_tia: 'unknown', known_heart_failure: 'unknown', known_atrial_fibrillation: 'unknown',
+    exacerbations_past_year: null, reliever_use_per_week: null, hypoglycaemia_episodes_3m: null, eye_screen: 'unknown', foot_exam: 'unknown',
   }
 }
 
@@ -26,7 +30,7 @@ export const symptoms: [string, string][] = [
   ['wheeze', 'Wheeze'], ['hemoptysis', 'Coughing blood'], ['unexplained_weight_loss', 'Unexplained weight loss'],
   ['persistent_cough', 'Persistent cough'], ['breast_lump', 'Breast lump'], ['abnormal_bleeding', 'Abnormal bleeding'],
 ]
-export const medicineNames = ['Metformin', 'Insulin', 'Glibenclamide', 'Gliclazide', 'Lisinopril', 'Enalapril', 'Losartan', 'Amlodipine', 'Hydrochlorothiazide', 'Spironolactone', 'Ibuprofen', 'Aspirin', 'Atorvastatin']
+export const medicineNames = ['Metformin', 'Insulin', 'Glibenclamide', 'Gliclazide', 'Empagliflozin', 'Dapagliflozin', 'Sitagliptin', 'Lisinopril', 'Enalapril', 'Losartan', 'Amlodipine', 'Nifedipine', 'Hydrochlorothiazide', 'Indapamide', 'Furosemide', 'Spironolactone', 'Bisoprolol', 'Carvedilol', 'Atorvastatin', 'Rosuvastatin', 'Aspirin', 'Clopidogrel', 'Warfarin', 'Rivaroxaban', 'Apixaban', 'Salbutamol', 'Budesonide', 'Budesonide/formoterol', 'Tiotropium', 'Ibuprofen', 'Diclofenac']
 export const formatDate = (date?: string | null, withTime = false) => {
   if (!date) return 'Not recorded'
   const parsed = new Date(date)
@@ -53,7 +57,8 @@ export function isDirty(saved: Encounter | null, draft: ClinicalData): boolean {
 }
 export function carryForwardContext(prior: Encounter): ClinicalData {
   const data = emptyClinicalData()
-  for (const key of ['known_hypertension', 'known_diabetes', 'known_asthma', 'known_copd', 'known_ckd', 'known_cancer'] as const) data[key] = prior.data[key] ?? 'unknown'
+  for (const key of ['known_hypertension', 'known_diabetes', 'known_asthma', 'known_copd', 'known_ckd', 'known_cancer', 'known_ascvd', 'prior_stroke_tia', 'known_heart_failure', 'known_atrial_fibrillation'] as const) data[key] = prior.data[key] ?? 'unknown'
+  if (prior.data.height_cm != null) data.height_cm = prior.data.height_cm
   if (prior.data.medications_reviewed) data.medications = structuredClone(prior.data.medications)
   if (prior.data.allergies_reviewed) data.allergies = [...prior.data.allergies]
   data.notes = `Historical context brought forward from encounter ${prior.id} (${formatDate(prior.created_at)}). Confirm chronic history, reconcile medicines and allergies for this visit. Current measurements and symptoms were not copied.`

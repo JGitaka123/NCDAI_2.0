@@ -92,8 +92,29 @@ class ClinicalData(StrictModel):
     medicine_availability: Literal["available", "limited", "unknown"] = "unknown"
     dosing_requests: list[DosingRequest] = Field(default_factory=list, max_length=5)
     dosing_context: DosingContext = Field(default_factory=DosingContext)
+    # Consultant-reasoning context. Every field is optional; blank stays unknown.
+    weight_kg: float | None = Field(default=None, ge=20, le=350)
+    height_cm: float | None = Field(default=None, ge=100, le=250)
+    waist_cm: float | None = Field(default=None, ge=40, le=250)
+    creatinine_umol: float | None = Field(default=None, ge=10, le=3000)
+    urine_acr_mg_mmol: float | None = Field(default=None, ge=0, le=3000)
+    total_cholesterol_mmol: float | None = Field(default=None, ge=1, le=20)
+    hdl_mmol: float | None = Field(default=None, ge=0.2, le=5)
+    ldl_mmol: float | None = Field(default=None, ge=0.2, le=15)
+    hemoglobin_g_dl: float | None = Field(default=None, ge=3, le=25)
+    glucose_context: Literal["fasting", "random", "unknown"] = "unknown"
+    known_ascvd: Known = "unknown"
+    prior_stroke_tia: Known = "unknown"
+    known_heart_failure: Known = "unknown"
+    known_atrial_fibrillation: Known = "unknown"
+    exacerbations_past_year: int | None = Field(default=None, ge=0, le=50, strict=True)
+    reliever_use_per_week: int | None = Field(default=None, ge=0, le=100, strict=True)
+    hypoglycaemia_episodes_3m: int | None = Field(default=None, ge=0, le=100, strict=True)
+    eye_screen: Literal["within_12_months", "over_12_months", "never", "unknown"] = "unknown"
+    foot_exam: Literal["within_12_months", "over_12_months", "never", "unknown"] = "unknown"
 
-    @field_validator("systolic_bp", "diastolic_bp", "repeat_systolic_bp", "repeat_diastolic_bp", "pulse", "oxygen_saturation", "respiratory_rate", "hba1c", "glucose", "egfr", "potassium", mode="before")
+    @field_validator("systolic_bp", "diastolic_bp", "repeat_systolic_bp", "repeat_diastolic_bp", "pulse", "oxygen_saturation", "respiratory_rate", "hba1c", "glucose", "egfr", "potassium",
+                     "weight_kg", "height_cm", "waist_cm", "creatinine_umol", "urine_acr_mg_mmol", "total_cholesterol_mmol", "hdl_mmol", "ldl_mmol", "hemoglobin_g_dl", mode="before")
     @classmethod
     def numeric_measurement(cls, value):
         if value is not None and (isinstance(value, bool) or not isinstance(value, (int, float))):
@@ -129,6 +150,8 @@ class ClinicalData(StrictModel):
             raise ValueError("Glucose is outside the supported mmol/L measurement range; check units")
         if len(self.symptoms) != len(set(self.symptoms)):
             raise ValueError("Symptoms must not be duplicated")
+        if self.hdl_mmol is not None and self.total_cholesterol_mmol is not None and self.hdl_mmol >= self.total_cholesterol_mmol:
+            raise ValueError("HDL cholesterol must be lower than total cholesterol; check units (mmol/L)")
         return self
 
 

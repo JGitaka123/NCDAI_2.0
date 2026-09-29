@@ -110,6 +110,10 @@ def encounter_bundle(patient, encounter):
                 lines.append(f"Source: {source['title']} | {source.get('section', '')} | {source.get('version', '')} | {source['url']}")
         if encounter.review.get("note"):
             lines.append("Clinician review note: " + encounter.review["note"])
+        consultant = assessment.get("consultant")
+        if consultant and consultant.get("summary_text"):
+            lines.append(f"Consultant synthesis ({consultant.get('version', 'unversioned')}), advisory and reviewed with this record:")
+            lines.append(consultant["summary_text"])
         resources.append({"resourceType": "DocumentReference", "id": f"{encounter.id}-review", "status": "current", "docStatus": "final",
                           "subject": {"reference": patient_ref}, "date": encounter.review["reviewed_at"],
                           "author": [{"identifier": {"system": f"urn:ncdai:facility:{patient.facility_id}:user", "value": encounter.review["reviewer_id"]}, "display": encounter.review["reviewer_name"]}],

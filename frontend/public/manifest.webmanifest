@@ -1,0 +1,20 @@
+{
+  "name": "NCDAI 2.0 Clinical Workspace",
+  "short_name": "NCDAI",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "description": "Clinician workspace for coordinated adult NCD care with consultant-level decision support.",
+  "background_color": "#fffafa",
+  "theme_color": "#FF5757",
+  "categories": ["medical", "health"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Offline consult", "short_name": "Consult", "url": "/mobile/", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

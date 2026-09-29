@@ -15,6 +15,8 @@ This hosted release enables **supervised clinical testing at Mary Help Hospital 
 - Patient registration and search, encounter history, current observations with explicit units and unknown states.
 - Deterministic safety and referral prompts with stable rule IDs and inspectable source/version references.
 - Four bounded Kenya starting-dose references, proposed-dose range checks, contraindication/context withholding and immutable review provenance. See [dose-engine scope](docs/dosing-engine.md).
+- **Consultant synthesis on every assessment**: patient-specific one-line summary, CKD-EPI 2021 eGFR, KDIGO stage and risk, cardiovascular risk, CHA2DS2-VA, a ranked problem list with individual targets, stepwise plans linked to WHO, ISH, ESC, ADA, KDIGO, GINA, GOLD and Kenya MOH guidance, medication review, monitoring and follow-up. Deterministic and never prescribing. See [consultant reasoning](docs/consultant-reasoning.md).
+- **Mobile**: the workspace installs as an app, and [NCDAI Consult](docs/mobile-app.md) at `/mobile/` gives an offline, on-device quick consult whose engine is parity-tested against the backend.
 - Optional DeepSeek-first AI review focus, with an OpenAI adapter option. AI selects established items; it cannot create advice, change urgency or remove critical findings.
 - Mandatory clinician review of every action: accept, modify, defer or reject, with rationale for changes.
 - Version checks and immutable reviewed records, including exact input and assessment snapshots.

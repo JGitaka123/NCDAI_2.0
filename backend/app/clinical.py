@@ -13,7 +13,7 @@ from uuid import uuid4
 
 from .evidence import EVIDENCE_VERSION, REVIEW_STATUS, evidence
 
-RULESET_VERSION = "ncdai-2-rules-0.1.3"
+RULESET_VERSION = "ncdai-2-rules-0.2.0"
 
 ACE = {"lisinopril", "enalapril", "ramipril", "captopril", "perindopril"}
 ARB = {"losartan", "valsartan", "candesartan", "telmisartan", "irbesartan"}
@@ -96,6 +96,13 @@ def assess(data: dict, age: int, sex: str) -> dict:
         if s is not None and d is not None and s <= d:
             raise ValueError("Systolic pressure must exceed diastolic pressure")
     egfr, potassium = num("egfr", 0, 200), num("potassium", 1, 10)
+    creatinine = num("creatinine_umol", 10, 3000)
+    calculated_egfr = None
+    if egfr is None and creatinine is not None:
+        # An entered laboratory eGFR always wins; a calculated value never hides it.
+        from .reasoning import ckd_epi_2021, fmt
+        calculated_egfr = ckd_epi_2021(creatinine, age, sex)
+        egfr = calculated_egfr
     pulse = num("pulse", 20, 250)
     hba1c = num("hba1c", 2, 25)
     spo2, rr = num("oxygen_saturation", 1, 100), num("respiratory_rate", 1, 80)
@@ -339,6 +346,8 @@ def assess(data: dict, age: int, sex: str) -> dict:
         result["warnings"].append("Confirm medicine stock, cost and access; availability is unverified or limited.")
     if any(m.get("dose") is None or not m.get("unit") or not m.get("frequency") for m in meds):
         result["warnings"].append("One or more medication schedules are incomplete; dose safety has not been evaluated.")
+    if calculated_egfr is not None:
+        result["warnings"].append(f"eGFR {fmt(calculated_egfr)} mL/min/1.73 m² was calculated from creatinine (CKD-EPI 2021) and used by these rules; confirm the result date and trend.")
     result["warnings"].append("Medication checks are limited to selected ingredients and exact allergy matches; cross-reactivity, all interactions and dose appropriateness are not covered.")
     observed = data.get("observed_at")
     if not observed:
@@ -368,4 +377,8 @@ def assess(data: dict, age: int, sex: str) -> dict:
         "routine": "Complete the supervised NCD review and agree follow-up; this result does not provide clinical clearance.",
     }[result["urgency"]]
     from .dosing import attach_dosing
-    return attach_dosing(result, data, age, sex)
+    from .reasoning import build
+    result = attach_dosing(result, data, age, sex)
+    # Consultant synthesis reads the final urgency; it never changes findings.
+    result["consultant"] = build(data, age, sex, result)
+    return result
