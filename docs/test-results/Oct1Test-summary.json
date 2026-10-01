@@ -1,0 +1,172 @@
+{
+  "label": "Oct1Test",
+  "generated_at": "2026-10-01T18:03:17.613875+00:00",
+  "kind": "Synthetic engineering verification of the deployed NCDAI 2.0 release across both delivery surfaces; not clinical validation",
+  "deployed_revision": "e3c077cc51d54221609a50ccd18b46d3f27c21e2",
+  "deployment": "dpl_91RnnyUg7Gyh4ZL3AzY2vgSYWkP3",
+  "hosted_application": "https://ncdai-2.vercel.app",
+  "versions": {
+    "rules": "ncdai-2-rules-0.2.0",
+    "reasoning": "ncdai-consultant-1.0.0",
+    "evidence": "ncdai-2026-09-29.1",
+    "dose_reference": "ncdai-dose-reference-0.1.1"
+  },
+  "case_set": {
+    "catalogue": "tests/cases/clinical_cases.json",
+    "catalogue_version": "1.0",
+    "selected": 50,
+    "of": 66,
+    "selection": "deterministic round-robin across domains, 50 of 66 cases",
+    "domains": {
+      "cardiovascular": 9,
+      "diabetes": 9,
+      "kidney": 9,
+      "respiratory": 8,
+      "cancer_referral": 6,
+      "multimorbidity": 9
+    },
+    "urgency_distribution": {
+      "soon": 13,
+      "urgent": 20,
+      "emergency": 17
+    },
+    "case_ids": [
+      "NCD-001",
+      "NCD-002",
+      "NCD-003",
+      "NCD-004",
+      "NCD-005",
+      "NCD-006",
+      "NCD-007",
+      "NCD-008",
+      "NCD-009",
+      "NCD-013",
+      "NCD-014",
+      "NCD-015",
+      "NCD-016",
+      "NCD-017",
+      "NCD-018",
+      "NCD-019",
+      "NCD-020",
+      "NCD-021",
+      "NCD-027",
+      "NCD-028",
+      "NCD-029",
+      "NCD-030",
+      "NCD-031",
+      "NCD-032",
+      "NCD-033",
+      "NCD-034",
+      "NCD-035",
+      "NCD-039",
+      "NCD-040",
+      "NCD-041",
+      "NCD-042",
+      "NCD-043",
+      "NCD-044",
+      "NCD-045",
+      "NCD-046",
+      "NCD-049",
+      "NCD-050",
+      "NCD-051",
+      "NCD-052",
+      "NCD-053",
+      "NCD-054",
+      "NCD-055",
+      "NCD-056",
+      "NCD-057",
+      "NCD-058",
+      "NCD-059",
+      "NCD-060",
+      "NCD-061",
+      "NCD-062",
+      "NCD-063"
+    ]
+  },
+  "environment": {
+    "frontend": "the deployed production bundle; every file hashed identical to a local build of the deployed commit",
+    "backend": "NCDAI API at the deployed commit, run locally",
+    "database": "PostgreSQL 16.14, local, loopback only, synthetic facilities only",
+    "browser": "Chromium 141.0.7390.37 via Playwright 1.63.0",
+    "live_ai_requests": 0,
+    "real_patient_data": false,
+    "hosted_write_operations": 0
+  },
+  "results": {
+    "api_workflow_50": {
+      "total": 50,
+      "passed": 50,
+      "failed": 0,
+      "database": "PostgreSQL",
+      "run_id": "ea6ad23910",
+      "steps_per_case": [
+        "register patient",
+        "persist encounter",
+        "assess expected safety findings and evidence",
+        "review every action; retrieve immutable decisions",
+        "request, accept and complete referral",
+        "export reviewed FHIR document",
+        "verify audit integrity"
+      ]
+    },
+    "pwa_ui_50": {
+      "total": 50,
+      "passed": 50,
+      "failed": 0,
+      "urgency_agreement": "50/50",
+      "recommendations_reviewed_and_locked": 80,
+      "evidence_links_opened": 125
+    },
+    "mobile_ui_50": {
+      "total": 50,
+      "passed": 50,
+      "failed": 0,
+      "urgency_agreement": "50/50",
+      "rule_set_agreement_with_backend": "50/50",
+      "console_errors": 0
+    },
+    "pwa_capability": {
+      "total": 19,
+      "passed": 19,
+      "failed": 0
+    },
+    "accessibility": {
+      "audits": 15,
+      "standard": [
+        "wcag2a",
+        "wcag2aa",
+        "wcag21aa",
+        "wcag22aa"
+      ],
+      "serious_or_critical": 0,
+      "horizontal_overflow_views": 0
+    },
+    "engine_parity": {
+      "suite": "backend/tests/test_engine_parity.py",
+      "tests": 4,
+      "passed": 4,
+      "coverage": "66-case catalogue, targeted scenarios and 1500 seeded fuzz cases"
+    }
+  },
+  "database_state": {
+    "name": "ncdai_oct1test",
+    "patients": 102,
+    "patients_api_workflow": 50,
+    "patients_pwa_ui": 52,
+    "encounters": 102,
+    "encounters_assessed": 102,
+    "encounters_reviewed_and_locked": 102,
+    "referrals": 50,
+    "audit_events": 664,
+    "facilities": 2,
+    "all_facilities_synthetic": true,
+    "non_synthetic_patients": 0,
+    "note": "52 PWA UI patients because two cases were created once by a harness smoke test and once on re-run after a correct duplicate-record-ID rejection."
+  },
+  "boundaries": [
+    "No test touched the hosted Mary Help database; every record here is synthetic and local.",
+    "The hosted clinical workflow against the live deployment still needs provisioned accounts and was not run.",
+    "No live AI provider request was made.",
+    "Engineering verification only. These results say nothing about clinical accuracy, effectiveness or adoption."
+  ]
+}

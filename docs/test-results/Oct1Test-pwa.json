@@ -1,0 +1,863 @@
+{
+  "label": "Oct1Test",
+  "surface": "NCDAI 2.0 installable clinical workspace (PWA) UI",
+  "base": "http://127.0.0.1:8902",
+  "frontend": "deployed production bundle",
+  "api": "NCDAI backend at deployed commit",
+  "database": "PostgreSQL 16.14 (local, synthetic)",
+  "started_at": "2026-10-01T18:14:35.552Z",
+  "completed_at": "2026-10-01T18:17:29.743Z",
+  "total": 50,
+  "passed": 50,
+  "failed": 0,
+  "urgency_matches": 50,
+  "console_errors": [
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "Failed to load resource: the server responded with a status of 409 (Conflict)",
+    "Failed to load resource: the server responded with a status of 409 (Conflict)",
+    "Failed to load resource: the server responded with a status of 409 (Conflict)",
+    "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "cases": [
+    {
+      "id": "NCD-001",
+      "domain": "cardiovascular",
+      "title": "Stable treated hypertension review",
+      "backend_urgency": "soon",
+      "backend_rules": [
+        "DIABETES_CONFIRM",
+        "HTN_FOLLOWUP"
+      ],
+      "pwa_urgency": "soon",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2541,
+      "status": "passed",
+      "note": "First attempt in this run hit the unique (facility, record ID) constraint because the harness smoke test had already created that record ID. Re-run with a distinct record ID; the rejection was correct application behaviour, not a defect."
+    },
+    {
+      "id": "NCD-002",
+      "domain": "cardiovascular",
+      "title": "Severe isolated systolic reading",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "BP_SEVERE",
+        "DATA_COMPLETENESS"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2434,
+      "status": "passed",
+      "note": "First attempt in this run hit the unique (facility, record ID) constraint because the harness smoke test had already created that record ID. Re-run with a distinct record ID; the rejection was correct application behaviour, not a defect."
+    },
+    {
+      "id": "NCD-003",
+      "domain": "cardiovascular",
+      "title": "Severe isolated diastolic reading",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "BP_SEVERE",
+        "DATA_COMPLETENESS"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2582,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-004",
+      "domain": "cardiovascular",
+      "title": "Chest pain despite normal blood pressure",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2454,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-005",
+      "domain": "cardiovascular",
+      "title": "Focal neurological deficit with normal pressure",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2257,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-006",
+      "domain": "cardiovascular",
+      "title": "Confusion requires immediate assessment",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2349,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-007",
+      "domain": "cardiovascular",
+      "title": "Seizure cannot be reassured by normal glucose",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2208,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-008",
+      "domain": "cardiovascular",
+      "title": "Severe hypertension with visual disturbance",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "BP_CRISIS",
+        "DATA_COMPLETENESS"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2320,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-009",
+      "domain": "cardiovascular",
+      "title": "Severe hypertension with headache",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "BP_CRISIS",
+        "DATA_COMPLETENESS"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2420,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-013",
+      "domain": "diabetes",
+      "title": "Low glucose in mmol per litre",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2347,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-014",
+      "domain": "diabetes",
+      "title": "Severe low glucose",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2204,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-015",
+      "domain": "diabetes",
+      "title": "Equivalent low glucose in mg per decilitre",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2338,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-016",
+      "domain": "diabetes",
+      "title": "Equivalent severe low glucose in mg per decilitre",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2324,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-017",
+      "domain": "diabetes",
+      "title": "Hypoglycaemia inclusive guideline boundary",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2174,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-018",
+      "domain": "diabetes",
+      "title": "Just above hypoglycaemia threshold",
+      "backend_urgency": "soon",
+      "backend_rules": [
+        "DIABETES_CONFIRM"
+      ],
+      "pwa_urgency": "soon",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 1,
+      "locked_after_review": true,
+      "ms": 2147,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-019",
+      "domain": "diabetes",
+      "title": "High glucose and dehydration",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "HYPERGLYCEMIC_CRISIS"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2283,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-020",
+      "domain": "diabetes",
+      "title": "High glucose and vomiting",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "HYPERGLYCEMIC_CRISIS"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2366,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-021",
+      "domain": "diabetes",
+      "title": "Very high glucose without recorded acute symptoms",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "GLUCOSE_HIGH"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2277,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-027",
+      "domain": "kidney",
+      "title": "Severely reduced renal function",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "RENAL_SEVERE"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2252,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-028",
+      "domain": "kidney",
+      "title": "Metformin with eGFR below thirty",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "METFORMIN_RENAL",
+        "RENAL_SEVERE"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2444,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-029",
+      "domain": "kidney",
+      "title": "Metformin with moderately impaired renal function",
+      "backend_urgency": "soon",
+      "backend_rules": [
+        "CKD_REVIEW",
+        "DIABETES_REVIEW",
+        "METFORMIN_REVIEW"
+      ],
+      "pwa_urgency": "soon",
+      "urgency_match": true,
+      "recommendations": 3,
+      "evidence_links": 4,
+      "locked_after_review": true,
+      "ms": 2527,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-030",
+      "domain": "kidney",
+      "title": "Metformin without renal observation",
+      "backend_urgency": "soon",
+      "backend_rules": [
+        "DATA_COMPLETENESS",
+        "DIABETES_REVIEW"
+      ],
+      "pwa_urgency": "soon",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2508,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-031",
+      "domain": "kidney",
+      "title": "Severe hyperkalaemia",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "DATA_COMPLETENESS",
+        "POTASSIUM_HIGH"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2527,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-032",
+      "domain": "kidney",
+      "title": "Moderate hyperkalaemia",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "DATA_COMPLETENESS",
+        "POTASSIUM_HIGH"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2338,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-033",
+      "domain": "kidney",
+      "title": "Severe hypokalaemia",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "POTASSIUM_LOW"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 1,
+      "locked_after_review": true,
+      "ms": 2274,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-034",
+      "domain": "kidney",
+      "title": "Moderate hypokalaemia",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "POTASSIUM_LOW"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 1,
+      "locked_after_review": true,
+      "ms": 2313,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-035",
+      "domain": "kidney",
+      "title": "Known CKD requires longitudinal assessment",
+      "backend_urgency": "soon",
+      "backend_rules": [
+        "CKD_REVIEW",
+        "DIABETES_CONFIRM"
+      ],
+      "pwa_urgency": "soon",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2475,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-039",
+      "domain": "respiratory",
+      "title": "Low oxygen saturation",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2277,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-040",
+      "domain": "respiratory",
+      "title": "Asthma low oxygen near severe boundary",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2209,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-041",
+      "domain": "respiratory",
+      "title": "Borderline oxygenation needs review",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2251,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-042",
+      "domain": "respiratory",
+      "title": "Rapid respiration with asthma",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "RESP_TACHYPNEA"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2189,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-043",
+      "domain": "respiratory",
+      "title": "Wheeze with preserved oxygenation",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "RESP_WHEEZE"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 1,
+      "locked_after_review": true,
+      "ms": 2244,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-044",
+      "domain": "respiratory",
+      "title": "Acute breathlessness despite normal oximetry",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2281,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-045",
+      "domain": "respiratory",
+      "title": "Chronic asthma review",
+      "backend_urgency": "soon",
+      "backend_rules": [
+        "DIABETES_CONFIRM",
+        "RESP_CHRONIC_REVIEW"
+      ],
+      "pwa_urgency": "soon",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2327,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-046",
+      "domain": "respiratory",
+      "title": "COPD and current tobacco use",
+      "backend_urgency": "soon",
+      "backend_rules": [
+        "DIABETES_CONFIRM",
+        "RESP_CHRONIC_REVIEW",
+        "TOBACCO_SUPPORT"
+      ],
+      "pwa_urgency": "soon",
+      "urgency_match": true,
+      "recommendations": 3,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2472,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-049",
+      "domain": "cancer_referral",
+      "title": "Breast lump requires diagnostic pathway",
+      "backend_urgency": "soon",
+      "backend_rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "pwa_urgency": "soon",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2585,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-050",
+      "domain": "cancer_referral",
+      "title": "Unexplained weight loss",
+      "backend_urgency": "soon",
+      "backend_rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "pwa_urgency": "soon",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2410,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-051",
+      "domain": "cancer_referral",
+      "title": "Persistent cough requires differential assessment",
+      "backend_urgency": "soon",
+      "backend_rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "pwa_urgency": "soon",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2442,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-052",
+      "domain": "cancer_referral",
+      "title": "Abnormal bleeding with severity not established",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "CANCER_WARNING"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2315,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-053",
+      "domain": "cancer_referral",
+      "title": "Known cancer needs treating-team coordination",
+      "backend_urgency": "soon",
+      "backend_rules": [
+        "CANCER_SCOPE",
+        "DIABETES_CONFIRM"
+      ],
+      "pwa_urgency": "soon",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 3,
+      "locked_after_review": true,
+      "ms": 2421,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-054",
+      "domain": "cancer_referral",
+      "title": "Cancer warning signs with haemoptysis",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "CANCER_WARNING",
+        "HEMOPTYSIS"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 4,
+      "locked_after_review": true,
+      "ms": 2256,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-055",
+      "domain": "multimorbidity",
+      "title": "Pregnancy with severe blood pressure",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "DATA_COMPLETENESS",
+        "PREGNANCY_SCOPE",
+        "PREGNANCY_SEVERE_BP"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 3,
+      "evidence_links": 4,
+      "locked_after_review": true,
+      "ms": 2525,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-056",
+      "domain": "multimorbidity",
+      "title": "Pregnancy outside routine adult NCD treatment scope",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "PREGNANCY_SCOPE"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2167,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-057",
+      "domain": "multimorbidity",
+      "title": "Pregnancy with ACE inhibitor",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "PREGNANCY_SCOPE",
+        "RAS_PREGNANCY"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 4,
+      "locked_after_review": true,
+      "ms": 2480,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-058",
+      "domain": "multimorbidity",
+      "title": "Pregnancy with ARB",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "PREGNANCY_SCOPE",
+        "RAS_PREGNANCY"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 4,
+      "locked_after_review": true,
+      "ms": 2465,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-059",
+      "domain": "multimorbidity",
+      "title": "Documented exact medication allergy conflict",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "ALLERGY_CONFLICT"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 1,
+      "evidence_links": 1,
+      "locked_after_review": true,
+      "ms": 2368,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-060",
+      "domain": "multimorbidity",
+      "title": "Unknown medication and allergy lists",
+      "backend_urgency": "soon",
+      "backend_rules": [
+        "DATA_COMPLETENESS",
+        "DIABETES_CONFIRM"
+      ],
+      "pwa_urgency": "soon",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2293,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-061",
+      "domain": "multimorbidity",
+      "title": "Older adult with diabetes CKD and hypertension",
+      "backend_urgency": "urgent",
+      "backend_rules": [
+        "DATA_COMPLETENESS",
+        "METFORMIN_RENAL",
+        "RENAL_SEVERE"
+      ],
+      "pwa_urgency": "urgent",
+      "urgency_match": true,
+      "recommendations": 3,
+      "evidence_links": 4,
+      "locked_after_review": true,
+      "ms": 2780,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-062",
+      "domain": "multimorbidity",
+      "title": "Emergency danger retains priority over multiple chronic findings",
+      "backend_urgency": "emergency",
+      "backend_rules": [
+        "EMERGENCY_SYMPTOMS",
+        "METFORMIN_REVIEW",
+        "RESP_WHEEZE"
+      ],
+      "pwa_urgency": "emergency",
+      "urgency_match": true,
+      "recommendations": 3,
+      "evidence_links": 4,
+      "locked_after_review": true,
+      "ms": 2656,
+      "status": "passed"
+    },
+    {
+      "id": "NCD-063",
+      "domain": "multimorbidity",
+      "title": "Limited medicines are visible context",
+      "backend_urgency": "soon",
+      "backend_rules": [
+        "DIABETES_CONFIRM",
+        "HTN_FOLLOWUP"
+      ],
+      "pwa_urgency": "soon",
+      "urgency_match": true,
+      "recommendations": 2,
+      "evidence_links": 2,
+      "locked_after_review": true,
+      "ms": 2405,
+      "status": "passed"
+    }
+  ],
+  "reruns": {
+    "cases": [
+      "NCD-001",
+      "NCD-002"
+    ],
+    "reason": "duplicate record ID from the harness smoke test; application correctly refused the duplicate"
+  },
+  "console_errors_note": "Each entry is the pre-sign-in /api/auth/session probe returning 401, which is the same response production gives an unauthenticated visitor."
+}
