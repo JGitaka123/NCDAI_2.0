@@ -9,9 +9,9 @@
 | Item | Recorded value |
 |---|---|
 | Vercel account/project | `jessegitaka-7527s-projects / ncdai-2` |
-| Deployed application commit | `c0b05886c6931bd8c9ab5c09611fcfbe034cd4b8` |
-| Deployment | `dpl_FceePPtPL1Bqm7EUYYKNDkwGiktA` |
-| Vercel inspection | [Deployment details](https://vercel.com/jessegitaka-7527s-projects/ncdai-2/FceePPtPL1Bqm7EUYYKNDkwGiktA) |
+| Deployed application commit | `7dc960bc3f3c7d9c255bc6b581629cddd9874ce5` |
+| Deployment | `dpl_91RnnyUg7Gyh4ZL3AzY2vgSYWkP3` |
+| Vercel inspection | [Deployment details](https://vercel.com/jessegitaka-7527s-projects/ncdai-2/91RnnyUg7Gyh4ZL3AzY2vgSYWkP3) |
 | Runtime | Vite frontend and Python 3.12 FastAPI services; API function inspected in `fra1` |
 | Database | Dedicated Neon `ncdai-2-db`, Free plan, Frankfurt requested at provisioning; server reports PostgreSQL `18.6 (2078fcb)` |
 | Schema revision | `20260913_mary_help`; consultant `consultant-20260913-1` |
@@ -24,9 +24,11 @@ The existing `aifya-web` project was not replaced. NCDAI has its own project, da
 
 ## Current Mary Help release
 
-The 1 October 2026 deployment publishes the consultant synthesis shown on every assessment, the installable workspace (web manifest, icons and a network-first service worker that never intercepts `/api/`) and the offline [NCDAI Consult](mobile-app.md) app at `/mobile/`. It is a code-only release: the schema revision is unchanged at `20260913_mary_help`, so no migration was applied and no account, facility or environment setting was altered.
+The first 1 October 2026 deployment published the consultant synthesis shown on every assessment, the installable workspace (web manifest, icons and a network-first service worker that never intercepts `/api/`) and the offline [NCDAI Consult](mobile-app.md) app at `/mobile/`. It is a code-only release: the schema revision is unchanged at `20260913_mary_help`, so no migration was applied and no account, facility or environment setting was altered.
 
 All three [quality jobs passed at the deployed commit](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/36605249082), covering the backend, security and regression suites, the frozen 66 synthetic cases on SQLite and on migrated PostgreSQL, the transaction-pooler regression, 50 two-database consultant workflows, the dose-reference workflows and both dependency audits. The same suites were reproduced independently before deployment: 425 backend tests passed with 10 conditional skips, and 33 frontend tests passed. The deploy itself ran through the manual [production workflow](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/36887091624); its read-only checks confirmed readiness, the PWA files, `/mobile/` and the security headers, and a headless browser loaded `/` and `/mobile/` at phone width with no console errors or CSP violations. The published frontend bundle hashes match a local build of the same commit, and `vercel inspect` places the API function in `fra1`. Deployment Protection (Vercel Authentication) guards the per-deployment URL; the clinician-facing `ncdai-2.vercel.app` alias remains open as intended. These are engineering and transport checks; they are not new clinical-accuracy evidence.
+
+A second 1 October deployment, `dpl_91RnnyUg7Gyh4ZL3AzY2vgSYWkP3` at commit `7dc960b`, corrects one accessibility defect found by auditing the first: the guideline source links in the offline `/mobile/` consult were below the WCAG 2.2 target size at phone width. It changes `frontend/mobile/page.html` only; the workspace bundle hashes are unchanged. Its manual [deploy run](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/36901959641) passed every step, the API function is again inspected in `fra1`, and the deployed files each hash identically to a local build of that commit.
 
 Mary Help Hospital, Thika is enabled for supervised testing with named accounts, mandatory initial password changes, facility-scoped real-record registration and constrained DeepSeek briefing. The consultant workspace has its own logical database and restricted role, preserving the request, independent opinion and primary action. The demonstration facility remains fictional-only. See [current status and operating handover](clinical-deployment-status.md), [testing guide](mary-help-testing-guide.md), and [release evidence](test-results/mary-help-release-summary.json).
 
