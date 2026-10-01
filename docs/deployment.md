@@ -16,7 +16,9 @@
 | Database | Dedicated Neon `ncdai-2-db`, Free plan, Frankfurt requested at provisioning; server reports PostgreSQL `18.6 (2078fcb)` |
 | Schema revision | `20260913_mary_help`; consultant `consultant-20260913-1` |
 | Application database role | `ncdai_app`, separate from the migration owner |
-| Clinical rules | `ncdai-2-rules-0.1.3` |
+| Clinical rules | `ncdai-2-rules-0.2.0` |
+| Consultant reasoning | `ncdai-consultant-1.0.0` |
+| Evidence set | `ncdai-2026-09-29.1` |
 | AI provider/model | DeepSeek / `deepseek-v4-pro` |
 | Prompt contract | `ncdai-briefing-select-v1.5` |
 

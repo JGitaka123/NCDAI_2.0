@@ -1,0 +1,108 @@
+{
+  "label": "Oct1Test",
+  "surface": "PWA installability, service worker and offline behaviour",
+  "base": "http://127.0.0.1:8902",
+  "run_at": "2026-10-01T18:18:50.343Z",
+  "total": 19,
+  "passed": 19,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "workspace: manifest served as application/manifest+json",
+      "pass": true,
+      "detail": "application/manifest+json; charset=utf-8"
+    },
+    {
+      "name": "workspace: manifest has the installability fields",
+      "pass": true,
+      "detail": "all present"
+    },
+    {
+      "name": "workspace: standalone display and correct scope",
+      "pass": true,
+      "detail": "display=standalone scope=/"
+    },
+    {
+      "name": "workspace: 192px and 512px icons declared",
+      "pass": true,
+      "detail": "192x192 512x512 512x512"
+    },
+    {
+      "name": "workspace: maskable icon declared",
+      "pass": true,
+      "detail": "required for a clean Android launcher icon"
+    },
+    {
+      "name": "workspace: every declared icon resolves",
+      "pass": true,
+      "detail": "3 icons checked"
+    },
+    {
+      "name": "offline consult: manifest served as application/manifest+json",
+      "pass": true,
+      "detail": "application/manifest+json; charset=utf-8"
+    },
+    {
+      "name": "offline consult: manifest has the installability fields",
+      "pass": true,
+      "detail": "all present"
+    },
+    {
+      "name": "offline consult: standalone display and correct scope",
+      "pass": true,
+      "detail": "display=standalone scope=/mobile/"
+    },
+    {
+      "name": "offline consult: 192px and 512px icons declared",
+      "pass": true,
+      "detail": "192x192 512x512 512x512"
+    },
+    {
+      "name": "offline consult: maskable icon declared",
+      "pass": true,
+      "detail": "required for a clean Android launcher icon"
+    },
+    {
+      "name": "offline consult: every declared icon resolves",
+      "pass": true,
+      "detail": "3 icons checked"
+    },
+    {
+      "name": "service worker registers and activates",
+      "pass": true,
+      "detail": "scope http://127.0.0.1:8902/ state activated"
+    },
+    {
+      "name": "service worker served no-cache so clinicians get new releases",
+      "pass": true,
+      "detail": "verified against production (https://ncdai-2.vercel.app/sw.js): cache-control: no-cache",
+      "note": "This header comes from vercel.json, which the local static host used for the rest of this suite does not reproduce; it is therefore checked against the live deployment."
+    },
+    {
+      "name": "offline shell is precached",
+      "pass": true,
+      "detail": "12 entries in ncdai-shell-v2"
+    },
+    {
+      "name": "no /api/ response is ever cached",
+      "pass": true,
+      "detail": "no clinical API traffic in any cache"
+    },
+    {
+      "name": "offline: /mobile/ loads with no network",
+      "pass": true,
+      "detail": "served from the service worker cache"
+    },
+    {
+      "name": "offline: on-device engine still triages",
+      "pass": true,
+      "detail": "severe BP + chest pain -> emergency, 3819 chars rendered"
+    },
+    {
+      "name": "offline: clinical API is not answered from cache",
+      "pass": true,
+      "detail": "result: network error (not served from cache)"
+    }
+  ],
+  "note": "Run against the deployed frontend bundle on a local host. Response headers configured in vercel.json are verified against the live deployment instead, and are marked as such."
+}

@@ -1,0 +1,4319 @@
+{
+  "label": "Oct1Test",
+  "surface": "NCDAI Consult offline mobile app (/mobile/)",
+  "base": "http://127.0.0.1:8901",
+  "run_at": "2026-10-01T18:10:40.583Z",
+  "total": 50,
+  "passed": 50,
+  "failed": 0,
+  "urgency_matches": 50,
+  "rule_matches": 50,
+  "console_errors": [],
+  "cases": [
+    {
+      "id": "NCD-001",
+      "domain": "cardiovascular",
+      "title": "Stable treated hypertension review",
+      "backend_urgency": "soon",
+      "mobile_urgency": "soon",
+      "urgency_match": true,
+      "backend_rules": [
+        "DIABETES_CONFIRM",
+        "HTN_FOLLOWUP"
+      ],
+      "mobile_rules": [
+        "DIABETES_CONFIRM",
+        "HTN_FOLLOWUP"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "yes",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [
+            {
+              "code": "amlodipine",
+              "name": "Amlodipine"
+            }
+          ],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:17.391Z"
+        }
+      },
+      "ui": {
+        "urgency": "soon",
+        "headline": "Review soon",
+        "oneLiner": "58-year-old woman with hypertension. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85. 1 current medicine.",
+        "findings": [
+          "Confirm possible diabetes warning"
+        ],
+        "problems": 2,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 7,
+        "summaryChars": 1189,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 1,
+      "medicines_expected": 1,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-002",
+      "domain": "cardiovascular",
+      "title": "Severe isolated systolic reading",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "BP_SEVERE",
+        "DATA_COMPLETENESS"
+      ],
+      "mobile_rules": [
+        "BP_SEVERE",
+        "DATA_COMPLETENESS"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 190,
+          "diastolic_bp": 95,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:17.840Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 190/95 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Severe blood pressure reading critical"
+        ],
+        "problems": 2,
+        "derivedTiles": 2,
+        "monitoringRows": 1,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1559,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-003",
+      "domain": "cardiovascular",
+      "title": "Severe isolated diastolic reading",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "BP_SEVERE",
+        "DATA_COMPLETENESS"
+      ],
+      "mobile_rules": [
+        "BP_SEVERE",
+        "DATA_COMPLETENESS"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 175,
+          "diastolic_bp": 115,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:18.255Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 175/115 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Severe blood pressure reading critical"
+        ],
+        "problems": 2,
+        "derivedTiles": 2,
+        "monitoringRows": 1,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1561,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-004",
+      "domain": "cardiovascular",
+      "title": "Chest pain despite normal blood pressure",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "mobile_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "chest_pain"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:18.723Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Immediate acute assessment critical"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 1028,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-005",
+      "domain": "cardiovascular",
+      "title": "Focal neurological deficit with normal pressure",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "mobile_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "neurological_deficit"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:19.207Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Immediate acute assessment critical"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 1028,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-006",
+      "domain": "cardiovascular",
+      "title": "Confusion requires immediate assessment",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "mobile_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "confusion"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:19.657Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Immediate acute assessment critical"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 1028,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-007",
+      "domain": "cardiovascular",
+      "title": "Seizure cannot be reassured by normal glucose",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "mobile_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "seizure"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:20.157Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Immediate acute assessment critical"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 1028,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-008",
+      "domain": "cardiovascular",
+      "title": "Severe hypertension with visual disturbance",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "BP_CRISIS",
+        "DATA_COMPLETENESS"
+      ],
+      "mobile_rules": [
+        "BP_CRISIS",
+        "DATA_COMPLETENESS"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 200,
+          "diastolic_bp": 120,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "visual_disturbance"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:20.625Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 200/120 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Severe BP with warning symptoms critical"
+        ],
+        "problems": 2,
+        "derivedTiles": 2,
+        "monitoringRows": 1,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1563,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-009",
+      "domain": "cardiovascular",
+      "title": "Severe hypertension with headache",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "BP_CRISIS",
+        "DATA_COMPLETENESS"
+      ],
+      "mobile_rules": [
+        "BP_CRISIS",
+        "DATA_COMPLETENESS"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 195,
+          "diastolic_bp": 115,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "severe_headache"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:21.090Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 195/115 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Severe BP with warning symptoms critical"
+        ],
+        "problems": 2,
+        "derivedTiles": 2,
+        "monitoringRows": 1,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1563,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-013",
+      "domain": "diabetes",
+      "title": "Low glucose in mmol per litre",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "mobile_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 3.5,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "yes",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:21.573Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with diabetes. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Low glucose requires action now critical"
+        ],
+        "problems": 2,
+        "derivedTiles": 3,
+        "monitoringRows": 3,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1270,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-014",
+      "domain": "diabetes",
+      "title": "Severe low glucose",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "mobile_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 2.5,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "yes",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:22.061Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with diabetes. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Low glucose requires action now critical"
+        ],
+        "problems": 2,
+        "derivedTiles": 3,
+        "monitoringRows": 3,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1270,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-015",
+      "domain": "diabetes",
+      "title": "Equivalent low glucose in mg per decilitre",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "mobile_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 3.5,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "yes",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:22.525Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with diabetes. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Low glucose requires action now critical"
+        ],
+        "problems": 2,
+        "derivedTiles": 3,
+        "monitoringRows": 3,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1270,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": "glucose 63 mg/dL entered as 3.5 mmol/L (form is mmol/L only)",
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-016",
+      "domain": "diabetes",
+      "title": "Equivalent severe low glucose in mg per decilitre",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "mobile_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 2.5,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "yes",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:23.057Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with diabetes. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Low glucose requires action now critical"
+        ],
+        "problems": 2,
+        "derivedTiles": 3,
+        "monitoringRows": 3,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1270,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": "glucose 45 mg/dL entered as 2.5 mmol/L (form is mmol/L only)",
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-017",
+      "domain": "diabetes",
+      "title": "Hypoglycaemia inclusive guideline boundary",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "mobile_rules": [
+        "HYPOGLYCEMIA"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 3.9,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:23.546Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Low glucose requires action now critical"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 1033,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-018",
+      "domain": "diabetes",
+      "title": "Just above hypoglycaemia threshold",
+      "backend_urgency": "soon",
+      "mobile_urgency": "soon",
+      "urgency_match": true,
+      "backend_rules": [
+        "DIABETES_CONFIRM"
+      ],
+      "mobile_rules": [
+        "DIABETES_CONFIRM"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 4,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:24.007Z"
+        }
+      },
+      "ui": {
+        "urgency": "soon",
+        "headline": "Review soon",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Confirm possible diabetes warning"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 918,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-019",
+      "domain": "diabetes",
+      "title": "High glucose and dehydration",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "HYPERGLYCEMIC_CRISIS"
+      ],
+      "mobile_rules": [
+        "HYPERGLYCEMIC_CRISIS"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 22,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "yes",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "dehydration"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:24.507Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with diabetes. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Assess possible hyperglycaemic crisis critical"
+        ],
+        "problems": 2,
+        "derivedTiles": 3,
+        "monitoringRows": 3,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1276,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-020",
+      "domain": "diabetes",
+      "title": "High glucose and vomiting",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "HYPERGLYCEMIC_CRISIS"
+      ],
+      "mobile_rules": [
+        "HYPERGLYCEMIC_CRISIS"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 24,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "yes",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "vomiting"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:24.939Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with diabetes. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Assess possible hyperglycaemic crisis critical"
+        ],
+        "problems": 2,
+        "derivedTiles": 3,
+        "monitoringRows": 3,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1276,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-021",
+      "domain": "diabetes",
+      "title": "Very high glucose without recorded acute symptoms",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "GLUCOSE_HIGH"
+      ],
+      "mobile_rules": [
+        "GLUCOSE_HIGH"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 23,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "yes",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:25.395Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with diabetes. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Markedly elevated glucose critical"
+        ],
+        "problems": 2,
+        "derivedTiles": 3,
+        "monitoringRows": 3,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1264,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-027",
+      "domain": "kidney",
+      "title": "Severely reduced renal function",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "RENAL_SEVERE"
+      ],
+      "mobile_rules": [
+        "RENAL_SEVERE"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 22,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:25.856Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 22.",
+        "findings": [
+          "Severely reduced kidney function critical"
+        ],
+        "problems": 3,
+        "derivedTiles": 4,
+        "monitoringRows": 1,
+        "medicationReview": 0,
+        "sourceLinks": 15,
+        "summaryChars": 2266,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-028",
+      "domain": "kidney",
+      "title": "Metformin with eGFR below thirty",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "METFORMIN_RENAL",
+        "RENAL_SEVERE"
+      ],
+      "mobile_rules": [
+        "METFORMIN_RENAL",
+        "RENAL_SEVERE"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 25,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "yes",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [
+            {
+              "code": "metformin",
+              "name": "Metformin"
+            }
+          ],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:26.356Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with diabetes. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 25. 1 current medicine.",
+        "findings": [
+          "Metformin renal contraindication flag critical",
+          "Severely reduced kidney function critical"
+        ],
+        "problems": 3,
+        "derivedTiles": 4,
+        "monitoringRows": 4,
+        "medicationReview": 0,
+        "sourceLinks": 16,
+        "summaryChars": 2381,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 1,
+      "medicines_expected": 1,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-029",
+      "domain": "kidney",
+      "title": "Metformin with moderately impaired renal function",
+      "backend_urgency": "soon",
+      "mobile_urgency": "soon",
+      "urgency_match": true,
+      "backend_rules": [
+        "CKD_REVIEW",
+        "DIABETES_REVIEW",
+        "METFORMIN_REVIEW"
+      ],
+      "mobile_rules": [
+        "CKD_REVIEW",
+        "DIABETES_REVIEW",
+        "METFORMIN_REVIEW"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 35,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "yes",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [
+            {
+              "code": "metformin",
+              "name": "Metformin"
+            }
+          ],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:26.907Z"
+        }
+      },
+      "ui": {
+        "urgency": "soon",
+        "headline": "Review soon",
+        "oneLiner": "58-year-old woman with diabetes. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 35. 1 current medicine.",
+        "findings": [
+          "Review kidney status and chronicity warning",
+          "Review metformin with reduced eGFR warning"
+        ],
+        "problems": 3,
+        "derivedTiles": 4,
+        "monitoringRows": 4,
+        "medicationReview": 0,
+        "sourceLinks": 15,
+        "summaryChars": 2275,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 1,
+      "medicines_expected": 1,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-030",
+      "domain": "kidney",
+      "title": "Metformin without renal observation",
+      "backend_urgency": "soon",
+      "mobile_urgency": "soon",
+      "urgency_match": true,
+      "backend_rules": [
+        "DATA_COMPLETENESS",
+        "DIABETES_REVIEW"
+      ],
+      "mobile_rules": [
+        "DATA_COMPLETENESS",
+        "DIABETES_REVIEW"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "yes",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [
+            {
+              "code": "metformin",
+              "name": "Metformin"
+            }
+          ],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:27.440Z"
+        }
+      },
+      "ui": {
+        "urgency": "soon",
+        "headline": "Review soon",
+        "oneLiner": "58-year-old woman with diabetes. Today: BP 126/78 mmHg, HbA1c 6.5%. 1 current medicine.",
+        "findings": [],
+        "problems": 2,
+        "derivedTiles": 3,
+        "monitoringRows": 4,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1270,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 1,
+      "medicines_expected": 1,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-031",
+      "domain": "kidney",
+      "title": "Severe hyperkalaemia",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "DATA_COMPLETENESS",
+        "POTASSIUM_HIGH"
+      ],
+      "mobile_rules": [
+        "DATA_COMPLETENESS",
+        "POTASSIUM_HIGH"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 6.8,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:27.873Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Elevated potassium critical"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 1020,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-032",
+      "domain": "kidney",
+      "title": "Moderate hyperkalaemia",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "DATA_COMPLETENESS",
+        "POTASSIUM_HIGH"
+      ],
+      "mobile_rules": [
+        "DATA_COMPLETENESS",
+        "POTASSIUM_HIGH"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 6.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:28.356Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Elevated potassium critical"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 1020,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-033",
+      "domain": "kidney",
+      "title": "Severe hypokalaemia",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "POTASSIUM_LOW"
+      ],
+      "mobile_rules": [
+        "POTASSIUM_LOW"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 2.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:28.807Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Reduced potassium critical"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 1019,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-034",
+      "domain": "kidney",
+      "title": "Moderate hypokalaemia",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "POTASSIUM_LOW"
+      ],
+      "mobile_rules": [
+        "POTASSIUM_LOW"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 2.8,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:29.289Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Reduced potassium critical"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 1019,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-035",
+      "domain": "kidney",
+      "title": "Known CKD requires longitudinal assessment",
+      "backend_urgency": "soon",
+      "mobile_urgency": "soon",
+      "urgency_match": true,
+      "backend_rules": [
+        "CKD_REVIEW",
+        "DIABETES_CONFIRM"
+      ],
+      "mobile_rules": [
+        "CKD_REVIEW",
+        "DIABETES_CONFIRM"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 50,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "yes",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:29.756Z"
+        }
+      },
+      "ui": {
+        "urgency": "soon",
+        "headline": "Review soon",
+        "oneLiner": "58-year-old woman with chronic kidney disease G3a. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 50.",
+        "findings": [
+          "Review kidney status and chronicity warning",
+          "Confirm possible diabetes warning"
+        ],
+        "problems": 3,
+        "derivedTiles": 4,
+        "monitoringRows": 1,
+        "medicationReview": 0,
+        "sourceLinks": 12,
+        "summaryChars": 1780,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-039",
+      "domain": "respiratory",
+      "title": "Low oxygen saturation",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "mobile_rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 88,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "yes",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:30.189Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with asthma. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Low oxygen saturation needs assessment critical"
+        ],
+        "problems": 2,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1354,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-040",
+      "domain": "respiratory",
+      "title": "Asthma low oxygen near severe boundary",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "mobile_rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 91,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "yes",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:30.641Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with asthma. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Low oxygen saturation needs assessment critical"
+        ],
+        "problems": 2,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 8,
+        "summaryChars": 1354,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-041",
+      "domain": "respiratory",
+      "title": "Borderline oxygenation needs review",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "mobile_rules": [
+        "RESP_HYPOXEMIA"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 93,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "yes",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:31.056Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with COPD. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Low oxygen saturation needs assessment warning"
+        ],
+        "problems": 2,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 10,
+        "summaryChars": 1538,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-042",
+      "domain": "respiratory",
+      "title": "Rapid respiration with asthma",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "RESP_TACHYPNEA"
+      ],
+      "mobile_rules": [
+        "RESP_TACHYPNEA"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 32,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "yes",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:31.489Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with asthma. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Raised respiratory rate warning"
+        ],
+        "problems": 2,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 7,
+        "summaryChars": 1182,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-043",
+      "domain": "respiratory",
+      "title": "Wheeze with preserved oxygenation",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "RESP_WHEEZE"
+      ],
+      "mobile_rules": [
+        "RESP_WHEEZE"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "wheeze"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:31.956Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Assess current wheeze warning"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 1003,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-044",
+      "domain": "respiratory",
+      "title": "Acute breathlessness despite normal oximetry",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "mobile_rules": [
+        "EMERGENCY_SYMPTOMS"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "breathlessness"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:32.389Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Immediate acute assessment critical"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 1028,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-045",
+      "domain": "respiratory",
+      "title": "Chronic asthma review",
+      "backend_urgency": "soon",
+      "mobile_urgency": "soon",
+      "urgency_match": true,
+      "backend_rules": [
+        "DIABETES_CONFIRM",
+        "RESP_CHRONIC_REVIEW"
+      ],
+      "mobile_rules": [
+        "DIABETES_CONFIRM",
+        "RESP_CHRONIC_REVIEW"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "yes",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:32.839Z"
+        }
+      },
+      "ui": {
+        "urgency": "soon",
+        "headline": "Review soon",
+        "oneLiner": "58-year-old woman with asthma. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Confirm possible diabetes warning"
+        ],
+        "problems": 2,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 7,
+        "summaryChars": 1121,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-046",
+      "domain": "respiratory",
+      "title": "COPD and current tobacco use",
+      "backend_urgency": "soon",
+      "mobile_urgency": "soon",
+      "urgency_match": true,
+      "backend_rules": [
+        "DIABETES_CONFIRM",
+        "RESP_CHRONIC_REVIEW",
+        "TOBACCO_SUPPORT"
+      ],
+      "mobile_rules": [
+        "DIABETES_CONFIRM",
+        "RESP_CHRONIC_REVIEW",
+        "TOBACCO_SUPPORT"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "current",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "yes",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:33.271Z"
+        }
+      },
+      "ui": {
+        "urgency": "soon",
+        "headline": "Review soon",
+        "oneLiner": "58-year-old woman with COPD, current smoker. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Confirm possible diabetes warning"
+        ],
+        "problems": 3,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 10,
+        "summaryChars": 1704,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-049",
+      "domain": "cancer_referral",
+      "title": "Breast lump requires diagnostic pathway",
+      "backend_urgency": "soon",
+      "mobile_urgency": "soon",
+      "urgency_match": true,
+      "backend_rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "mobile_rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "breast_lump"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:33.688Z"
+        }
+      },
+      "ui": {
+        "urgency": "soon",
+        "headline": "Review soon",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Arrange diagnostic assessment of warning symptoms warning",
+          "Confirm possible diabetes warning"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 918,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-050",
+      "domain": "cancer_referral",
+      "title": "Unexplained weight loss",
+      "backend_urgency": "soon",
+      "mobile_urgency": "soon",
+      "urgency_match": true,
+      "backend_rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "mobile_rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "unexplained_weight_loss"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:34.105Z"
+        }
+      },
+      "ui": {
+        "urgency": "soon",
+        "headline": "Review soon",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Arrange diagnostic assessment of warning symptoms warning",
+          "Confirm possible diabetes warning"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 7,
+        "summaryChars": 1076,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-051",
+      "domain": "cancer_referral",
+      "title": "Persistent cough requires differential assessment",
+      "backend_urgency": "soon",
+      "mobile_urgency": "soon",
+      "urgency_match": true,
+      "backend_rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "mobile_rules": [
+        "CANCER_WARNING",
+        "DIABETES_CONFIRM"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "persistent_cough"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:34.505Z"
+        }
+      },
+      "ui": {
+        "urgency": "soon",
+        "headline": "Review soon",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Arrange diagnostic assessment of warning symptoms warning",
+          "Confirm possible diabetes warning"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 7,
+        "summaryChars": 1076,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-052",
+      "domain": "cancer_referral",
+      "title": "Abnormal bleeding with severity not established",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "CANCER_WARNING"
+      ],
+      "mobile_rules": [
+        "CANCER_WARNING"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "abnormal_bleeding"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:34.956Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Arrange diagnostic assessment of warning symptoms warning"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 1003,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-053",
+      "domain": "cancer_referral",
+      "title": "Known cancer needs treating-team coordination",
+      "backend_urgency": "soon",
+      "mobile_urgency": "soon",
+      "urgency_match": true,
+      "backend_rules": [
+        "CANCER_SCOPE",
+        "DIABETES_CONFIRM"
+      ],
+      "mobile_rules": [
+        "CANCER_SCOPE",
+        "DIABETES_CONFIRM"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "yes",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:35.390Z"
+        }
+      },
+      "ui": {
+        "urgency": "soon",
+        "headline": "Review soon",
+        "oneLiner": "58-year-old woman with cancer. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Confirm possible diabetes warning"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 891,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-054",
+      "domain": "cancer_referral",
+      "title": "Cancer warning signs with haemoptysis",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "CANCER_WARNING",
+        "HEMOPTYSIS"
+      ],
+      "mobile_rules": [
+        "CANCER_WARNING",
+        "HEMOPTYSIS"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "male",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "hemoptysis",
+            "unexplained_weight_loss"
+          ],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:35.822Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old man with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Arrange diagnostic assessment of warning symptoms warning",
+          "Assess coughing blood today warning"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 7,
+        "summaryChars": 1159,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-055",
+      "domain": "multimorbidity",
+      "title": "Pregnancy with severe blood pressure",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "DATA_COMPLETENESS",
+        "PREGNANCY_SCOPE",
+        "PREGNANCY_SEVERE_BP"
+      ],
+      "mobile_rules": [
+        "DATA_COMPLETENESS",
+        "PREGNANCY_SCOPE",
+        "PREGNANCY_SEVERE_BP"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 30,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "yes",
+          "systolic_bp": 165,
+          "diastolic_bp": 105,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:36.254Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "30-year-old woman with no chronic NCD diagnosis recorded, currently pregnant. Today: BP 165/105 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Severe BP in pregnancy critical",
+          "Use the pregnancy care pathway warning"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 2,
+        "summaryChars": 940,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-056",
+      "domain": "multimorbidity",
+      "title": "Pregnancy outside routine adult NCD treatment scope",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "PREGNANCY_SCOPE"
+      ],
+      "mobile_rules": [
+        "PREGNANCY_SCOPE"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 28,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "yes",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "yes",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:36.690Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "28-year-old woman with hypertension, currently pregnant. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Use the pregnancy care pathway warning"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 2,
+        "summaryChars": 897,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-057",
+      "domain": "multimorbidity",
+      "title": "Pregnancy with ACE inhibitor",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "PREGNANCY_SCOPE",
+        "RAS_PREGNANCY"
+      ],
+      "mobile_rules": [
+        "PREGNANCY_SCOPE",
+        "RAS_PREGNANCY"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 34,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "yes",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [
+            {
+              "code": "lisinopril",
+              "name": "Lisinopril"
+            }
+          ],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:37.222Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "34-year-old woman with no chronic NCD diagnosis recorded, currently pregnant. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85. 1 current medicine.",
+        "findings": [
+          "ACE inhibitor/ARB in pregnancy critical",
+          "Use the pregnancy care pathway warning"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 2,
+        "summaryChars": 967,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 1,
+      "medicines_expected": 1,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-058",
+      "domain": "multimorbidity",
+      "title": "Pregnancy with ARB",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "PREGNANCY_SCOPE",
+        "RAS_PREGNANCY"
+      ],
+      "mobile_rules": [
+        "PREGNANCY_SCOPE",
+        "RAS_PREGNANCY"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 36,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "yes",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [
+            {
+              "code": "losartan",
+              "name": "Losartan"
+            }
+          ],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:37.756Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "36-year-old woman with no chronic NCD diagnosis recorded, currently pregnant. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85. 1 current medicine.",
+        "findings": [
+          "ACE inhibitor/ARB in pregnancy critical",
+          "Use the pregnancy care pathway warning"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 2,
+        "summaryChars": 967,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 1,
+      "medicines_expected": 1,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-059",
+      "domain": "multimorbidity",
+      "title": "Documented exact medication allergy conflict",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "ALLERGY_CONFLICT"
+      ],
+      "mobile_rules": [
+        "ALLERGY_CONFLICT"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [
+            {
+              "code": "metformin",
+              "name": "Metformin"
+            }
+          ],
+          "allergies": [
+            "metformin"
+          ],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:38.307Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85. 1 current medicine.",
+        "findings": [
+          "Medicine overlaps a recorded allergy critical"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 1058,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 1,
+      "medicines_expected": 1,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-060",
+      "domain": "multimorbidity",
+      "title": "Unknown medication and allergy lists",
+      "backend_urgency": "soon",
+      "mobile_urgency": "soon",
+      "urgency_match": true,
+      "backend_rules": [
+        "DATA_COMPLETENESS",
+        "DIABETES_CONFIRM"
+      ],
+      "mobile_rules": [
+        "DATA_COMPLETENESS",
+        "DIABETES_CONFIRM"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": false,
+          "allergies_reviewed": false,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:38.756Z"
+        }
+      },
+      "ui": {
+        "urgency": "soon",
+        "headline": "Review soon",
+        "oneLiner": "58-year-old woman with no chronic NCD diagnosis recorded. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Confirm possible diabetes warning"
+        ],
+        "problems": 1,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 6,
+        "summaryChars": 918,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-061",
+      "domain": "multimorbidity",
+      "title": "Older adult with diabetes CKD and hypertension",
+      "backend_urgency": "urgent",
+      "mobile_urgency": "urgent",
+      "urgency_match": true,
+      "backend_rules": [
+        "DATA_COMPLETENESS",
+        "METFORMIN_RENAL",
+        "RENAL_SEVERE"
+      ],
+      "mobile_rules": [
+        "DATA_COMPLETENESS",
+        "METFORMIN_RENAL",
+        "RENAL_SEVERE"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 84,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 165,
+          "diastolic_bp": 95,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 26,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "yes",
+          "known_diabetes": "yes",
+          "known_ckd": "yes",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [
+            {
+              "code": "metformin",
+              "name": "Metformin"
+            },
+            {
+              "code": "losartan",
+              "name": "Losartan"
+            }
+          ],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:39.365Z"
+        }
+      },
+      "ui": {
+        "urgency": "urgent",
+        "headline": "Same-day assessment",
+        "oneLiner": "84-year-old woman with hypertension, diabetes and chronic kidney disease G4. Today: BP 165/95 mmHg, HbA1c 6.5%, eGFR 26. 2 current medicines.",
+        "findings": [
+          "Metformin renal contraindication flag critical",
+          "Severely reduced kidney function critical"
+        ],
+        "problems": 4,
+        "derivedTiles": 4,
+        "monitoringRows": 6,
+        "medicationReview": 0,
+        "sourceLinks": 21,
+        "summaryChars": 3173,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 2,
+      "medicines_expected": 2,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-062",
+      "domain": "multimorbidity",
+      "title": "Emergency danger retains priority over multiple chronic findings",
+      "backend_urgency": "emergency",
+      "mobile_urgency": "emergency",
+      "urgency_match": true,
+      "backend_rules": [
+        "EMERGENCY_SYMPTOMS",
+        "METFORMIN_REVIEW",
+        "RESP_WHEEZE"
+      ],
+      "mobile_rules": [
+        "EMERGENCY_SYMPTOMS",
+        "METFORMIN_REVIEW",
+        "RESP_WHEEZE"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 40,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "no",
+          "known_diabetes": "yes",
+          "known_ckd": "yes",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "yes",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [
+            "chest_pain",
+            "wheeze"
+          ],
+          "medications": [
+            {
+              "code": "metformin",
+              "name": "Metformin"
+            }
+          ],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:39.889Z"
+        }
+      },
+      "ui": {
+        "urgency": "emergency",
+        "headline": "Emergency: act now",
+        "oneLiner": "58-year-old woman with diabetes, chronic kidney disease G3b and asthma. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 40. 1 current medicine.",
+        "findings": [
+          "Immediate acute assessment critical",
+          "Review metformin with reduced eGFR warning",
+          "Assess current wheeze warning"
+        ],
+        "problems": 4,
+        "derivedTiles": 4,
+        "monitoringRows": 4,
+        "medicationReview": 0,
+        "sourceLinks": 15,
+        "summaryChars": 2397,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 1,
+      "medicines_expected": 1,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "NCD-063",
+      "domain": "multimorbidity",
+      "title": "Limited medicines are visible context",
+      "backend_urgency": "soon",
+      "mobile_urgency": "soon",
+      "urgency_match": true,
+      "backend_rules": [
+        "DIABETES_CONFIRM",
+        "HTN_FOLLOWUP"
+      ],
+      "mobile_rules": [
+        "DIABETES_CONFIRM",
+        "HTN_FOLLOWUP"
+      ],
+      "rules_match": true,
+      "collected_by_ui": {
+        "age": 58,
+        "sex": "female",
+        "data": {
+          "glucose_unit": "mmol/L",
+          "dosing_context": {
+            "frailty": "unknown"
+          },
+          "pregnancy_status": "no",
+          "systolic_bp": 126,
+          "diastolic_bp": 78,
+          "pulse": 76,
+          "oxygen_saturation": 98,
+          "respiratory_rate": 16,
+          "tobacco_use": "never",
+          "adherence": "taking",
+          "hba1c": 6.5,
+          "glucose": 6,
+          "glucose_context": "unknown",
+          "egfr": 85,
+          "potassium": 4.2,
+          "eye_screen": "unknown",
+          "foot_exam": "unknown",
+          "known_hypertension": "yes",
+          "known_diabetes": "no",
+          "known_ckd": "no",
+          "known_ascvd": "unknown",
+          "prior_stroke_tia": "unknown",
+          "known_heart_failure": "unknown",
+          "known_atrial_fibrillation": "unknown",
+          "known_asthma": "no",
+          "known_copd": "no",
+          "known_cancer": "no",
+          "acutely_unwell": "unknown",
+          "acute_kidney_injury": "unknown",
+          "symptoms": [],
+          "medications": [],
+          "allergies": [],
+          "medications_reviewed": true,
+          "allergies_reviewed": true,
+          "symptoms_reviewed": true,
+          "observed_at": "2026-10-01T18:10:40.338Z"
+        }
+      },
+      "ui": {
+        "urgency": "soon",
+        "headline": "Review soon",
+        "oneLiner": "58-year-old woman with hypertension. Today: BP 126/78 mmHg, HbA1c 6.5%, eGFR 85.",
+        "findings": [
+          "Confirm possible diabetes warning"
+        ],
+        "problems": 2,
+        "derivedTiles": 2,
+        "monitoringRows": 0,
+        "medicationReview": 0,
+        "sourceLinks": 7,
+        "summaryChars": 1166,
+        "error": false
+      },
+      "fill_misses": [],
+      "medicines_entered": 0,
+      "medicines_expected": 0,
+      "conversion": null,
+      "unsupported_fields": [
+        "medicine_availability",
+        "notes"
+      ],
+      "status": "passed"
+    }
+  ]
+}
