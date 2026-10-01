@@ -1,6 +1,6 @@
 # Hosted NCDAI 2.0 release
 
-13 September 2026 · Mary Help supervised testing · Application version 0.1
+1 October 2026 · Mary Help supervised testing · Application version 0.1
 
 **Open the application: [https://ncdai-2.vercel.app](https://ncdai-2.vercel.app).** The original coral `#FF5757` and unchanged NCDAI logo are restored. Sign-in is required for clinical records. Private account details are delivered separately and are not in this repository.
 
@@ -9,9 +9,9 @@
 | Item | Recorded value |
 |---|---|
 | Vercel account/project | `jessegitaka-7527s-projects / ncdai-2` |
-| Deployed application commit | `1ded07988c4086ec75bf512e828410993a095e7b` |
-| Deployment | `dpl_BEqK7J126wTCP2QFu3yUrBMYK9M6` |
-| Vercel inspection | [Deployment details](https://vercel.com/jessegitaka-7527s-projects/ncdai-2/BEqK7J126wTCP2QFu3yUrBMYK9M6) |
+| Deployed application commit | `c0b05886c6931bd8c9ab5c09611fcfbe034cd4b8` |
+| Deployment | `dpl_FceePPtPL1Bqm7EUYYKNDkwGiktA` |
+| Vercel inspection | [Deployment details](https://vercel.com/jessegitaka-7527s-projects/ncdai-2/FceePPtPL1Bqm7EUYYKNDkwGiktA) |
 | Runtime | Vite frontend and Python 3.12 FastAPI services; API function inspected in `fra1` |
 | Database | Dedicated Neon `ncdai-2-db`, Free plan, Frankfurt requested at provisioning; server reports PostgreSQL `18.6 (2078fcb)` |
 | Schema revision | `20260913_mary_help`; consultant `consultant-20260913-1` |
@@ -23,6 +23,10 @@
 The existing `aifya-web` project was not replaced. NCDAI has its own project, database and canonical domain. Repository changes were pushed to `codex/ncdai-2-platform`; deployment is explicit through the Vercel CLI, rather than automatically publishing every push.
 
 ## Current Mary Help release
+
+The 1 October 2026 deployment publishes the consultant synthesis shown on every assessment, the installable workspace (web manifest, icons and a network-first service worker that never intercepts `/api/`) and the offline [NCDAI Consult](mobile-app.md) app at `/mobile/`. It is a code-only release: the schema revision is unchanged at `20260913_mary_help`, so no migration was applied and no account, facility or environment setting was altered.
+
+All three [quality jobs passed at the deployed commit](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/36605249082), covering the backend, security and regression suites, the frozen 66 synthetic cases on SQLite and on migrated PostgreSQL, the transaction-pooler regression, 50 two-database consultant workflows, the dose-reference workflows and both dependency audits. The same suites were reproduced independently before deployment: 425 backend tests passed with 10 conditional skips, and 33 frontend tests passed. The deploy itself ran through the manual [production workflow](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/36887091624); its read-only checks confirmed readiness, the PWA files, `/mobile/` and the security headers, and a headless browser loaded `/` and `/mobile/` at phone width with no console errors or CSP violations. The published frontend bundle hashes match a local build of the same commit, and `vercel inspect` places the API function in `fra1`. Deployment Protection (Vercel Authentication) guards the per-deployment URL; the clinician-facing `ncdai-2.vercel.app` alias remains open as intended. These are engineering and transport checks; they are not new clinical-accuracy evidence.
 
 Mary Help Hospital, Thika is enabled for supervised testing with named accounts, mandatory initial password changes, facility-scoped real-record registration and constrained DeepSeek briefing. The consultant workspace has its own logical database and restricted role, preserving the request, independent opinion and primary action. The demonstration facility remains fictional-only. See [current status and operating handover](clinical-deployment-status.md), [testing guide](mary-help-testing-guide.md), and [release evidence](test-results/mary-help-release-summary.json).
 
