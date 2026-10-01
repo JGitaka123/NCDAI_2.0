@@ -37,6 +37,19 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --global vercel@latest
+      - name: Check the deployment credential
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "${VERCEL_TOKEN:-}" ]; then
+            echo "::error::VERCEL_TOKEN is not set. Add it as a repository secret."
+            exit 1
+          fi
+          if ! vercel whoami --token "$VERCEL_TOKEN" >/dev/null 2>&1; then
+            echo "::error::VERCEL_TOKEN was rejected by Vercel (the CLI reports \"User not found\"). The token is invalid, revoked or expired: create a new one at https://vercel.com/account/settings/tokens with access to the $VERCEL_SCOPE scope and replace the VERCEL_TOKEN repository secret."
+            exit 1
+          fi
+          echo "Authenticated as $(vercel whoami --token "$VERCEL_TOKEN")"
       - name: Link project
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
