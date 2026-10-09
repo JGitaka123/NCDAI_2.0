@@ -134,7 +134,7 @@ def normalise(result):
 
 def run_node(cases):
     completed = subprocess.run([NODE, str(ROOT / "scripts" / "mobile_engine_runner.cjs")], input=json.dumps({"cases": cases}),
-                               capture_output=True, text=True, timeout=120, check=True)
+                               capture_output=True, text=True, encoding="utf-8", timeout=120, check=True)
     return json.loads(completed.stdout)
 
 
