@@ -48,3 +48,11 @@ def test_workflow_gate_is_trusted_inline_code_before_credentials():
     assert "\n".join(line[10:] for line in block.splitlines()) == SOURCE.read_text(encoding="utf-8").rstrip()
     assert workflow.index("Require exact-commit quality") < workflow.index("Check the deployment credential")
     assert "vercel@59.14.0" in workflow
+
+
+def test_candidate_smoke_checks_precede_domain_promotion():
+    workflow = (ROOT / ".github" / "workflows" / "deploy-production.yml").read_text(encoding="utf-8")
+    assert "vercel deploy --prod --skip-domain" in workflow
+    assert workflow.count("SITE: ${{ steps.deploy.outputs.url }}") == 2
+    assert workflow.index("HTTP checks") < workflow.index("Browser checks at phone width") < workflow.index("Promote the verified deployment")
+    assert 'vercel promote "$DEPLOY_URL"' in workflow

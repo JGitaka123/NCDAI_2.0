@@ -121,13 +121,13 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: vercel link --yes --project "$VERCEL_PROJECT" --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN"
-      - name: Deploy to production (fra1)
+      - name: Stage production without assigning domains (fra1)
         id: deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           echo "Deploying commit $(git rev-parse HEAD)"
-          url=$(vercel deploy --prod --yes --regions fra1 --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN")
+          url=$(vercel deploy --prod --skip-domain --yes --regions fra1 --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN")
           echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "Deployment: $url"
       - name: Inspect deployment
@@ -136,6 +136,8 @@ jobs:
           DEPLOY_URL: ${{ steps.deploy.outputs.url }}
         run: vercel inspect "$DEPLOY_URL" --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN"
       - name: HTTP checks
+        env:
+          SITE: ${{ steps.deploy.outputs.url }}
         run: |
           set -euo pipefail
           ready=$(curl -sS -w '\n%{http_code}' "$SITE/api/health/ready")
@@ -151,8 +153,18 @@ jobs:
           echo "Security headers on /:"
           curl -sSI "$SITE/" | grep -iE '^(content-security-policy|x-frame-options|x-content-type-options|referrer-policy|permissions-policy|strict-transport-security):'
       - name: Browser checks at phone width
+        env:
+          SITE: ${{ steps.deploy.outputs.url }}
         run: |
           npm --prefix frontend ci --no-audit --no-fund
           cd frontend
           npx playwright install --with-deps chromium
           node tests/browser/live-check.mjs "$SITE"
+      - name: Promote the verified deployment
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        run: vercel promote "$DEPLOY_URL" --yes --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN"
+      - name: Confirm canonical readiness after promotion
+        run: |
+          curl --fail --silent --show-error "$SITE/api/health/ready" | python3 -c 'import json,sys; assert json.load(sys.stdin)["rules"] == "loaded"'
