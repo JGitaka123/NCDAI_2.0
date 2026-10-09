@@ -7,7 +7,7 @@
     "dev": "node scripts/build-mobile.mjs && vite --host 127.0.0.1",
     "build": "node scripts/build-mobile.mjs && tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "vitest run",
+    "test": "vitest run && node --test tests/service-worker.test.mjs",
     "test:browser": "playwright test workflow.spec.ts && node tests/browser/summarize.mjs",
     "test:browser:consultant": "playwright test consultation.spec.ts",
     "build:mobile": "node scripts/build-mobile.mjs"

@@ -21,16 +21,26 @@ export async function api<T>(path: string, options: { method?: string; body?: un
   if (options.signal?.aborted) forwardAbort()
   else options.signal?.addEventListener('abort', forwardAbort, { once: true })
   const timeout = window.setTimeout(() => controller.abort(new DOMException('Request deadline exceeded', 'TimeoutError')), 45000)
-  let response: Response
   try {
-    response = await fetch(`/api${path}`, {
+    const response = await fetch(`/api${path}`, {
       method,
       credentials: 'include',
       headers: { Accept: 'application/json', ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}), ...(method !== 'GET' && csrfToken ? { 'X-CSRF-Token': csrfToken } : {}) },
       body: options.body === undefined ? undefined : JSON.stringify(options.body),
       signal: controller.signal,
     })
+    if (!response.ok) {
+      const body = await response.json().catch(error => {
+        if (controller.signal.aborted) throw error
+        return {}
+      })
+      if (response.status === 401 && path !== '/auth/login' && path !== '/auth/session') window.dispatchEvent(new CustomEvent('ncdai-session-expired'))
+      throw new ApiError(response.status, response.status === 409 && path.startsWith('/encounters/') ? 'This record changed in another session. Reload the latest saved record before continuing. Your unsaved changes have not been applied.' : errorText(body.detail))
+    }
+    if (response.status === 204) return undefined as T
+    return await response.json() as T
   } catch (error) {
+    if (error instanceof ApiError) throw error
     if (options.signal?.aborted) throw new DOMException('Request cancelled', 'AbortError')
     const timedOut = controller.signal.aborted && controller.signal.reason?.name === 'TimeoutError'
     throw new ApiError(0, `${timedOut ? 'The clinical service did not respond in time.' : 'The clinical service is unreachable.'} No offline save is available.${method === 'GET' ? ' Check the connection and try again.' : ' The request outcome is unconfirmed. Reload saved records before repeating this action.'}`)
@@ -38,13 +48,6 @@ export async function api<T>(path: string, options: { method?: string; body?: un
     window.clearTimeout(timeout)
     options.signal?.removeEventListener('abort', forwardAbort)
   }
-  if (!response.ok) {
-    const body = await response.json().catch(() => ({}))
-    if (response.status === 401 && path !== '/auth/login' && path !== '/auth/session') window.dispatchEvent(new CustomEvent('ncdai-session-expired'))
-    throw new ApiError(response.status, response.status === 409 && path.startsWith('/encounters/') ? 'This record changed in another session. Reload the latest saved record before continuing. Your unsaved changes have not been applied.' : errorText(body.detail))
-  }
-  if (response.status === 204) return undefined as T
-  return response.json() as Promise<T>
 }
 
 export function message(error: unknown): string { return error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.' }
