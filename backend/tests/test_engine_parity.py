@@ -169,3 +169,14 @@ def test_catalogue_and_scenarios_match():
 def test_seeded_fuzz_matches():
     rng = random.Random(20260929)
     compare([random_case(rng) for _ in range(1500)])
+
+
+def test_missing_tobacco_backend_mobile_match():
+    cases = []
+    for tobacco in (None, "unknown", "absent"):
+        for measurements in (dict(total_cholesterol_mmol=5.5, hdl_mmol=1.2), dict(weight_kg=80, height_cm=175)):
+            data = {"systolic_bp": 120, "diastolic_bp": 75, **measurements}
+            if tobacco != "absent":
+                data["tobacco_use"] = tobacco
+            cases.append({"data": data, "age": 50, "sex": "male"})
+    compare(cases)

@@ -65,6 +65,26 @@ def test_framingham_behaves_like_the_published_model():
     assert framingham("female_lipid", 50, 130, False, False, False, tc=200 / 38.67, hdl=45 / 38.67) < base
 
 
+@pytest.mark.parametrize("tobacco", [None, "unknown"])
+@pytest.mark.parametrize("measurements", [dict(total_cholesterol_mmol=5.5, hdl_mmol=1.2), dict(weight_kg=80, height_cm=175)])
+def test_missing_tobacco_withholds_numeric_risk(tobacco, measurements):
+    result = consult(50, tobacco_use=tobacco, **measurements)
+    assert result["cardiovascular_risk"] is None
+    assert any(gap["field"] == "tobacco_use" for gap in result["data_gaps"])
+
+
+def test_missing_tobacco_preserves_established_disease_risk():
+    result = consult(50, tobacco_use="unknown", known_diabetes="yes", total_cholesterol_mmol=5.5, hdl_mmol=1.2)
+    assert result["cardiovascular_risk"]["category"] == "high"
+    assert result["cardiovascular_risk"]["percent"] is None
+
+
+@pytest.mark.parametrize("tobacco", ["never", "former", "current"])
+def test_known_tobacco_keeps_numeric_risk(tobacco):
+    result = consult(50, tobacco_use=tobacco, total_cholesterol_mmol=5.5, hdl_mmol=1.2)
+    assert result["cardiovascular_risk"]["percent"] is not None
+
+
 def test_creatinine_derives_egfr_for_safety_rules_but_entered_egfr_wins():
     calculated = assess(complete(creatinine_umol=300, known_diabetes="yes", medications=meds("metformin")), 70, "female")
     rules = {rec["rule_id"] for rec in calculated["recommendations"]}

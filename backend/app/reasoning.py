@@ -19,7 +19,7 @@ import re
 
 from .evidence import evidence
 
-REASONING_VERSION = "ncdai-consultant-1.0.0"
+REASONING_VERSION = "ncdai-consultant-1.1.0-review"
 
 ALIASES = {"glyburide": "glibenclamide", "hctz": "hydrochlorothiazide", "albuterol": "salbutamol",
            "frusemide": "furosemide", "acetylsalicylic": "aspirin", "asa": "aspirin"}
@@ -342,7 +342,8 @@ def build(data, age, sex, assessment):
         risk.update(category="high", basis="markedly raised cholesterol (possible familial hypercholesterolaemia)", source_ids=cite("ESC_LIPIDS_2019"))
     if risk["category"] is None or risk["category"] != "very high":
         model = None
-        if sex in ("female", "male") and 30 <= age <= 74 and mean_sbp is not None and not any_ascvd:
+        if (sex in ("female", "male") and 30 <= age <= 74 and mean_sbp is not None and not any_ascvd
+                and data.get("tobacco_use") in {"current", "former", "never"}):
             if tc is not None and hdl is not None:
                 model = sex + "_lipid"
             elif bmi is not None:
@@ -351,8 +352,6 @@ def build(data, age, sex, assessment):
             value = framingham(model, age, mean_sbp, on_bp_treatment, smoker, diabetic, tc, hdl, bmi)
             percent = r1(value * 100)
             method = "Framingham 2008 general CVD, " + ("laboratory (cholesterol)" if model.endswith("lipid") else "office (BMI)") + " model"
-            if data.get("tobacco_use") in (None, "unknown"):
-                method += "; tobacco status unknown, scored as non-smoker"
             risk.update(percent=percent, method=method)
             cite("FRAMINGHAM_2008", "WHO_CVD_RISK_2019")
             if risk["category"] is None:
@@ -815,8 +814,8 @@ def build(data, age, sex, assessment):
         add_problem("tobacco", "Current tobacco use", "at_risk", ["Current tobacco use"],
                     "Stopping is the single most effective intervention for cardiovascular and lung risk.",
                     [item("Give brief advice to quit today and offer behavioural support with pharmacotherapy (varenicline, nicotine replacement, bupropion or cytisine) where available; follow up within 2 weeks.", "WHO_TOBACCO_2024")])
-    elif data.get("tobacco_use", "unknown") == "unknown":
-        gap("tobacco_use", "Tobacco status changes cardiovascular risk and respiratory plans.")
+    elif data.get("tobacco_use") not in {"former", "never"}:
+        gap("tobacco_use", "Record tobacco status before calculating numeric cardiovascular risk; unknown status is not scored as non-smoking.")
 
     # ---- diagnostic considerations -----------------------------------------
     if symptoms & {"persistent_cough", "hemoptysis", "unexplained_weight_loss"}:

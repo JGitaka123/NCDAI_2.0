@@ -8,7 +8,7 @@
   var REGISTRY = root.NCDAI_EVIDENCE
   if (!REGISTRY) throw new Error('Load evidence.js before engine.js')
   var RULESET_VERSION = 'ncdai-2-rules-0.2.0'
-  var REASONING_VERSION = 'ncdai-consultant-1.0.0'
+  var REASONING_VERSION = 'ncdai-consultant-1.1.0-review'
   var SOURCES = {}
   REGISTRY.sources.forEach(function (source) { SOURCES[source.source_id] = source })
 
@@ -530,15 +530,13 @@
     else if ((tc != null && tc >= 8) || (ldl != null && ldl >= 4.9)) setRisk('high', 'markedly raised cholesterol (possible familial hypercholesterolaemia)', cite('ESC_LIPIDS_2019'))
     if (risk.category == null || risk.category !== 'very high') {
       var model = null
-      if ((sex === 'female' || sex === 'male') && age >= 30 && age <= 74 && meanSbp != null && !anyAscvd) {
+      if ((sex === 'female' || sex === 'male') && age >= 30 && age <= 74 && meanSbp != null && !anyAscvd && ['current', 'former', 'never'].includes(get(data, 'tobacco_use'))) {
         if (tc != null && hdl != null) model = sex + '_lipid'
         else if (bmi != null) model = sex + '_bmi'
       }
       if (model) {
         var percent = r1(framingham(model, age, meanSbp, onBpTreatment, smoker, diabetic, tc, hdl, bmi) * 100)
         var method = 'Framingham 2008 general CVD, ' + (model.slice(-5) === 'lipid' ? 'laboratory (cholesterol)' : 'office (BMI)') + ' model'
-        var tobacco = get(data, 'tobacco_use')
-        if (tobacco == null || tobacco === 'unknown') method += '; tobacco status unknown, scored as non-smoker'
         risk.percent = percent; risk.method = method
         cite('FRAMINGHAM_2008', 'WHO_CVD_RISK_2019')
         if (risk.category == null) setRisk(percent >= 20 ? 'high' : percent >= 10 ? 'moderate' : 'low', 'estimated 10-year risk ' + fmt(percent) + '%', ['FRAMINGHAM_2008', 'WHO_CVD_RISK_2019'])
@@ -917,7 +915,7 @@
     if (bmi != null && bmi < 18.5) consider('underweight', 'BMI ' + fmt(bmi) + ' kg/m²: evaluate undernutrition, TB, HIV, uncontrolled diabetes, malignancy and food insecurity.', 'WHO_OBESITY', 'WHO_TB_SCREENING_2021')
     if (smoker) addProblem('tobacco', 'Current tobacco use', 'at_risk', ['Current tobacco use'], 'Stopping is the single most effective intervention for cardiovascular and lung risk.',
       [item('Give brief advice to quit today and offer behavioural support with pharmacotherapy (varenicline, nicotine replacement, bupropion or cytisine) where available; follow up within 2 weeks.', 'WHO_TOBACCO_2024')])
-    else if (get(data, 'tobacco_use', 'unknown') === 'unknown') gap('tobacco_use', 'Tobacco status changes cardiovascular risk and respiratory plans.')
+    else if (!['former', 'never'].includes(get(data, 'tobacco_use'))) gap('tobacco_use', 'Record tobacco status before calculating numeric cardiovascular risk; unknown status is not scored as non-smoking.')
 
     // ---- diagnostic considerations
     if (symptoms.has('persistent_cough') || symptoms.has('hemoptysis') || symptoms.has('unexplained_weight_loss'))
