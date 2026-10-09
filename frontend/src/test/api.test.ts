@@ -1,9 +1,34 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { api, setSession } from '../api'
 import type { Session } from '../types'
 
 describe('Authenticated API requests', () => {
   beforeEach(() => { setSession(null); vi.unstubAllGlobals() })
+  afterEach(() => { vi.useRealTimers() })
+  it.each([200, 400])('keeps the deadline active while a %s response body is stalled', async status => {
+    vi.useFakeTimers()
+    const fetch = vi.fn().mockImplementation(async (_url, options) => ({
+      ok: status === 200, status,
+      json: () => new Promise((_resolve, reject) => options.signal.addEventListener('abort', () => reject(options.signal.reason), { once: true })),
+    }))
+    vi.stubGlobal('fetch', fetch)
+    const pending = expect(api('/encounters', { method: 'POST', body: {} })).rejects.toMatchObject({ status: 0, message: expect.stringContaining('outcome is unconfirmed') })
+    await vi.advanceTimersByTimeAsync(45000)
+    await pending
+    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(vi.getTimerCount()).toBe(0)
+  })
+  it('forwards cancellation after response headers arrive', async () => {
+    const controller = new AbortController()
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(async (_url, options) => ({
+      ok: true, status: 200,
+      json: () => new Promise((_resolve, reject) => {
+        options.signal.addEventListener('abort', () => reject(options.signal.reason), { once: true })
+        controller.abort()
+      }),
+    })))
+    await expect(api('/patients', { signal: controller.signal })).rejects.toMatchObject({ name: 'AbortError' })
+  })
   it('uses cookie credentials and attaches CSRF only to mutations', async () => {
     const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 'saved' }), { status: 200 })); vi.stubGlobal('fetch', fetch)
     setSession({ csrf_token: 'synthetic-csrf-token' } as Session)
