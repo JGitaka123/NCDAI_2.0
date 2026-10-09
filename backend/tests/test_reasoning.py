@@ -127,6 +127,41 @@ def test_missing_tobacco_does_not_create_risk_based_statin_start(sex, measuremen
     assert any(gap["field"] == "tobacco_use" for gap in result["data_gaps"])
 
 
+@pytest.mark.parametrize("tobacco", [None, "unknown", "absent"])
+@pytest.mark.parametrize("sex", ["female", "male"])
+def test_uncertain_risk_keeps_between_target_bp_control_provisional(tobacco, sex):
+    data = complete(systolic_bp=135, diastolic_bp=80, known_hypertension="yes",
+                    total_cholesterol_mmol=6, hdl_mmol=1, tobacco_use=tobacco)
+    if tobacco == "absent":
+        data.pop("tobacco_use")
+    result = assess(data, 70, sex)["consultant"]
+    bp = problem(result, "hypertension")
+    assert bp["status"] == "needs_data"
+    assert bp["targets"] == ["Individual BP target pending cardiovascular risk assessment"]
+    assert "At target" not in bp["assessment"]
+    assert "Continue the current regimen" not in plan_text(result, "hypertension")
+    assert "Recorded conditions are at target" not in result["impression"]
+    assert "3-6 months" not in result["follow_up"]
+    assert "confirm the blood pressure target" in result["follow_up"]
+    assert "Risk not estimated: tobacco status missing" in result["summary_text"]
+    assert "control is provisional" in result["summary_text"]
+
+
+@pytest.mark.parametrize("sbp,dbp,status", [(120, 75, "at_target"), (130, 80, "needs_data"),
+                                           (139, 89, "needs_data"), (140, 90, "uncontrolled"),
+                                           (180, 110, "acute")])
+def test_missing_risk_preserves_existing_bp_boundaries(sbp, dbp, status):
+    result = consult(70, tobacco_use="unknown", systolic_bp=sbp, diastolic_bp=dbp,
+                     known_hypertension="yes", total_cholesterol_mmol=6, hdl_mmol=1)
+    assert problem(result, "hypertension")["status"] == status
+
+
+def test_elderly_target_is_not_replaced_by_risk_pending_target():
+    result = consult(82, tobacco_use="unknown", systolic_bp=135, diastolic_bp=80, known_hypertension="yes")
+    assert problem(result, "hypertension")["status"] == "at_target"
+    assert "age 80+" in problem(result, "hypertension")["targets"][0]
+
+
 @pytest.mark.parametrize("tobacco", ["never", "former", "current"])
 def test_known_tobacco_keeps_numeric_risk(tobacco):
     result = consult(50, tobacco_use=tobacco, total_cholesterol_mmol=5.5, hdl_mmol=1.2)

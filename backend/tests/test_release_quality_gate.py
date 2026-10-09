@@ -13,7 +13,7 @@ SHA = "a" * 40
 
 def run(rid=1, **changes):
     return {"id": rid, "workflow_id": gate.QUALITY_WORKFLOW_ID, "head_sha": SHA,
-            "status": "completed", "conclusion": "success", **changes}
+            "status": "completed", "conclusion": "success", "event": "push", **changes}
 
 
 def test_latest_run_must_pass_not_an_older_green_result():
@@ -24,6 +24,7 @@ def test_latest_run_must_pass_not_an_older_green_result():
 @pytest.mark.parametrize("payload", [
     {"workflow_runs": []}, {"workflow_runs": [run(head_sha="b" * 40)]},
     {"workflow_runs": [run(workflow_id=1)]}, {"workflow_runs": [run(status="in_progress")]},
+    {"workflow_runs": [run(event="pull_request")]},
 ])
 def test_missing_wrong_or_incomplete_run_blocks(payload):
     with pytest.raises(ValueError):
@@ -56,3 +57,9 @@ def test_candidate_smoke_checks_precede_domain_promotion():
     assert workflow.count("SITE: ${{ steps.deploy.outputs.url }}") == 2
     assert workflow.index("HTTP checks") < workflow.index("Browser checks at phone width") < workflow.index("Promote the verified deployment")
     assert 'vercel promote "$DEPLOY_URL"' in workflow
+
+
+def test_pr_merge_tree_run_cannot_replace_exact_push_evidence():
+    assert gate.latest_quality_run({"workflow_runs": [run(1), run(2, event="pull_request")]}, SHA)["id"] == 1
+    with pytest.raises(ValueError):
+        gate.latest_quality_run({"workflow_runs": [run(1, conclusion="failure"), run(2, event="pull_request")]}, SHA)

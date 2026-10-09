@@ -183,6 +183,19 @@ def test_missing_tobacco_backend_mobile_match():
     compare(cases)
 
 
+def test_uncertain_bp_complete_advice_and_copied_summary_match():
+    cases = []
+    for sex in ("female", "male"):
+        for tobacco in (None, "unknown", "absent"):
+            for sbp, dbp in ((120, 75), (130, 80), (135, 80), (139, 89), (140, 90), (180, 110)):
+                data = {"systolic_bp": sbp, "diastolic_bp": dbp, "known_hypertension": "yes",
+                        "total_cholesterol_mmol": 6, "hdl_mmol": 1}
+                if tobacco != "absent":
+                    data["tobacco_use"] = tobacco
+                cases.append({"data": data, "age": 70, "sex": sex})
+    compare(cases)
+
+
 def test_unestimated_risk_statin_complete_output_matches():
     cases = []
     for tobacco in (None, "unknown", "absent"):

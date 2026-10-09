@@ -14,7 +14,7 @@ def latest_quality_run(payload, sha):
     if not re.fullmatch(r"[0-9a-f]{40}", sha):
         raise ValueError("A resolved 40-character commit SHA is required")
     runs = payload.get("workflow_runs", [])
-    matches = [run for run in runs if run.get("head_sha") == sha and run.get("workflow_id") == QUALITY_WORKFLOW_ID]
+    matches = [run for run in runs if run.get("head_sha") == sha and run.get("workflow_id") == QUALITY_WORKFLOW_ID and run.get("event") == "push"]
     if not matches:
         raise ValueError("No quality run exists for the selected commit")
     latest = max(matches, key=lambda run: int(run["id"]))

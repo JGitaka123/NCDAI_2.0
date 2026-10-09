@@ -563,6 +563,7 @@
         item('Arrange joint obstetric and physician care for any hypertension, diabetes or kidney disease.', 'NICE_PREGNANCY')])
 
     // ---- hypertension
+    var bpTargetPending = false
     var plan, facts, status, summary
     if (!pregnant && (meanSbp != null || hypertensive)) {
       var target, targetText
@@ -591,6 +592,12 @@
           summary = 'Above target at ' + bpText + ' (target ' + targetText.split(' (')[0].split(',')[0] + '); systolic ' + fmt0(Math.max(meanSbp - target[0], 0)) + ' mmHg above the systolic goal on ' + classes.length + ' antihypertensive class' + (classes.length !== 1 ? 'es' : '') + '.'
         } else if (above) {
           status = 'unconfirmed'; summary = 'Raised BP (' + bpText + ') without a recorded hypertension diagnosis.'
+        } else if ((hypertensive || onBpTreatment) && age < 80 && !frail && !(anyAscvd || diabetic || ckd) && risk.category == null && !['current', 'former', 'never'].includes(get(data, 'tobacco_use')) && (meanSbp >= 130 || meanDbp >= 80)) {
+          bpTargetPending = true
+          status = 'needs_data'
+          targetText = 'Individual BP target pending cardiovascular risk assessment'
+          summary = 'BP ' + bpText + ': control is provisional because cardiovascular risk is not estimable; this reading lies between the existing general and high-risk targets.'
+          plan.push(item('Record tobacco status and complete cardiovascular risk assessment before judging BP control or assigning a routine review interval; confirm correctly measured readings.', 'WHO_HTN_2021', 'ISH_HTN_2020', 'ESC_HTN_2024'))
         } else if (hypertensive || onBpTreatment) {
           status = 'at_target'; summary = 'At target (' + bpText + ') on ' + (classes.length ? join(classes) : 'no recorded medicine') + '.'
         } else if (meanSbp >= 130 || meanDbp >= 85 || (highRisk && meanDbp >= 80)) {
@@ -983,6 +990,7 @@
     var followUp
     if (acuteFirst) followUp = 'Same day, per the acute findings; chronic review within 2 weeks of stabilisation.'
     else if (problems.some(function (e) { return shortInterval.indexOf(e.status) >= 0 }) || medReview.length) followUp = '2–4 weeks: confirm readings, review changes and blood results.'
+    else if (bpTargetPending) followUp = 'Complete cardiovascular risk inputs and confirm the blood pressure target before assigning routine follow-up.'
     else if (problems.length) followUp = '3–6 months, with monitoring as listed.'
     else followUp = 'Routine screening interval; re-assess if new symptoms.'
 
@@ -998,6 +1006,7 @@
     if (considerations.length) { lines.push(''); lines.push('Consider:'); considerations.forEach(function (e) { lines.push('   - ' + e.text) }) }
     if (monitoring.length) { lines.push(''); lines.push('Monitoring:'); monitoring.forEach(function (e) { lines.push('   - ' + e.test + ': ' + e.timing) }) }
     lines.push('')
+    if (risk.category == null && !['current', 'former', 'never'].includes(get(data, 'tobacco_use'))) lines.push('Risk not estimated: tobacco status missing. Record tobacco status before calculating numeric cardiovascular risk; unknown status is not scored as non-smoking.')
     lines.push('Follow-up: ' + followUp)
     lines.push('Decision support for clinician review; not a prescription.')
 
