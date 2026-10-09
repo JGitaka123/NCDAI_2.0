@@ -169,3 +169,40 @@ def test_catalogue_and_scenarios_match():
 def test_seeded_fuzz_matches():
     rng = random.Random(20260929)
     compare([random_case(rng) for _ in range(1500)])
+
+
+def test_missing_tobacco_backend_mobile_match():
+    cases = []
+    for tobacco in (None, "unknown", "absent"):
+        for sex in ("male", "female"):
+            for measurements in (dict(total_cholesterol_mmol=5.5, hdl_mmol=1.2), dict(weight_kg=80, height_cm=175)):
+                data = {"systolic_bp": 120, "diastolic_bp": 75, **measurements}
+                if tobacco != "absent":
+                    data["tobacco_use"] = tobacco
+                cases.append({"data": data, "age": 50, "sex": sex})
+    compare(cases)
+
+
+def test_uncertain_bp_complete_advice_and_copied_summary_match():
+    cases = []
+    for sex in ("female", "male"):
+        for tobacco in (None, "unknown", "absent"):
+            for sbp, dbp in ((120, 75), (130, 80), (135, 80), (139, 89), (140, 90), (180, 110)):
+                data = {"systolic_bp": sbp, "diastolic_bp": dbp, "known_hypertension": "yes",
+                        "total_cholesterol_mmol": 6, "hdl_mmol": 1}
+                if tobacco != "absent":
+                    data["tobacco_use"] = tobacco
+                cases.append({"data": data, "age": 70, "sex": sex})
+    compare(cases)
+
+
+def test_unestimated_risk_statin_complete_output_matches():
+    cases = []
+    for tobacco in (None, "unknown", "absent"):
+        data = {"systolic_bp": 135, "diastolic_bp": 80, "known_hypertension": "yes",
+                "total_cholesterol_mmol": 6, "hdl_mmol": 1, "ldl_mmol": 3,
+                "medications": [{"code": "atorvastatin", "name": "Atorvastatin"}]}
+        if tobacco != "absent":
+            data["tobacco_use"] = tobacco
+        cases.append({"data": data, "age": 70, "sex": "male"})
+    compare(cases)

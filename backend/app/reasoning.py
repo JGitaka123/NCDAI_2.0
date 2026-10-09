@@ -19,7 +19,7 @@ import re
 
 from .evidence import evidence
 
-REASONING_VERSION = "ncdai-consultant-1.0.0"
+REASONING_VERSION = "ncdai-consultant-1.1.0-review"
 
 ALIASES = {"glyburide": "glibenclamide", "hctz": "hydrochlorothiazide", "albuterol": "salbutamol",
            "frusemide": "furosemide", "acetylsalicylic": "aspirin", "asa": "aspirin"}
@@ -342,7 +342,8 @@ def build(data, age, sex, assessment):
         risk.update(category="high", basis="markedly raised cholesterol (possible familial hypercholesterolaemia)", source_ids=cite("ESC_LIPIDS_2019"))
     if risk["category"] is None or risk["category"] != "very high":
         model = None
-        if sex in ("female", "male") and 30 <= age <= 74 and mean_sbp is not None and not any_ascvd:
+        if (sex in ("female", "male") and 30 <= age <= 74 and mean_sbp is not None and not any_ascvd
+                and data.get("tobacco_use") in {"current", "former", "never"}):
             if tc is not None and hdl is not None:
                 model = sex + "_lipid"
             elif bmi is not None:
@@ -351,8 +352,6 @@ def build(data, age, sex, assessment):
             value = framingham(model, age, mean_sbp, on_bp_treatment, smoker, diabetic, tc, hdl, bmi)
             percent = r1(value * 100)
             method = "Framingham 2008 general CVD, " + ("laboratory (cholesterol)" if model.endswith("lipid") else "office (BMI)") + " model"
-            if data.get("tobacco_use") in (None, "unknown"):
-                method += "; tobacco status unknown, scored as non-smoker"
             risk.update(percent=percent, method=method)
             cite("FRAMINGHAM_2008", "WHO_CVD_RISK_2019")
             if risk["category"] is None:
@@ -385,6 +384,7 @@ def build(data, age, sex, assessment):
                      item("Arrange joint obstetric and physician care for any hypertension, diabetes or kidney disease.", "NICE_PREGNANCY")])
 
     # ---- hypertension ------------------------------------------------------
+    bp_target_pending = False
     if not pregnant and (mean_sbp is not None or hypertensive):
         elderly = age >= 80 or frail
         if elderly:
@@ -422,6 +422,14 @@ def build(data, age, sex, assessment):
             elif above:
                 status = "unconfirmed"
                 summary = f"Raised BP ({bp_text}) without a recorded hypertension diagnosis."
+            elif ((hypertensive or on_bp_treatment) and not elderly and not (any_ascvd or diabetic or ckd)
+                  and risk["category"] is None and data.get("tobacco_use") not in {"current", "former", "never"}
+                  and (mean_sbp >= 130 or mean_dbp >= 80)):
+                bp_target_pending = True
+                status = "needs_data"
+                target_text = "Individual BP target pending cardiovascular risk assessment"
+                summary = f"BP {bp_text}: control is provisional because cardiovascular risk is not estimable; this reading lies between the existing general and high-risk targets."
+                plan.append(item("Record tobacco status and complete cardiovascular risk assessment before judging BP control or assigning a routine review interval; confirm correctly measured readings.", *hsrc))
             elif hypertensive or on_bp_treatment:
                 status = "at_target"
                 summary = f"At target ({bp_text}) on {join(classes) if classes else 'no recorded medicine'}."
@@ -694,6 +702,9 @@ def build(data, age, sex, assessment):
             status = "above_target"
             steps = "confirm adherence, then increase to high intensity" if not high_intensity else "confirm adherence, then add ezetimibe"
             plan.append(item(f"LDL {fmt(ldl)} mmol/L is above the goal of <{fmt(ldl_goal)} mmol/L for {risk['category']} risk: {steps}.", "ESC_LIPIDS_2019"))
+        elif statin_names and ldl_goal is None:
+            status = "needs_data"
+            plan.append(item("Confirm cardiovascular risk and an individual LDL goal before judging statin response; no target is established from the recorded data.", "ESC_LIPIDS_2019"))
         elif statin_names and ldl is None:
             status = "needs_data"
             plan.append(item("Check a lipid profile to confirm the statin response (target LDL " + (f"<{fmt(ldl_goal)} mmol/L" if ldl_goal else "per risk category") + ").", "ESC_LIPIDS_2019"))
@@ -815,8 +826,8 @@ def build(data, age, sex, assessment):
         add_problem("tobacco", "Current tobacco use", "at_risk", ["Current tobacco use"],
                     "Stopping is the single most effective intervention for cardiovascular and lung risk.",
                     [item("Give brief advice to quit today and offer behavioural support with pharmacotherapy (varenicline, nicotine replacement, bupropion or cytisine) where available; follow up within 2 weeks.", "WHO_TOBACCO_2024")])
-    elif data.get("tobacco_use", "unknown") == "unknown":
-        gap("tobacco_use", "Tobacco status changes cardiovascular risk and respiratory plans.")
+    elif data.get("tobacco_use") not in {"former", "never"}:
+        gap("tobacco_use", "Record tobacco status before calculating numeric cardiovascular risk; unknown status is not scored as non-smoking.")
 
     # ---- diagnostic considerations -----------------------------------------
     if symptoms & {"persistent_cough", "hemoptysis", "unexplained_weight_loss"}:
@@ -919,6 +930,8 @@ def build(data, age, sex, assessment):
         follow_up = "Same day, per the acute findings; chronic review within 2 weeks of stabilisation."
     elif any(entry["status"] in ("acute", "uncontrolled", "untreated", "above_target", "high_risk", "review", "unconfirmed", "needs_confirmation") for entry in problems) or med_review:
         follow_up = "2–4 weeks: confirm readings, review changes and blood results."
+    elif bp_target_pending:
+        follow_up = "Complete cardiovascular risk inputs and confirm the blood pressure target before assigning routine follow-up."
     elif problems:
         follow_up = "3–6 months, with monitoring as listed."
     else:
@@ -950,6 +963,8 @@ def build(data, age, sex, assessment):
         for entry in monitoring:
             lines.append(f"   - {entry['test']}: {entry['timing']}")
     lines.append("")
+    if risk["category"] is None and data.get("tobacco_use") not in {"current", "former", "never"}:
+        lines.append("Risk not estimated: tobacco status missing. Record tobacco status before calculating numeric cardiovascular risk; unknown status is not scored as non-smoking.")
     lines.append("Follow-up: " + follow_up)
     lines.append("Decision support for clinician review; not a prescription.")
 

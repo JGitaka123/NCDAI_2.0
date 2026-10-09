@@ -8,7 +8,7 @@
   var REGISTRY = root.NCDAI_EVIDENCE
   if (!REGISTRY) throw new Error('Load evidence.js before engine.js')
   var RULESET_VERSION = 'ncdai-2-rules-0.2.0'
-  var REASONING_VERSION = 'ncdai-consultant-1.0.0'
+  var REASONING_VERSION = 'ncdai-consultant-1.1.0-review'
   var SOURCES = {}
   REGISTRY.sources.forEach(function (source) { SOURCES[source.source_id] = source })
 
@@ -530,15 +530,13 @@
     else if ((tc != null && tc >= 8) || (ldl != null && ldl >= 4.9)) setRisk('high', 'markedly raised cholesterol (possible familial hypercholesterolaemia)', cite('ESC_LIPIDS_2019'))
     if (risk.category == null || risk.category !== 'very high') {
       var model = null
-      if ((sex === 'female' || sex === 'male') && age >= 30 && age <= 74 && meanSbp != null && !anyAscvd) {
+      if ((sex === 'female' || sex === 'male') && age >= 30 && age <= 74 && meanSbp != null && !anyAscvd && ['current', 'former', 'never'].includes(get(data, 'tobacco_use'))) {
         if (tc != null && hdl != null) model = sex + '_lipid'
         else if (bmi != null) model = sex + '_bmi'
       }
       if (model) {
         var percent = r1(framingham(model, age, meanSbp, onBpTreatment, smoker, diabetic, tc, hdl, bmi) * 100)
         var method = 'Framingham 2008 general CVD, ' + (model.slice(-5) === 'lipid' ? 'laboratory (cholesterol)' : 'office (BMI)') + ' model'
-        var tobacco = get(data, 'tobacco_use')
-        if (tobacco == null || tobacco === 'unknown') method += '; tobacco status unknown, scored as non-smoker'
         risk.percent = percent; risk.method = method
         cite('FRAMINGHAM_2008', 'WHO_CVD_RISK_2019')
         if (risk.category == null) setRisk(percent >= 20 ? 'high' : percent >= 10 ? 'moderate' : 'low', 'estimated 10-year risk ' + fmt(percent) + '%', ['FRAMINGHAM_2008', 'WHO_CVD_RISK_2019'])
@@ -565,6 +563,7 @@
         item('Arrange joint obstetric and physician care for any hypertension, diabetes or kidney disease.', 'NICE_PREGNANCY')])
 
     // ---- hypertension
+    var bpTargetPending = false
     var plan, facts, status, summary
     if (!pregnant && (meanSbp != null || hypertensive)) {
       var target, targetText
@@ -593,6 +592,12 @@
           summary = 'Above target at ' + bpText + ' (target ' + targetText.split(' (')[0].split(',')[0] + '); systolic ' + fmt0(Math.max(meanSbp - target[0], 0)) + ' mmHg above the systolic goal on ' + classes.length + ' antihypertensive class' + (classes.length !== 1 ? 'es' : '') + '.'
         } else if (above) {
           status = 'unconfirmed'; summary = 'Raised BP (' + bpText + ') without a recorded hypertension diagnosis.'
+        } else if ((hypertensive || onBpTreatment) && age < 80 && !frail && !(anyAscvd || diabetic || ckd) && risk.category == null && !['current', 'former', 'never'].includes(get(data, 'tobacco_use')) && (meanSbp >= 130 || meanDbp >= 80)) {
+          bpTargetPending = true
+          status = 'needs_data'
+          targetText = 'Individual BP target pending cardiovascular risk assessment'
+          summary = 'BP ' + bpText + ': control is provisional because cardiovascular risk is not estimable; this reading lies between the existing general and high-risk targets.'
+          plan.push(item('Record tobacco status and complete cardiovascular risk assessment before judging BP control or assigning a routine review interval; confirm correctly measured readings.', 'WHO_HTN_2021', 'ISH_HTN_2020', 'ESC_HTN_2024'))
         } else if (hypertensive || onBpTreatment) {
           status = 'at_target'; summary = 'At target (' + bpText + ') on ' + (classes.length ? join(classes) : 'no recorded medicine') + '.'
         } else if (meanSbp >= 130 || meanDbp >= 85 || (highRisk && meanDbp >= 80)) {
@@ -809,6 +814,9 @@
       } else if (statinNames.length && ldl != null && ldlGoal != null && ldl > ldlGoal) {
         status = 'above_target'
         plan.push(item('LDL ' + fmt(ldl) + ' mmol/L is above the goal of <' + fmt(ldlGoal) + ' mmol/L for ' + risk.category + ' risk: ' + (highIntensity ? 'confirm adherence, then add ezetimibe' : 'confirm adherence, then increase to high intensity') + '.', 'ESC_LIPIDS_2019'))
+      } else if (statinNames.length && ldlGoal == null) {
+        status = 'needs_data'
+        plan.push(item('Confirm cardiovascular risk and an individual LDL goal before judging statin response; no target is established from the recorded data.', 'ESC_LIPIDS_2019'))
       } else if (statinNames.length && ldl == null) {
         status = 'needs_data'
         plan.push(item('Check a lipid profile to confirm the statin response (target LDL ' + (ldlGoal ? '<' + fmt(ldlGoal) + ' mmol/L' : 'per risk category') + ').', 'ESC_LIPIDS_2019'))
@@ -917,7 +925,7 @@
     if (bmi != null && bmi < 18.5) consider('underweight', 'BMI ' + fmt(bmi) + ' kg/m²: evaluate undernutrition, TB, HIV, uncontrolled diabetes, malignancy and food insecurity.', 'WHO_OBESITY', 'WHO_TB_SCREENING_2021')
     if (smoker) addProblem('tobacco', 'Current tobacco use', 'at_risk', ['Current tobacco use'], 'Stopping is the single most effective intervention for cardiovascular and lung risk.',
       [item('Give brief advice to quit today and offer behavioural support with pharmacotherapy (varenicline, nicotine replacement, bupropion or cytisine) where available; follow up within 2 weeks.', 'WHO_TOBACCO_2024')])
-    else if (get(data, 'tobacco_use', 'unknown') === 'unknown') gap('tobacco_use', 'Tobacco status changes cardiovascular risk and respiratory plans.')
+    else if (!['former', 'never'].includes(get(data, 'tobacco_use'))) gap('tobacco_use', 'Record tobacco status before calculating numeric cardiovascular risk; unknown status is not scored as non-smoking.')
 
     // ---- diagnostic considerations
     if (symptoms.has('persistent_cough') || symptoms.has('hemoptysis') || symptoms.has('unexplained_weight_loss'))
@@ -982,6 +990,7 @@
     var followUp
     if (acuteFirst) followUp = 'Same day, per the acute findings; chronic review within 2 weeks of stabilisation.'
     else if (problems.some(function (e) { return shortInterval.indexOf(e.status) >= 0 }) || medReview.length) followUp = '2–4 weeks: confirm readings, review changes and blood results.'
+    else if (bpTargetPending) followUp = 'Complete cardiovascular risk inputs and confirm the blood pressure target before assigning routine follow-up.'
     else if (problems.length) followUp = '3–6 months, with monitoring as listed.'
     else followUp = 'Routine screening interval; re-assess if new symptoms.'
 
@@ -997,6 +1006,7 @@
     if (considerations.length) { lines.push(''); lines.push('Consider:'); considerations.forEach(function (e) { lines.push('   - ' + e.text) }) }
     if (monitoring.length) { lines.push(''); lines.push('Monitoring:'); monitoring.forEach(function (e) { lines.push('   - ' + e.test + ': ' + e.timing) }) }
     lines.push('')
+    if (risk.category == null && !['current', 'former', 'never'].includes(get(data, 'tobacco_use'))) lines.push('Risk not estimated: tobacco status missing. Record tobacco status before calculating numeric cardiovascular risk; unknown status is not scored as non-smoking.')
     lines.push('Follow-up: ' + followUp)
     lines.push('Decision support for clinician review; not a prescription.')
 
