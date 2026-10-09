@@ -807,6 +807,9 @@
       } else if (statinNames.length && ldl != null && ldlGoal != null && ldl > ldlGoal) {
         status = 'above_target'
         plan.push(item('LDL ' + fmt(ldl) + ' mmol/L is above the goal of <' + fmt(ldlGoal) + ' mmol/L for ' + risk.category + ' risk: ' + (highIntensity ? 'confirm adherence, then add ezetimibe' : 'confirm adherence, then increase to high intensity') + '.', 'ESC_LIPIDS_2019'))
+      } else if (statinNames.length && ldlGoal == null) {
+        status = 'needs_data'
+        plan.push(item('Confirm cardiovascular risk and an individual LDL goal before judging statin response; no target is established from the recorded data.', 'ESC_LIPIDS_2019'))
       } else if (statinNames.length && ldl == null) {
         status = 'needs_data'
         plan.push(item('Check a lipid profile to confirm the statin response (target LDL ' + (ldlGoal ? '<' + fmt(ldlGoal) + ' mmol/L' : 'per risk category') + ').', 'ESC_LIPIDS_2019'))

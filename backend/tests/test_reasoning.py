@@ -79,6 +79,54 @@ def test_missing_tobacco_preserves_established_disease_risk():
     assert result["cardiovascular_risk"]["percent"] is None
 
 
+@pytest.mark.parametrize("tobacco", [None, "unknown", "absent"])
+def test_unestimated_risk_does_not_claim_statin_target_met(tobacco):
+    data = complete(systolic_bp=135, diastolic_bp=80, known_hypertension="yes",
+                    total_cholesterol_mmol=6, hdl_mmol=1, ldl_mmol=3,
+                    medications=meds("atorvastatin"), tobacco_use=tobacco)
+    if tobacco == "absent":
+        data.pop("tobacco_use")
+    result = assess(data, 70, "male")["consultant"]
+    lipids = problem(result, "cv_prevention")
+    assert result["cardiovascular_risk"] is None
+    assert lipids["status"] == "needs_data"
+    assert not lipids["targets"]
+    text = plan_text(result, "cv_prevention")
+    assert "no target is established" in text
+    assert "Continue the statin; recheck lipids annually" not in text
+
+
+def test_established_diabetes_still_judges_statin_against_existing_goal():
+    result = consult(70, tobacco_use="unknown", known_diabetes="yes",
+                     ldl_mmol=3, medications=meds("atorvastatin"))
+    assert problem(result, "cv_prevention")["status"] == "above_target"
+
+
+@pytest.mark.parametrize("changes,category", [
+    ({"known_ascvd": "yes"}, "very high"),
+    ({"known_diabetes": "yes"}, "high"),
+    ({"egfr": 25}, "very high"), ({"egfr": 50}, "high"),
+    ({"total_cholesterol_mmol": 8.5}, "high"),
+])
+def test_missing_tobacco_preserves_disease_based_targets(changes, category):
+    result = consult(45, tobacco_use="unknown", systolic_bp=150, diastolic_bp=95,
+                     known_hypertension="yes", ldl_mmol=3, medications=meds("atorvastatin"), **changes)
+    assert result["cardiovascular_risk"]["category"] == category
+    assert problem(result, "cv_prevention")["status"] == "above_target"
+    assert problem(result, "cv_prevention")["targets"]
+    assert any("<130/80" in target for target in problem(result, "hypertension")["targets"])
+
+
+@pytest.mark.parametrize("sex", ["female", "male"])
+@pytest.mark.parametrize("measurements", [dict(total_cholesterol_mmol=6, hdl_mmol=1), dict(weight_kg=80, height_cm=175)])
+def test_missing_tobacco_does_not_create_risk_based_statin_start(sex, measurements):
+    result = consult(70, sex, tobacco_use="unknown", systolic_bp=135, diastolic_bp=80,
+                     known_hypertension="yes", **measurements)
+    assert result["cardiovascular_risk"] is None
+    assert not any(entry["id"] == "cv_prevention" for entry in result["problems"])
+    assert any(gap["field"] == "tobacco_use" for gap in result["data_gaps"])
+
+
 @pytest.mark.parametrize("tobacco", ["never", "former", "current"])
 def test_known_tobacco_keeps_numeric_risk(tobacco):
     result = consult(50, tobacco_use=tobacco, total_cholesterol_mmol=5.5, hdl_mmol=1.2)

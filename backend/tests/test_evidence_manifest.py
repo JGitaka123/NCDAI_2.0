@@ -17,3 +17,19 @@ def test_source_change_changes_manifest_hash(monkeypatch):
     package["sources"][0]["section"] += "; proposed revision"
     monkeypatch.setattr(evidence_manifest, "registry", lambda: package)
     assert evidence_manifest.manifest()["manifest_sha256"] != before["manifest_sha256"]
+
+
+def test_ordering_is_invariant(monkeypatch):
+    before = evidence_manifest.manifest()
+    package = evidence_manifest.registry()
+    package["sources"].reverse()
+    monkeypatch.setattr(evidence_manifest, "registry", lambda: package)
+    assert evidence_manifest.manifest() == before
+
+
+def test_malformed_document_hash_is_missing(monkeypatch):
+    package = evidence_manifest.registry()
+    for source in package["sources"]:
+        source["version"] = "SHA256 " + "a" * 65
+    monkeypatch.setattr(evidence_manifest, "registry", lambda: package)
+    assert all(source["document_sha256"] is None for source in evidence_manifest.manifest()["sources"])

@@ -693,6 +693,9 @@ def build(data, age, sex, assessment):
             status = "above_target"
             steps = "confirm adherence, then increase to high intensity" if not high_intensity else "confirm adherence, then add ezetimibe"
             plan.append(item(f"LDL {fmt(ldl)} mmol/L is above the goal of <{fmt(ldl_goal)} mmol/L for {risk['category']} risk: {steps}.", "ESC_LIPIDS_2019"))
+        elif statin_names and ldl_goal is None:
+            status = "needs_data"
+            plan.append(item("Confirm cardiovascular risk and an individual LDL goal before judging statin response; no target is established from the recorded data.", "ESC_LIPIDS_2019"))
         elif statin_names and ldl is None:
             status = "needs_data"
             plan.append(item("Check a lipid profile to confirm the statin response (target LDL " + (f"<{fmt(ldl_goal)} mmol/L" if ldl_goal else "per risk category") + ").", "ESC_LIPIDS_2019"))
