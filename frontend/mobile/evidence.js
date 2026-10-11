@@ -131,6 +131,13 @@
      "version": "2017; accessed 2026-09-12"
     },
     {
+     "section": "1.2.1 aspirin; 1.4.5-1.4.8 lipid referral; 1.5 baseline tests and pregnancy; 1.6.1 and 1.6.7 primary prevention atorvastatin 20 mg; 1.7.1-1.7.3 and 1.7.9 secondary prevention atorvastatin 80 mg; 1.8.1-1.8.3 CKD; 1.9 optimising; 1.11 monitoring; statin intensity definitions",
+     "source_id": "NICE_LIPIDS_NG238",
+     "title": "NICE NG238: Cardiovascular disease: risk assessment and reduction, including lipid modification",
+     "url": "https://www.nice.org.uk/guidance/ng238/chapter/Recommendations",
+     "version": "Published 2023-12-14; recommendations text read 2026-09-19"
+    },
+    {
      "section": "Input semantics, conservative triage adaptations, scope, and release gates",
      "source_id": "NCDAI_SAFETY_SPEC",
      "title": "NCDAI 2.0 clinical safety specification (proposed engineering policy)",
@@ -288,18 +295,95 @@
      "section": "Table 4, printed page 16 (PDF page 25); selected oral antihypertensive starting and maximum doses",
      "source_id": "KENYA_DOSES_HTN",
      "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
-     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf",
+     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf#page=25",
      "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
     },
     {
      "section": "4.5, printed page 35 (PDF page 44); metformin initial dose and titration ceiling; renal scope restricted by NCDAI policy",
      "source_id": "KENYA_DOSES_DM",
      "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
-     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf",
+     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf#page=44",
+     "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
+    },
+    {
+     "section": "1. CVD risk management, printed page 2 (PDF page 11); statin for >20% risk; established DM, CVD or renal disease counted as >20%; total cholesterol >=8 mmol/L",
+     "source_id": "KENYA_CVD_RISK",
+     "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
+     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf#page=11",
+     "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
+    },
+    {
+     "section": "Hypertension treatment steps 1-4, printed page 11 (PDF page 20); target <140/90 mmHg; at least 3 months per step; step 4 with a physician",
+     "source_id": "KENYA_HTN_STEPS",
+     "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
+     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf#page=20",
+     "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
+    },
+    {
+     "section": "Table 3 lifestyle modifications and referral indications, printed page 15 (PDF page 24)",
+     "source_id": "KENYA_HTN_LIFESTYLE",
+     "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
+     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf#page=24",
+     "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
+    },
+    {
+     "section": "Table 6 diagnostic criteria, printed page 32 (PDF page 41); FPG >=7.0, RPG >=11.1 mmol/L, HbA1c >=6.5%",
+     "source_id": "KENYA_DM_DIAGNOSIS",
+     "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
+     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf#page=41",
+     "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
+    },
+    {
+     "section": "4.3 management of prediabetes, printed page 33 (PDF page 42); HbA1c 5.7-6.4%, FBS 5.6-6.9 mmol/L; lose 5-10% weight in 12 months",
+     "source_id": "KENYA_PREDIABETES",
+     "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
+     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf#page=42",
+     "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
+    },
+    {
+     "section": "4.1 screening, printed page 31 (PDF page 40); BMI >=25 kg/m2; HDL <0.90 mmol/L; triglycerides >2.82 mmol/L",
+     "source_id": "KENYA_DM_SCREENING",
+     "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
+     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf#page=40",
+     "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
+    },
+    {
+     "section": "4.8 hypoglycaemia management in adults, printed page 41 (PDF page 50); CBG <=3.9 mmol/L; 15-20 g oral carbohydrate; 25 g (50 ml) D50 IV or glucagon 1 mg IM",
+     "source_id": "KENYA_HYPOGLYCAEMIA",
+     "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
+     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf#page=50",
+     "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
+    },
+    {
+     "section": "5. Table 9 common cancer symptoms and actions for health workers, printed pages 52-53 (PDF pages 61-62)",
+     "source_id": "KENYA_CANCER_SIGNS",
+     "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
+     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf#page=61",
+     "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
+    },
+    {
+     "section": "6.7 stepwise asthma treatment for 12 years and above, printed pages 83-84 (PDF pages 92-93); SABA monotherapy not recommended",
+     "source_id": "KENYA_ASTHMA",
+     "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
+     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf#page=92",
+     "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
+    },
+    {
+     "section": "6.8 COPD groups A, B and E and non-pharmacological management, printed pages 86-87 (PDF pages 95-96)",
+     "source_id": "KENYA_COPD",
+     "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
+     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf#page=95",
+     "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
+    },
+    {
+     "section": "4.5 type 2 diabetes treatment flowchart, printed pages 35-36 (PDF pages 44-45); Table 7 targets HbA1c <7.0%, fasting glucose 4.4-7.2 mmol/L",
+     "source_id": "KENYA_DM_TREATMENT",
+     "title": "Kenya Ministry of Health: Protocols for Management of Selected NCDs at Primary Care Setting",
+     "url": "https://health.go.ke/sites/default/files/2025-07/FINAL_NCD%20protocols.pdf#page=44",
      "version": "MOH July 2025 hosted copy; 132 pages, no explicit edition date found; verified 2026-09-12; SHA256 e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
     }
    ],
-   "version": "ncdai-2026-09-29.1"
+   "version": "ncdai-2026-10-11.1"
   };
   root.NCDAI_EVIDENCE = registry;
 })(typeof self !== 'undefined' ? self : this);

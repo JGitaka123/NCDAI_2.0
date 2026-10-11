@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy.pool import StaticPool
 
-SCHEMA_REVISION = "20260913_mary_help"
+SCHEMA_REVISION = "20260914_study"
 
 
 class Base(DeclarativeBase):

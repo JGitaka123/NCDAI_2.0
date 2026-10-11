@@ -67,3 +67,93 @@ th,td{color:#50654f}th{font-size:11px}.badge-completed,.badge-reviewed,.badge-ac
 .consultation-snapshot { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 100%; font-size: 13px; padding: 12px; background: #faf7f7; }
 .consultation-hash { overflow-wrap: anywhere; }
 .badge-soon,.count-pill { color: #725a22; }
+
+.study-form { padding: 1rem; }
+.study-metrics { padding: 1rem; }
+.study-metrics dt { font-weight: 600; margin-top: .8rem; }
+.study-metrics dd { margin: .25rem 0; }
+
+/* Clinician feedback revision, September 2026: body size, lipids, dose guide, review flow, dashboard */
+.intake-subheading{font-size:12px;letter-spacing:.3px;color:#4b6b60;margin:14px 0 8px;text-transform:uppercase}
+.intake-section-content .intake-subheading:first-child{margin-top:0}
+.four-cols{grid-template-columns:repeat(4,minmax(0,1fr))}
+.bmi-readout{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:4px 0 8px;padding:10px 14px;border-radius:8px;background:var(--soft);border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.bmi-readout strong{font-size:20px;color:var(--heading)}.bmi-readout strong small{font-size:12px;color:var(--muted);font-weight:500}
+.bmi-readout em{font-style:normal;font-weight:700;border-radius:999px;padding:2px 10px;background:#e3efe9;color:#1f6b57}
+.bmi-overweight em,.bmi-underweight em{background:#fbf0d9;color:#8a5a12}.bmi-obesity em{background:#fbe3df;color:#9a3a30}
+.dose-guide{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:13px}
+.dose-guide ol{margin:8px 0 8px 18px;padding:0}.dose-guide li{margin:3px 0}
+.dose-scope{margin:0 0 12px;font-size:13px}.dose-scope summary{cursor:pointer;color:#31574c;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.dose-catalogue-list{margin:6px 0 6px 18px;padding:0}
+.dose-readiness{border:1px solid #e9e3cd;background:#fcfaf2;border-radius:10px;padding:12px 14px;margin:0 0 14px;font-size:13px}
+.dose-readiness ul{list-style:none;margin:8px 0;padding:0;display:grid;gap:5px}
+.dose-readiness li{display:flex;gap:8px;align-items:flex-start;color:#7a6a3c}.dose-readiness li svg{flex:0 0 auto;margin-top:2px}
+.dose-readiness li.done{color:#1f6b57}.dose-readiness small{color:var(--muted)}
+.recommendations-header>div{display:flex;flex-direction:column;gap:2px}
+.recommendations-header>div h2{font-size:17px;color:var(--heading)}.recommendations-header>div span{font-size:12px;color:var(--muted)}
+.review-progress{height:6px;border-radius:99px;background:#e6ece8;overflow:hidden;margin:-6px 0 10px}.review-progress span{display:block;height:100%;background:var(--accent);transition:width .25s}
+.recommendation-group{margin:18px 0 8px}
+.recommendation-group-heading{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px;color:var(--heading)}
+.recommendation-group-heading h3{font-size:15px;display:flex;align-items:center;gap:6px}.recommendation-group-heading small{color:var(--muted);flex-basis:100%;margin-left:25px}
+.group-critical .recommendation-group-heading{color:#9a3a30}.group-treatment .recommendation-group-heading svg{color:var(--accent)}
+.group-treatment .recommendation{border-left:4px solid var(--accent)}
+.recommendation-basis{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 18px 10px 44px;font-size:12px}
+.recommendation-basis>span{font-weight:700;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.6px}
+.recommendation-basis em{font-style:normal;background:#eef4f1;color:#28544a;border-radius:6px;padding:2px 8px}
+.recommendation .recommendation-detail{font-size:14px;line-height:1.6}
+.recommendation-sources{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:0 18px 14px 44px;font-size:12px}
+.recommendation-sources>span:first-child{font-weight:700;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.6px}
+.source-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 10px 3px 3px;background:#fff}
+.source-chip a{display:inline-flex;align-items:center;gap:4px;color:var(--accent);font-weight:600;text-decoration:none}.source-chip a:hover{text-decoration:underline}
+.source-chip .source-number{justify-content:center;min-width:20px;height:20px;border-radius:999px;background:var(--soft);font-size:11px}
+.recommendation-sources .mono{color:#98a59f;margin-left:auto}
+.decision-chip{margin-left:6px;border-radius:999px;padding:1px 8px;font-size:11px;font-weight:700;background:#eef4f1;color:#28544a}
+.decision-reject{background:#fbe3df;color:#9a3a30}.decision-defer{background:#fbf0d9;color:#8a5a12}.decision-modify{background:#e5ecfa;color:#2f4f8a}
+.recommendation-top>.icon-button{margin-left:auto}.rotate-180{transform:rotate(180deg)}
+.recommendation-collapsed{background:#fbfcfb}.recommendation-collapsed .recommendation-top{padding-bottom:6px}
+.quick-reasons{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px}
+.quick-reasons button{border:1px solid #d5dfd9;background:#fff;border-radius:999px;padding:5px 11px;font-size:12px;min-height:32px;color:#31574c}
+.quick-reasons button:hover{background:var(--soft)}.quick-reasons button.selected{background:var(--accent);border-color:var(--accent);color:#fff}
+.reference-list,.limitations,.ai-briefing-details{border:1px solid var(--line);border-radius:10px;background:#fff;padding:12px 16px;margin:14px 0;font-size:13px}
+.reference-list summary,.limitations summary,.ai-briefing-details summary{cursor:pointer;font-weight:700;color:var(--heading);display:flex;align-items:center;gap:8px}
+.summary-hint{margin-left:auto;font-weight:500;color:var(--muted);font-size:12px}
+.reference-list ol{margin:10px 0 0 18px;padding:0}.reference-list li{margin:0 0 10px;scroll-margin-top:90px}.reference-list li p{margin:2px 0}
+.reference-list li:target{background:#fcfaf2;border-radius:6px}
+.reference-list a{display:inline-flex;gap:4px;align-items:center;font-weight:650}
+.limitations ul{margin:8px 0 0 18px;padding:0;color:var(--muted)}
+.ai-briefing-details .ai-briefing{margin-top:10px}
+.review-footer-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.review-footer-actions span{color:var(--muted);font-size:13px}
+.review-footer{position:sticky;bottom:0;z-index:5;box-shadow:0 -6px 16px #0a302410}
+.dashboard-search{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 8px 8px 16px;margin:0 0 16px;box-shadow:0 2px 6px #0a302408}
+.dashboard-search>svg{color:var(--muted);flex:0 0 auto}.dashboard-search input{border:0;box-shadow:none;min-height:40px;padding:8px 4px}
+.quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:0 0 20px}
+.quick-actions button{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:12px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-height:72px}
+.quick-actions button:hover{border-color:var(--accent);background:var(--soft)}
+.quick-actions button>span{grid-row:1/3;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:var(--soft);color:var(--accent)}
+.quick-actions strong{color:var(--heading);font-size:14px}.quick-actions small{color:var(--muted)}
+.attention-list{list-style:none;margin:0;padding:0 8px 8px}
+.attention-list button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:12px 10px;min-height:60px}
+.attention-list li:first-child button{border-top:0}.attention-list button:hover:not(:disabled){background:var(--soft)}
+.attention-list button>div{flex:1;min-width:0;display:flex;flex-direction:column}.attention-list strong{color:var(--heading)}.attention-list small{color:var(--muted)}
+.attention-icon{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9px;background:var(--soft);color:var(--accent);flex:0 0 auto}
+.attention-stage{font-size:12px;color:#4b6b60;white-space:nowrap}
+.stat-card-link{text-align:left;font:inherit;color:inherit;width:100%}.stat-card-link:hover{border-color:var(--accent)}
+.stat-grid{margin-top:22px}
+@media(max-width:960px){.four-cols{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.four-cols{grid-template-columns:1fr 1fr}.attention-stage{display:none}.recommendation-basis,.recommendation-sources{margin-left:14px;margin-right:14px}.dashboard-search{flex-wrap:wrap;padding:8px}.dashboard-search .button{width:100%}.review-footer{position:static}}
+
+/* Patient summary (ruleset 0.3.0) */
+.patient-summary{border:1px solid var(--line);border-radius:12px;background:#fff;padding:16px 18px;margin:0 0 18px}
+.patient-summary-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.patient-summary-head h2{font-size:16px;line-height:1.45;color:var(--heading);max-width:62ch}
+.problem-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px;margin:4px 0 14px}.problem-table th:first-child{width:24%}.problem-table th:last-child,.problem-table td:last-child{width:118px}.problem-table td,.problem-table th{white-space:normal;overflow-wrap:anywhere}
+.problem-table th,.problem-table td{text-align:left;padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+.problem-table thead th{border-top:0;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.problem-table tbody th{color:var(--heading)}
+.tone{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap}
+.tone-ok{background:#e3efe9;color:#1f6b57}.tone-attention{background:#fbf0d9;color:#7a4f0e}.tone-urgent{background:#fbe3df;color:#8f3128}.tone-unknown{background:#eef1f0;color:#4d5f5a}
+.summary-columns{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.summary-columns h3{font-size:13px;margin:0 0 6px;color:var(--heading)}
+.summary-list{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:13px}
+.summary-list small{display:block;color:var(--muted)}
+@media(max-width:760px){.summary-columns{grid-template-columns:1fr}.problem-table th:last-child,.problem-table td:last-child{width:96px}}

@@ -172,8 +172,9 @@ def run():
             snapshot = {}
             with target.connect() as connection:
                 connection.execute(text("SET TIME ZONE 'UTC'"))
-                for table in ("facilities", "users", "auth_sessions", "login_attempts", "patients", "encounters", "referrals", "audit_events"):
-                    rows = connection.execute(text(f"SELECT row_to_json(t)::text FROM (SELECT * FROM {table} ORDER BY id) t")).scalars().all()
+                for table in ("facilities", "users", "auth_sessions", "login_attempts", "patients", "encounters", "referrals", "audit_events", "consultation_requests", "consultation_dispositions", "study_records", "study_events"):
+                    key = "request_id" if table == "consultation_dispositions" else "id"
+                    rows = connection.execute(text(f"SELECT row_to_json(t)::text FROM (SELECT * FROM {table} ORDER BY {key}) t")).scalars().all()
                     snapshot[table] = {"count": len(rows), "sha256": hashlib.sha256("\n".join(rows).encode()).hexdigest()}
             return snapshot
 

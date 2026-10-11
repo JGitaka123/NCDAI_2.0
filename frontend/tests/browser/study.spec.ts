@@ -1,0 +1,71 @@
+import {test,expect} from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
+import {readFileSync,mkdirSync,writeFileSync} from 'node:fs'
+import {resolve} from 'node:path'
+
+for(const viewport of [{name:'desktop',width:1366,height:900},{name:'mobile',width:375,height:812}]) {
+  test(`${viewport.name}: study collection, correction and aggregate reporting`,async({page},info)=>{
+    await page.setViewportSize(viewport)
+    const access=JSON.parse(readFileSync(resolve(process.env.NCDAI_STUDY_ACCESS_FILE || '../.runtime/demo-access.json'),'utf8'))
+    await page.goto('/')
+    await page.getByLabel('Email address').fill(access.email)
+    await page.getByLabel('Password',{exact:true}).fill(access.password)
+    await page.getByRole('button',{name:'Sign in',exact:true}).click()
+    await expect(page.getByRole('heading',{name:/^Good (morning|afternoon|evening),/})).toBeVisible()
+    async function navigate(name:string) {
+      const menu=page.getByRole('button',{name:'Open navigation',exact:true})
+      if(await menu.isVisible())await menu.click()
+      await page.getByRole('navigation',{name:'Main navigation'}).getByRole('button',{name,exact:true}).click()
+    }
+    await navigate('Patients')
+    await page.getByRole('button',{name:'Register patient',exact:true}).click()
+    await page.getByLabel('Record ID',{exact:true}).fill(`SYN-STUDY-BROWSER-${Date.now()}`)
+    await page.getByLabel('Given name',{exact:true}).fill('Synthetic')
+    await page.getByLabel('Family name',{exact:true}).fill('Study Verification')
+    await page.getByLabel(/^Date of birth/).fill('1970-01-01')
+    await page.getByLabel('Sex recorded').selectOption('female')
+    await page.getByRole('button',{name:'Create patient record'}).click()
+    await page.getByRole('button',{name:'Start first encounter'}).click()
+    await page.getByLabel('Systolic BP (mmHg)',{exact:true}).fill('150')
+    await page.getByLabel('Diastolic BP (mmHg)',{exact:true}).fill('95')
+    await page.getByRole('button',{name:'Save draft',exact:true}).click()
+    await page.getByRole('button',{name:'Open study observations'}).click()
+    await page.getByLabel('Participation status').selectOption('enrolled')
+    await page.getByLabel('Participation documented under the approved protocol').check()
+    await page.getByRole('button',{name:'Save study observation'}).click()
+    await expect(page.getByText('Study observation saved · revision 1.')).toBeVisible()
+    await page.getByLabel('Observation type').selectOption('visit')
+    await page.getByLabel('Total consultation time (minutes)').fill('12')
+    await page.getByLabel('How was time measured?').selectOption('observed')
+    await page.getByLabel('Safety screening at this visit').selectOption('no_event_reported')
+    await page.getByRole('button',{name:'Save study observation'}).click()
+    await expect(page.getByText('Study observation saved · revision 1.')).toBeVisible()
+    const results=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()
+    expect(results.violations.map(v=>v.id)).toEqual([])
+    await navigate('Study metrics')
+    await page.getByRole('button',{name:'Load study readout'}).click()
+    await expect(page.getByRole('heading',{name:'Descriptive feasibility readout'})).toBeVisible()
+    await page.getByLabel('All eligible adult NCD visits').fill('10')
+    await page.getByLabel('Visits using NCDAI').fill('8')
+    await page.getByLabel('Not used: workload').fill('2')
+    const existing=page.getByLabel('Saved observation to correct')
+    if(await existing.count()) {
+      page.once('dialog',dialog=>dialog.accept())
+      await existing.selectOption({index:1})
+      await page.getByLabel('All eligible adult NCD visits').fill('10')
+      await page.getByLabel('Visits using NCDAI').fill('8')
+      await page.getByLabel('Not used: workload').fill('2')
+    }
+    await page.getByRole('button',{name:/^Save (study observation|correction)$/}).click()
+    await expect(page.getByText(/Study observation saved/)).toBeVisible()
+    await expect(page.getByText('8/10 (80%) · 1 days reported')).toBeVisible()
+    const final=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()
+    expect(final.violations.map(v=>v.id)).toEqual([])
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewport.width+1)
+    const dir=resolve(process.env.NCDAI_BROWSER_ARTIFACT_DIR || '../.runtime/study-browser');mkdirSync(dir,{recursive:true})
+    const report={viewport,axe_scans:2,violations:[],workflow:'Synthetic collection, revision and aggregate readout'}
+    writeFileSync(resolve(dir,`${viewport.name}-study.json`),JSON.stringify(report,null,2))
+    await info.attach('study-verification',{body:JSON.stringify(report),contentType:'application/json'})
+    await page.screenshot({path:resolve(dir,`${viewport.name}-study.png`),fullPage:true})
+  })
+}

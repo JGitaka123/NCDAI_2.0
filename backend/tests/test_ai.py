@@ -164,7 +164,8 @@ def test_model_cannot_return_useless_empty_actionable_focus():
 
 
 def test_no_paid_request_when_no_selection_can_add_value():
-    record = assessment(38)
+    # Case 16 is a critical-only assessment with no gaps, so nothing is selectable.
+    record = assessment(16)
     def forbidden(_): pytest.fail("No paid request for an empty selection task")
     result = run(record, handler=forbidden)
     assert result["status"] == "disabled" and result["reason_code"] == "no_selectable_items"

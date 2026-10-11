@@ -13,7 +13,7 @@ async function login(page: Page, role: 'clinician' | 'supervisor') {
   await page.getByLabel('Email address').fill(access[role].email)
   await page.getByLabel('Password', { exact: true }).fill(access[role].password)
   await page.getByRole('button', { name: 'Sign in', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'A clearer view of care.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /^Good (morning|afternoon|evening),/ })).toBeVisible()
 }
 async function audit(page: Page, label: string) {
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()

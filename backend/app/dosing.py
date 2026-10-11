@@ -13,10 +13,10 @@ import json
 from .dosing_schemas import DosingInput
 from .evidence import evidence
 
-DOSING_VERSION = "ncdai-dose-reference-0.1.1"
+DOSING_VERSION = "ncdai-dose-reference-0.2.0"
 KENYA_PDF_SHA256 = "e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8"
 SCOPE_NOTE = (
-    "Selected oral single-ingredient adult starting-dose references, not prescriptions. "
+    "Kenya MOH starting and maximum doses for selected single-ingredient oral medicines, not prescriptions. "
     "No automatic titration, renal adjustment, insulin, oncology or paediatric dosing. "
     "The initial scope excludes age 65+, frailty, pregnancy, breastfeeding, organ impairment, "
     "acute illness, recorded allergies and medicines outside this small interaction catalogue. "
@@ -39,6 +39,37 @@ _MEDICINES = {
         checks="Review metabolic acidosis, hypoxia, alcohol excess, liver disease, acute illness, surgery/fasting and recent or planned iodinated contrast. Extended-release and combination products are excluded.",
         monitoring="Take with food; clinician directs gradual titration according to tolerance, glucose, renal function and vitamin B12 monitoring needs."),
 }
+# Further Table 4 rows with an unambiguous once-daily start and maximum (PDF page 25,
+# verified 2026-09-17 against the same SHA256). Kenya values only; no product label
+# is substituted. Enalapril (range/divided), captopril (divided), perindopril (salt
+# ambiguity) and nifedipine (no maximum) remain excluded.
+_CCB = dict(indication="hypertension", page=16, label=None,
+            checks="Review small body size, frailty, hepatic disease, severe aortic stenosis, hypotension and interacting medicines (including strong CYP3A4 inhibitors and grapefruit juice).",
+            monitoring="Review blood pressure, dizziness, oedema, headache and palpitations; clinician determines follow-up and any titration.")
+_DIURETIC = dict(indication="hypertension", page=16, label=None,
+                 checks="Review gout, previous hyponatraemia or hypokalaemia, diabetes control, lithium and NSAID use, and pregnancy or plans for pregnancy.",
+                 monitoring="Check sodium, potassium, creatinine and glucose after starting and at follow-up; Table 4 lists hypokalaemia, hyponatraemia, hyperuricaemia and hyperglycaemia.")
+_ACE = dict(indication="hypertension", page=16, label=None,
+            checks="Review pregnancy/plans for pregnancy, prior/hereditary angioedema, renal artery disease, volume depletion, potassium supplements/salt substitutes and sacubitril/valsartan exposure within 36 hours.",
+            monitoring="Arrange blood pressure, creatinine/eGFR and potassium follow-up; cough is common and swelling suggesting angioedema needs urgent assessment.")
+_ARB = dict(indication="hypertension", page=16, label=None,
+            checks="Review pregnancy/plans for pregnancy, volume depletion, renal artery disease, angioedema history, potassium supplements/salt substitutes and other renin-angiotensin-system medicines.",
+            monitoring="Arrange blood pressure, creatinine/eGFR and potassium follow-up after initiation or changes under the local protocol.")
+for _key, _name, _ingredient, _form, _initial, _maximum, _group in [
+    ("felodipine_pr_tablet", "Felodipine (prolonged release)", "felodipine", "Single-ingredient prolonged-release tablet", 5, 10, _CCB),
+    ("hydrochlorothiazide_tablet", "Hydrochlorothiazide", "hydrochlorothiazide", "Single-ingredient tablet", 12.5, 25, _DIURETIC),
+    ("chlorthalidone_tablet", "Chlorthalidone", "chlorthalidone", "Single-ingredient tablet", 25, 50, _DIURETIC),
+    ("indapamide_ir_tablet", "Indapamide (2.5 mg immediate release)", "indapamide", "Single-ingredient 2.5 mg immediate-release tablet only (not 1.5 mg modified release)", 2.5, 5, _DIURETIC),
+    ("ramipril_capsule", "Ramipril", "ramipril", "Single-ingredient capsule or tablet", 2.5, 10, _ACE),
+    ("candesartan_tablet", "Candesartan", "candesartan", "Single-ingredient candesartan cilexetil tablet", 8, 32, _ARB),
+    ("irbesartan_tablet", "Irbesartan", "irbesartan", "Single-ingredient tablet", 150, 300, _ARB),
+    ("telmisartan_tablet", "Telmisartan", "telmisartan", "Single-ingredient tablet", 40, 80, _ARB),
+    ("valsartan_tablet", "Valsartan", "valsartan", "Single-ingredient tablet", 80, 160, _ARB),
+]:
+    _MEDICINES[_key] = dict(name=_name, ingredient=_ingredient, formulation=_form, initial=_initial, maximum=_maximum,
+                            per_dose_max=_maximum, frequencies=[1], **_group)
+RAS_INGREDIENTS = {"losartan", "lisinopril", "ramipril", "candesartan", "irbesartan", "telmisartan", "valsartan"}
+POTASSIUM_GATED = RAS_INGREDIENTS | {"hydrochlorothiazide", "chlorthalidone", "indapamide"}
 MANIFEST_SHA256 = hashlib.sha256(json.dumps(_MEDICINES, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
@@ -85,7 +116,7 @@ def evaluate_dosing(data: dict, age: int, sex: str, urgency: str, *, now=None):
         if item is None:
             block("unsupported_medicine", "This medicine/formulation has no configured dose reference. Obtain a verified formulary review.")
             continue
-        sources = evidence("KENYA_DOSES_HTN" if item["page"] == 16 else "KENYA_DOSES_DM", item["label"])
+        sources = evidence("KENYA_DOSES_HTN" if item["page"] == 16 else "KENYA_DOSES_DM", *([item["label"]] if item["label"] else []))
         result["evidence"] = sources
         if request.indication != item["indication"]:
             block("indication_mismatch", "Selected indication does not match this medicine reference.")
@@ -139,13 +170,15 @@ def evaluate_dosing(data: dict, age: int, sex: str, urgency: str, *, now=None):
             block("ambiguous_medication", "Current medicine names must match the catalogue ingredient codes; resolve brand, combination or formulation ambiguity.")
         if item["ingredient"] in current:
             block("existing_therapy", "This medicine is already recorded. Regimen changes and duplicate initiation are outside this starting-dose scope.")
-        if request.medicine_id in {"losartan_tablet", "lisinopril_tablet"}:
+        if item["ingredient"] in POTASSIUM_GATED:
+            kind = "RAS-medicine" if item["ingredient"] in RAS_INGREDIENTS else "diuretic"
             if not _recent(ctx.potassium_observed_at, now, timedelta(days=7)):
                 block("potassium_result_time", "Verify the potassium result date separately; this initial implementation requires it within seven days.")
             if data.get("potassium") is None or not 3.5 <= data["potassium"] <= 5.0:
-                block("potassium", "A verified potassium result from 3.5 to 5.0 mmol/L is required for this bounded RAS-medicine reference.")
-            pair = {"losartan", "lisinopril"} & current
-            if pair or {"losartan_tablet", "lisinopril_tablet"} <= all_requested:
+                block("potassium", f"A verified potassium result from 3.5 to 5.0 mmol/L is required for this bounded {kind} reference.")
+        if item["ingredient"] in RAS_INGREDIENTS:
+            requested_ras = {_MEDICINES[r]["ingredient"] for r in all_requested if r in _MEDICINES} & RAS_INGREDIENTS
+            if (RAS_INGREDIENTS & current) or len(requested_ras) > 1:
                 block("dual_ras", "ACE inhibitor/ARB combination or duplicate RAS therapy requires prescriber review; no starting dose is supplied.")
         if request.medicine_id == "metformin_ir_tablet" and data.get("hba1c") is None and data.get("glucose") is None:
             block("glycaemic_measurement", "Record a glycaemic measurement and individualized treatment goal.")

@@ -16,6 +16,15 @@ The Kenya Ministry of Health [Protocols for Management of Selected NCDs at Prima
 | Losartan, single-ingredient potassium-salt oral tablet | 50 mg once daily | 100 mg | Table 4, printed16/PDF25 |
 | Lisinopril, single-ingredient oral tablet | 10 mg once daily | 40 mg | Table 4, printed16/PDF25 |
 | Metformin, single-ingredient immediate-release oral tablet | 500 mg once daily | 2,000 mg, with no more than1,000 mg per administration | Section4.5, printed35/PDF44; ceiling from1g twice daily |
+| Felodipine, single-ingredient prolonged-release tablet | 5 mg once daily | 10 mg | Table 4, printed16/PDF25 |
+| Hydrochlorothiazide, single-ingredient tablet | 12.5 mg once daily | 25 mg | Table 4, printed16/PDF25 |
+| Chlorthalidone, single-ingredient tablet | 25 mg once daily | 50 mg | Table 4, printed16/PDF25 |
+| Indapamide, single-ingredient 2.5 mg immediate-release tablet | 2.5 mg once daily | 5 mg | Table 4, printed16/PDF25 |
+| Ramipril, single-ingredient capsule or tablet | 2.5 mg once daily | 10 mg | Table 4, printed16/PDF25 |
+| Candesartan cilexetil, single-ingredient tablet | 8 mg once daily | 32 mg | Table 4, printed16/PDF25 |
+| Irbesartan, single-ingredient tablet | 150 mg once daily | 300 mg | Table 4, printed16/PDF25 |
+| Telmisartan, single-ingredient tablet | 40 mg once daily | 80 mg | Table 4, printed16/PDF25 |
+| Valsartan, single-ingredient tablet | 80 mg once daily | 160 mg | Table 4, printed16/PDF25 |
 
 The API returns a manifest hash and source versions. Clinical contraindication and monitoring checklists accompany the references. [Amlodipine label](https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=090f3e51-8129-4b5d-97f9-ab410e14df2d), [losartan label](https://www.dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=1bf520a2-a50e-a6ae-0fdf-9be4e69729c0), [lisinopril label](https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=03a497fe-fb09-4b2c-8ee0-2019600192b8), [metformin label](https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=54bb8030-8e80-4b38-8deb-89c99d73bf09).
 
@@ -49,3 +58,14 @@ The owner confirms DHA and ethics approval covers care and medicine recommendati
 ## Acute-context revision 0.1.1
 
 Both the general encounter's `acutely_unwell` and `acute_kidney_injury` fields must explicitly be `no` before a starting-dose reference is displayed. Existing `dosing_context.acute_illness` checks also remain required. A missing or unknown new field withholds the reference, including older draft records until reassessed. Historical reviewed records keep their original version and are not rewritten. The numerical four-medicine catalogue is unchanged; the dosing version advances because eligibility changed.
+
+
+## Catalogue expansion and treatment options, revision 0.2.0 (17 September 2026)
+
+Clinician feedback from supervised testing was that the section's purpose was unclear and that four medicines were too few. The section is renamed **Starting-dose check**, states its purpose and three steps in the interface, lists the medicines it covers, and shows a live checklist of the intake prerequisites (the server still makes every eligibility decision and explains each withheld reference).
+
+Nine further Table 4 rows were added after re-verifying the same PDF (SHA256 `e836eef61b8739db399e5af9ce75754b7836bf84693130f41bfa3107c27f78e8`) on 17 September 2026: felodipine, hydrochlorothiazide, chlorthalidone, indapamide 2.5 mg, ramipril, candesartan, irbesartan, telmisartan and valsartan. Enalapril (range given as divided doses), captopril (divided schedule), perindopril (two salt-dependent strengths) and nifedipine (no maximum printed) remain excluded because a single unambiguous once-daily start and maximum cannot be transcribed. Gliclazide, glimepiride and pioglitazone appear in the treatment options as protocol text with their printed ranges, but are not dose-reference entries because the protocol does not state their formulation and frequency.
+
+The potassium and dual-therapy gates now apply by ingredient class rather than by two hard-coded medicine IDs: every ACE inhibitor, ARB and thiazide-type entry requires a separately dated potassium of 3.5-5.0 mmol/L within seven days, and a RAS reference is withheld when any ACE inhibitor or ARB is already recorded or a second RAS medicine is requested. The catalogue version advances to `ncdai-dose-reference-0.2.0` and the manifest hash changes accordingly.
+
+Separately, `backend/app/treatment.py` introduces **guideline treatment options** (`TX_*`). Unlike this starting-dose module, they are not gated on the full elective-initiation checklist: they name the medicines and Kenya doses that the protocol's step chart indicates for a patient whose diagnosis is recorded and whose readings are above target, and are withheld in urgent, emergency, acutely unwell and pregnancy contexts. They remain mandatory review items, carry no prescribing authority, and require the same independent clinical and pharmacy adjudication as every other rule before clinical reliance.

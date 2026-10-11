@@ -101,6 +101,7 @@ class ClinicalData(StrictModel):
     total_cholesterol_mmol: float | None = Field(default=None, ge=1, le=20)
     hdl_mmol: float | None = Field(default=None, ge=0.2, le=5)
     ldl_mmol: float | None = Field(default=None, ge=0.2, le=15)
+    triglycerides_mmol: float | None = Field(default=None, ge=0.1, le=60)
     hemoglobin_g_dl: float | None = Field(default=None, ge=3, le=25)
     glucose_context: Literal["fasting", "random", "unknown"] = "unknown"
     known_ascvd: Known = "unknown"
@@ -114,7 +115,7 @@ class ClinicalData(StrictModel):
     foot_exam: Literal["within_12_months", "over_12_months", "never", "unknown"] = "unknown"
 
     @field_validator("systolic_bp", "diastolic_bp", "repeat_systolic_bp", "repeat_diastolic_bp", "pulse", "oxygen_saturation", "respiratory_rate", "hba1c", "glucose", "egfr", "potassium",
-                     "weight_kg", "height_cm", "waist_cm", "creatinine_umol", "urine_acr_mg_mmol", "total_cholesterol_mmol", "hdl_mmol", "ldl_mmol", "hemoglobin_g_dl", mode="before")
+                     "weight_kg", "height_cm", "waist_cm", "creatinine_umol", "urine_acr_mg_mmol", "total_cholesterol_mmol", "hdl_mmol", "ldl_mmol", "triglycerides_mmol", "hemoglobin_g_dl", mode="before")
     @classmethod
     def numeric_measurement(cls, value):
         if value is not None and (isinstance(value, bool) or not isinstance(value, (int, float))):

@@ -69,7 +69,9 @@ def encounter_bundle(patient, encounter):
               ("respiratory_rate", "9279-1", "Respiratory rate", "/min", "/min"),
               ("oxygen_saturation", "59408-5", "Oxygen saturation in Arterial blood by Pulse oximetry", "%", "%"),
               ("hba1c", "4548-4", "Hemoglobin A1c/Hemoglobin.total in Blood", "%", "%"),
-              ("potassium", "2823-3", "Potassium [Moles/volume] in Serum or Plasma", "mmol/L", "mmol/L")]
+              ("potassium", "2823-3", "Potassium [Moles/volume] in Serum or Plasma", "mmol/L", "mmol/L"),
+              ("weight_kg", "29463-7", "Body weight", "kg", "kg"),
+              ("height_cm", "8302-2", "Body height", "cm", "cm")]
     for key, code, display, unit, ucum in fields:
         if data.get(key) is not None:
             item = observation(key.replace("_", "-"), code, display)
@@ -90,6 +92,26 @@ def encounter_bundle(patient, encounter):
         item = observation("egfr", "", "Estimated glomerular filtration rate; method unspecified")
         item["code"] = {"coding": [{"system": "urn:ncdai:observation", "code": "egfr-unspecified-method"}], "text": "Estimated glomerular filtration rate; method unspecified"}
         item["valueQuantity"] = quantity(data["egfr"], "mL/min/1.73m2", "mL/min/{1.73_m2}")
+        resources.append(item)
+    # Waist and the mmol/L lipid panel use local codes with explicit text: their
+    # LOINC mappings are unit-specific and have not been verified for this release,
+    # and an unverified standard code would misrepresent the data downstream.
+    for key, code, display, unit, ucum in [
+        ("waist_cm", "waist-circumference-unspecified-method", "Waist circumference; measurement site and method unspecified", "cm", "cm"),
+        ("total_cholesterol_mmol", "total-cholesterol-mmol-l", "Total cholesterol, molar concentration; assay unspecified", "mmol/L", "mmol/L"),
+        ("ldl_mmol", "ldl-cholesterol-mmol-l", "LDL cholesterol, molar concentration; direct or calculated not recorded", "mmol/L", "mmol/L"),
+        ("hdl_mmol", "hdl-cholesterol-mmol-l", "HDL cholesterol, molar concentration; assay unspecified", "mmol/L", "mmol/L"),
+        ("triglycerides_mmol", "triglycerides-mmol-l", "Triglycerides, molar concentration; fasting state not recorded", "mmol/L", "mmol/L"),
+    ]:
+        if data.get(key) is not None:
+            item = observation(key.replace("_", "-"), "", display)
+            item["code"] = {"coding": [{"system": "urn:ncdai:observation", "code": code}], "text": display}
+            item["valueQuantity"] = quantity(data[key], unit, ucum)
+            resources.append(item)
+    if data.get("weight_kg") is not None and data.get("height_cm") is not None:
+        item = observation("bmi", "39156-5", "Body mass index (BMI) [Ratio]")
+        item["valueQuantity"] = quantity(round(data["weight_kg"] / (data["height_cm"] / 100) ** 2, 1), "kg/m2", "kg/m2")
+        item.setdefault("note", []).append({"text": "Derived from the recorded weight and height in this encounter; not separately measured."})
         resources.append(item)
     if reviewed:
         lines = ["NCDAI clinician-reviewed decision record. Acceptance is not a safety determination.",
