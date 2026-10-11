@@ -36,6 +36,7 @@ def append_audit(db, user, action, entity_type, entity_id):
     event.chain_hash = event_digest(event)
     db.add(event)
     db.flush()
+    return event
 
 
 def verify_chain(events):

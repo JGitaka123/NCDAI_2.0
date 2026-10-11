@@ -140,3 +140,20 @@ def test_bundle_timestamp_is_assembly_time_not_visit_creation():
     start = datetime.now(timezone.utc)
     bundle = encounter_bundle(*records())
     assert start <= datetime.fromisoformat(bundle["timestamp"]) <= datetime.now(timezone.utc)
+
+
+def test_body_size_and_lipid_observations_are_exported_with_explicit_coding():
+    bundle = encounter_bundle(*records({"weight_kg": 92, "height_cm": 165, "waist_cm": 104,
+                                        "total_cholesterol": 6.1, "ldl_cholesterol": 4.0,
+                                        "hdl_cholesterol": 0.8, "triglycerides": 3.1,
+                                        "observed_at": "2026-09-17T08:00:00+00:00"}))
+    found = {item["id"].split("305-", 1)[1]: item for item in resources(bundle, "Observation")}
+    assert {"weight-kg", "height-cm", "waist-cm", "bmi", "total-cholesterol", "ldl-cholesterol", "hdl-cholesterol", "triglycerides"} <= set(found)
+    assert found["weight-kg"]["code"]["coding"][0] == {"system": "http://loinc.org", "code": "29463-7", "display": "Body weight"}
+    assert found["bmi"]["valueQuantity"]["value"] == 33.8
+    assert any("Derived from the recorded weight and height" in note["text"] for note in found["bmi"]["note"])
+    # Unverified LOINC mappings are never asserted for the lipid panel or waist.
+    for key in ("waist-cm", "total-cholesterol", "ldl-cholesterol", "hdl-cholesterol", "triglycerides"):
+        assert found[key]["code"]["coding"][0]["system"] == "urn:ncdai:observation"
+        assert found[key]["code"]["text"]
+    assert all(item["valueQuantity"]["system"] == "http://unitsofmeasure.org" for item in found.values() if "valueQuantity" in item)

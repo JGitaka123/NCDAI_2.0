@@ -42,6 +42,47 @@ class AuthSession(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
+class StudyRecord(Base):
+    """Append-only study observations; corrections retain every preceding version."""
+    __tablename__ = 'study_records'
+    __table_args__ = (UniqueConstraint('facility_id','record_key','revision'),
+                     UniqueConstraint('actor_id','idempotency_key'),
+                     CheckConstraint('revision >= 1', name='ck_study_revision'),
+                     CheckConstraint("kind IN ('enrolment','visit','followup','safety','daily_tally')", name='ck_study_kind'),
+                     ForeignKeyConstraint(['facility_id','patient_id'], ['patients.facility_id','patients.id']),
+                     ForeignKeyConstraint(['facility_id','encounter_id','patient_id'], ['encounters.facility_id','encounters.id','encounters.patient_id']),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    facility_id: Mapped[str] = mapped_column(ForeignKey('facilities.id'), index=True)
+    patient_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    encounter_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    actor_id: Mapped[str] = mapped_column(ForeignKey('users.id'))
+    kind: Mapped[str] = mapped_column(String(30))
+    record_key: Mapped[str] = mapped_column(String(120))
+    revision: Mapped[int] = mapped_column(Integer)
+    previous_id: Mapped[str | None] = mapped_column(ForeignKey('study_records.id'), nullable=True)
+    idempotency_key: Mapped[str] = mapped_column(String(36))
+    payload_hash: Mapped[str] = mapped_column(String(64))
+    synthetic: Mapped[bool] = mapped_column(Boolean)
+    payload: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class StudyEvent(Base):
+    """Server-generated clinical activity, in the same transaction as its audit event."""
+    __tablename__ = 'study_events'
+    __table_args__ = (ForeignKeyConstraint(['facility_id','encounter_id','patient_id'], ['encounters.facility_id','encounters.id','encounters.patient_id']),)
+    id: Mapped[str] = mapped_column(ForeignKey('audit_events.id'), primary_key=True)
+    facility_id: Mapped[str] = mapped_column(ForeignKey('facilities.id'), index=True)
+    patient_id: Mapped[str] = mapped_column(String(36))
+    encounter_id: Mapped[str] = mapped_column(String(36), index=True)
+    actor_id: Mapped[str] = mapped_column(String(36))
+    action: Mapped[str] = mapped_column(String(60))
+    synthetic: Mapped[bool] = mapped_column(Boolean)
+    payload: Mapped[dict] = mapped_column(JSON)
+    payload_hash: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+
+
 class LoginAttempt(Base):
     __tablename__ = "login_attempts"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)

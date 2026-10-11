@@ -18,10 +18,15 @@ import time
 import httpx
 from pydantic import BaseModel, ConfigDict, Field, StrictStr, ValidationError
 
+from .dosing import _MEDICINES
 from .evidence import EVIDENCE_VERSION, registry
 
 
-PROMPT_VERSION = "ncdai-briefing-select-v1.5"
+def dose_catalogue_ids():
+    return tuple(_MEDICINES)
+
+
+PROMPT_VERSION = "ncdai-briefing-select-v1.7"
 MAX_RESPONSE_BYTES = 65536
 RULE_IDS = frozenset("""
 EMERGENCY_SYMPTOMS LOW_BP PULSE_EXTREME RESP_SLOW BP_CRISIS BP_SEVERE
@@ -34,8 +39,11 @@ POTASSIUM_MEDICATION_RISK NSAID_RENAL ALLERGY_CONFLICT DUPLICATE_MEDICATION
 MEDICATION_UNSUPPORTED BP_HIGH BP_REVIEW HTN_FOLLOWUP DIABETES_CONFIRM
 DIABETES_REVIEW CKD_REVIEW RESP_CHRONIC_REVIEW CANCER_SCOPE TOBACCO_SUPPORT
 ADHERENCE_REVIEW DATA_COMPLETENESS CLINICIAN_REVIEW
-DOSE_AMLODIPINE_TABLET DOSE_LOSARTAN_TABLET DOSE_LISINOPRIL_TABLET DOSE_METFORMIN_IR_TABLET
-""".split())
+PREDIABETES LIPID_RISK_FACTOR WEIGHT_MANAGEMENT LIPID_SPECIALIST STATIN_PREGNANCY
+TX_STATIN_START TX_STATIN_OPTIMISE TX_ASPIRIN_REVIEW TX_ASTHMA_ICS
+TX_HTN_START TX_HTN_ADHERENCE TX_HTN_STEP_UP TX_HTN_SPECIALIST
+TX_DM_METFORMIN TX_DM_INTENSIFY TX_DM_INSULIN TX_DM_CARDIORENAL
+""".split()) | frozenset("DOSE_" + key.upper() for key in dose_catalogue_ids())
 GAP_IDS = frozenset("""
 acutely_unwell acute_kidney_injury
 current_glucose_for_symptoms egfr_for_metformin_review
@@ -44,8 +52,9 @@ potassium_for_RAS_medication_review systolic_bp diastolic_bp repeat_blood_pressu
 glycaemic_measurement egfr oxygen_saturation respiratory_rate pregnancy_status
 known_hypertension known_diabetes known_asthma known_copd known_ckd known_cancer
 medications_reviewed allergies_reviewed symptoms_reviewed observed_at current_observations
+glucose_timing lipid_profile weight_and_height known_cvd_for_statin_choice
 """.split())
-CATEGORIES = frozenset("acute_safety hypertension scope medication_safety respiratory referral kidney diabetes continuity prevention data_quality dosing".split())
+CATEGORIES = frozenset("acute_safety hypertension scope medication_safety respiratory referral kidney diabetes continuity prevention data_quality dosing treatment".split())
 SEVERITY = {"critical": 0, "warning": 1, "info": 2}
 SYSTEM_PROMPT = """You organize an adult NCD clinician consultation briefing.
 The input is a deterministic assessment represented only by identifiers.

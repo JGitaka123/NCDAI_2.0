@@ -6,8 +6,8 @@ import { ageInYears, formatDate, titleCase } from './clinical'
 import { Empty, Field, Loading, Notice, PageHeader, Panel } from './components'
 import type { Patient } from './types'
 
-export default function Patients({ onSelect, clinicalTesting = false }: { clinicalTesting?: boolean; onSelect: (patient: Patient) => void }) {
-  const [patients, setPatients] = useState<Patient[]>([]), [search, setSearch] = useState(''), [query, setQuery] = useState('')
+export default function Patients({ onSelect, clinicalTesting = false, initialSearch = '' }: { clinicalTesting?: boolean; initialSearch?: string; onSelect: (patient: Patient) => void }) {
+  const [patients, setPatients] = useState<Patient[]>([]), [search, setSearch] = useState(initialSearch), [query, setQuery] = useState(initialSearch)
   const [loading, setLoading] = useState(true), [error, setError] = useState(''), [register, setRegister] = useState(false), [revision, setRevision] = useState(0)
   useEffect(() => {
     const controller = new AbortController(); setLoading(true); setError('')

@@ -6,7 +6,7 @@ redistributed. See docs/clinical-safety-spec.md for operational adaptations.
 
 from copy import deepcopy
 
-EVIDENCE_VERSION = "ncdai-2026-09-13.1"
+EVIDENCE_VERSION = "ncdai-2026-09-19.1"
 REVIEW_STATUS = "proposed_requires_independent_clinician_signoff"
 REVIEWED_ON = "2026-09-12"
 
@@ -137,6 +137,13 @@ SOURCES = {
         "section": "Diagnostic and referral capacity; timely access to treatment",
         "version": "2017; accessed 2026-09-12",
     },
+    "NICE_LIPIDS_NG238": {
+        "source_id": "NICE_LIPIDS_NG238",
+        "title": "NICE NG238: Cardiovascular disease: risk assessment and reduction, including lipid modification",
+        "url": "https://www.nice.org.uk/guidance/ng238/chapter/Recommendations",
+        "section": "1.2.1 aspirin; 1.4.5-1.4.8 lipid referral; 1.5 baseline tests and pregnancy; 1.6.1 and 1.6.7 primary prevention atorvastatin 20 mg; 1.7.1-1.7.3 and 1.7.9 secondary prevention atorvastatin 80 mg; 1.8.1-1.8.3 CKD; 1.9 optimising; 1.11 monitoring; statin intensity definitions",
+        "version": "Published 2023-12-14; recommendations text read 2026-09-19",
+    },
     "NCDAI_SAFETY_SPEC": {
         "source_id": "NCDAI_SAFETY_SPEC",
         "title": "NCDAI 2.0 clinical safety specification (proposed engineering policy)",
@@ -147,11 +154,25 @@ SOURCES = {
 }
 
 
-for _key, _section in {
-    "KENYA_DOSES_HTN": "Table 4, printed page 16 (PDF page 25); selected oral antihypertensive starting and maximum doses",
-    "KENYA_DOSES_DM": "4.5, printed page 35 (PDF page 44); metformin initial dose and titration ceiling; renal scope restricted by NCDAI policy",
+# Page-anchored derived entries: the URL fragment opens the exact PDF page in
+# standard browser viewers, so clinicians land on the cited table or chart.
+for _key, (_pdf_page, _section) in {
+    "KENYA_DOSES_HTN": (25, "Table 4, printed page 16 (PDF page 25); selected oral antihypertensive starting and maximum doses"),
+    "KENYA_DOSES_DM": (44, "4.5, printed page 35 (PDF page 44); metformin initial dose and titration ceiling; renal scope restricted by NCDAI policy"),
+    "KENYA_CVD_RISK": (11, "1. CVD risk management, printed page 2 (PDF page 11); statin for >20% risk; established DM, CVD or renal disease counted as >20%; total cholesterol >=8 mmol/L"),
+    "KENYA_HTN_STEPS": (20, "Hypertension treatment steps 1-4, printed page 11 (PDF page 20); target <140/90 mmHg; at least 3 months per step; step 4 with a physician"),
+    "KENYA_HTN_LIFESTYLE": (24, "Table 3 lifestyle modifications and referral indications, printed page 15 (PDF page 24)"),
+    "KENYA_DM_DIAGNOSIS": (41, "Table 6 diagnostic criteria, printed page 32 (PDF page 41); FPG >=7.0, RPG >=11.1 mmol/L, HbA1c >=6.5%"),
+    "KENYA_PREDIABETES": (42, "4.3 management of prediabetes, printed page 33 (PDF page 42); HbA1c 5.7-6.4%, FBS 5.6-6.9 mmol/L; lose 5-10% weight in 12 months"),
+    "KENYA_DM_SCREENING": (40, "4.1 screening, printed page 31 (PDF page 40); BMI >=25 kg/m2; HDL <0.90 mmol/L; triglycerides >2.82 mmol/L"),
+    "KENYA_HYPOGLYCAEMIA": (50, "4.8 hypoglycaemia management in adults, printed page 41 (PDF page 50); CBG <=3.9 mmol/L; 15-20 g oral carbohydrate; 25 g (50 ml) D50 IV or glucagon 1 mg IM"),
+    "KENYA_CANCER_SIGNS": (61, "5. Table 9 common cancer symptoms and actions for health workers, printed pages 52-53 (PDF pages 61-62)"),
+    "KENYA_ASTHMA": (92, "6.7 stepwise asthma treatment for 12 years and above, printed pages 83-84 (PDF pages 92-93); SABA monotherapy not recommended"),
+    "KENYA_COPD": (95, "6.8 COPD groups A, B and E and non-pharmacological management, printed pages 86-87 (PDF pages 95-96)"),
+    "KENYA_DM_TREATMENT": (44, "4.5 type 2 diabetes treatment flowchart, printed pages 35-36 (PDF pages 44-45); Table 7 targets HbA1c <7.0%, fasting glucose 4.4-7.2 mmol/L"),
 }.items():
-    SOURCES[_key] = {**SOURCES["KENYA_NCD_PROTOCOLS"], "source_id": _key, "section": _section}
+    SOURCES[_key] = {**SOURCES["KENYA_NCD_PROTOCOLS"], "source_id": _key, "section": _section,
+                     "url": SOURCES["KENYA_NCD_PROTOCOLS"]["url"] + f"#page={_pdf_page}"}
 
 
 def evidence(*source_ids: str) -> list[dict]:

@@ -12,9 +12,12 @@ This hosted release enables **supervised clinical testing at Mary Help Hospital 
 
 ## What is implemented
 
-- Patient registration and search, encounter history, current observations with explicit units and unknown states.
+- Patient registration and search, encounter history, current observations with explicit units and unknown states, including weight, height, waist and derived BMI.
+- Laboratory entry for HbA1c, fasting or random glucose (recorded separately), eGFR, potassium and a full lipid profile.
 - Deterministic safety and referral prompts with stable rule IDs and inspectable source/version references.
-- Four bounded Kenya starting-dose references, proposed-dose range checks, contraindication/context withholding and immutable review provenance. See [dose-engine scope](docs/dosing-engine.md).
+- Thirteen bounded Kenya starting-dose references, proposed-dose range checks, contraindication/context withholding and immutable review provenance. See [dose-engine scope](docs/dosing-engine.md).
+- Guideline treatment options for confirmed hypertension and type 2 diabetes, following the Kenya MOH step charts and naming specific medicines and transcribed doses; statin treatment with NICE NG238 doses (atorvastatin 20 mg for primary prevention, 80 mg with established cardiovascular disease, 20 mg in chronic kidney disease), lipid targets and monitoring; asthma inhaler review against the Kenya step chart; and weight, prediabetes and aspirin advice. Every option states the values it is based on, is withheld in acute, urgent and pregnancy contexts, and is a proposal for the prescriber to accept, modify, defer or reject. Independent clinical and pharmacy adjudication of these options is outstanding.
+- Patient-specific wording throughout: each recommendation quotes the recorded readings, names the patient's own medicines and doses, and computes their targets. Each assessment also carries a display-only patient summary: problems against their targets, the reconciled medicine list with dose positions, and a monitoring plan whose intervals each cite a source.
 - Optional DeepSeek-first AI review focus, with an OpenAI adapter option. AI selects established items; it cannot create advice, change urgency or remove critical findings.
 - Mandatory clinician review of every action: accept, modify, defer or reject, with rationale for changes.
 - Version checks and immutable reviewed records, including exact input and assessment snapshots.

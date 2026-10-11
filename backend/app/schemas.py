@@ -68,8 +68,16 @@ class ClinicalData(StrictModel):
     hba1c: float | None = Field(default=None, ge=2, le=25)
     glucose: float | None = Field(default=None, gt=0, le=1500)
     glucose_unit: Literal["mmol/L", "mg/dL"] = "mmol/L"
+    glucose_timing: Literal["fasting", "random", "unknown"] = "unknown"
     egfr: float | None = Field(default=None, ge=0, le=200)
     potassium: float | None = Field(default=None, ge=1, le=10)
+    weight_kg: float | None = Field(default=None, ge=20, le=350)
+    height_cm: float | None = Field(default=None, ge=100, le=250)
+    waist_cm: float | None = Field(default=None, ge=40, le=250)
+    total_cholesterol: float | None = Field(default=None, ge=0.5, le=30)
+    ldl_cholesterol: float | None = Field(default=None, ge=0.1, le=25)
+    hdl_cholesterol: float | None = Field(default=None, ge=0.1, le=5)
+    triglycerides: float | None = Field(default=None, ge=0.1, le=60)
     acutely_unwell: Known = "unknown"
     acute_kidney_injury: Known = "unknown"
     pregnancy_status: Pregnancy = "unknown"
@@ -79,6 +87,7 @@ class ClinicalData(StrictModel):
     known_copd: Known = "unknown"
     known_ckd: Known = "unknown"
     known_cancer: Known = "unknown"
+    known_cvd: Known = "unknown"
     tobacco_use: Literal["unknown", "current", "former", "never"] = "unknown"
     medications: list[Medication] = Field(default_factory=list, max_length=50)
     medications_reviewed: StrictBool = False
@@ -93,7 +102,7 @@ class ClinicalData(StrictModel):
     dosing_requests: list[DosingRequest] = Field(default_factory=list, max_length=5)
     dosing_context: DosingContext = Field(default_factory=DosingContext)
 
-    @field_validator("systolic_bp", "diastolic_bp", "repeat_systolic_bp", "repeat_diastolic_bp", "pulse", "oxygen_saturation", "respiratory_rate", "hba1c", "glucose", "egfr", "potassium", mode="before")
+    @field_validator("systolic_bp", "diastolic_bp", "repeat_systolic_bp", "repeat_diastolic_bp", "pulse", "oxygen_saturation", "respiratory_rate", "hba1c", "glucose", "egfr", "potassium", "weight_kg", "height_cm", "waist_cm", "total_cholesterol", "ldl_cholesterol", "hdl_cholesterol", "triglycerides", mode="before")
     @classmethod
     def numeric_measurement(cls, value):
         if value is not None and (isinstance(value, bool) or not isinstance(value, (int, float))):
