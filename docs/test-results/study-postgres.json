@@ -1,0 +1,21 @@
+{
+  "cases": 50,
+  "passed": 50,
+  "failed": 0,
+  "restricted_runtime_role": true,
+  "immutable_checks": 6,
+  "concurrent_revision_checks": 1,
+  "database": "Fresh isolated PostgreSQL",
+  "seconds": 25.44,
+  "scope": "Fictional engineering verification, not clinical validation",
+  "checks": [
+    "clinical encounter and review",
+    "enrolment baseline",
+    "visit observation",
+    "due and late follow-up denominators",
+    "withdrawals",
+    "safety reports",
+    "audit chain",
+    "restricted role and immutable triggers"
+  ]
+}

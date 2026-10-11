@@ -16,7 +16,7 @@ export function emptyClinicalData(): ClinicalData {
     adherence: 'unknown', notes: '', observed_at: null, medicine_availability: 'unknown',
     dosing_requests: [], dosing_context: emptyDosingContext(),
     weight_kg: null, height_cm: null, waist_cm: null, creatinine_umol: null, urine_acr_mg_mmol: null,
-    total_cholesterol_mmol: null, hdl_mmol: null, ldl_mmol: null, hemoglobin_g_dl: null, glucose_context: 'unknown',
+    total_cholesterol_mmol: null, hdl_mmol: null, ldl_mmol: null, triglycerides_mmol: null, hemoglobin_g_dl: null, glucose_context: 'unknown',
     known_ascvd: 'unknown', prior_stroke_tia: 'unknown', known_heart_failure: 'unknown', known_atrial_fibrillation: 'unknown',
     exacerbations_past_year: null, reliever_use_per_week: null, hypoglycaemia_episodes_3m: null, eye_screen: 'unknown', foot_exam: 'unknown',
   }
@@ -30,7 +30,14 @@ export const symptoms: [string, string][] = [
   ['wheeze', 'Wheeze'], ['hemoptysis', 'Coughing blood'], ['unexplained_weight_loss', 'Unexplained weight loss'],
   ['persistent_cough', 'Persistent cough'], ['breast_lump', 'Breast lump'], ['abnormal_bleeding', 'Abnormal bleeding'],
 ]
-export const medicineNames = ['Metformin', 'Insulin', 'Glibenclamide', 'Gliclazide', 'Empagliflozin', 'Dapagliflozin', 'Sitagliptin', 'Lisinopril', 'Enalapril', 'Losartan', 'Amlodipine', 'Nifedipine', 'Hydrochlorothiazide', 'Indapamide', 'Furosemide', 'Spironolactone', 'Bisoprolol', 'Carvedilol', 'Atorvastatin', 'Rosuvastatin', 'Aspirin', 'Clopidogrel', 'Warfarin', 'Rivaroxaban', 'Apixaban', 'Salbutamol', 'Budesonide', 'Budesonide/formoterol', 'Tiotropium', 'Ibuprofen', 'Diclofenac']
+export const medicineNames = ['Amlodipine', 'Nifedipine', 'Felodipine', 'Hydrochlorothiazide', 'Chlorthalidone', 'Indapamide', 'Lisinopril', 'Enalapril', 'Ramipril', 'Captopril', 'Losartan', 'Telmisartan', 'Valsartan', 'Candesartan', 'Irbesartan', 'Atenolol', 'Bisoprolol', 'Carvedilol', 'Methyldopa', 'Spironolactone', 'Furosemide',
+  'Metformin', 'Gliclazide', 'Glimepiride', 'Glibenclamide', 'Sitagliptin', 'Vildagliptin', 'Empagliflozin', 'Dapagliflozin', 'Pioglitazone', 'Insulin NPH', 'Insulin soluble', 'Insulin premixed', 'Insulin glargine',
+  'Atorvastatin', 'Simvastatin', 'Rosuvastatin', 'Aspirin', 'Salbutamol', 'Beclometasone', 'Budesonide', 'Clopidogrel', 'Warfarin', 'Rivaroxaban', 'Apixaban', 'Budesonide/formoterol', 'Tiotropium', 'Ibuprofen', 'Diclofenac']
+export function bmiOf(weight?: number | null, height?: number | null): { value: number; category: string } | null {
+  if (!weight || !height) return null
+  const value = Math.round(weight / (height / 100) ** 2 * 10) / 10
+  return { value, category: value < 18.5 ? 'Underweight' : value < 25 ? 'Healthy range' : value < 30 ? 'Overweight' : 'Obesity' }
+}
 export const formatDate = (date?: string | null, withTime = false) => {
   if (!date) return 'Not recorded'
   const parsed = new Date(date)

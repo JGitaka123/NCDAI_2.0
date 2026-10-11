@@ -1,12 +1,13 @@
 import { Plus, Trash2 } from 'lucide-react'
 import type { CareInterval, ClinicalData, Medication, TriState } from './types'
-import { medicineNames, numericInput, symptoms } from './clinical'
+import { bmiOf, medicineNames, numericInput, symptoms } from './clinical'
 import { Field } from './components'
 import DoseSupport from './DoseSupport'
 
 export default function ClinicalIntake({ data, onChange, disabled }: { data: ClinicalData; onChange: (data: ClinicalData) => void; disabled: boolean }) {
   const change = <K extends keyof ClinicalData>(key: K, value: ClinicalData[K]) => onChange({ ...data, [key]: value })
   function med(index: number, patch: Partial<Medication>) { change('medications', data.medications.map((item, i) => i === index ? { ...item, ...patch } : item)) }
+  const bmi = bmiOf(data.weight_kg, data.height_cm)
   return <fieldset className="intake-fieldset" disabled={disabled}>
     <div className="intake-intro"><strong>Today’s clinical picture</strong><p>Blank measurements remain unknown. Confirm findings and lists explicitly before assessment.</p></div>
     <details className="intake-section" open><summary><span><span className="section-number">01</span> Measurements & vital signs</span><span className="summary-tag">Units required</span></summary><div className="intake-section-content">
@@ -19,10 +20,14 @@ export default function ClinicalIntake({ data, onChange, disabled }: { data: Cli
         <Field label="Measurements observed at" hint="Local date and time; leaving blank means unrecorded"><input type="datetime-local" value={toLocalDateTime(data.observed_at)} onChange={e => change('observed_at', e.target.value ? new Date(e.target.value).toISOString() : null)} /></Field>
         <NumberField label="Oxygen saturation" unit="%" value={data.oxygen_saturation} min={30} max={100} onChange={v => change('oxygen_saturation', v)} />
         <NumberField label="Respiratory rate" unit="breaths/min" value={data.respiratory_rate} min={4} max={80} onChange={v => change('respiratory_rate', v)} />
-        <NumberField label="Weight" unit="kg" value={data.weight_kg} min={20} max={350} step="0.1" onChange={v => change('weight_kg', v)} />
-        <NumberField label="Height" unit="cm" value={data.height_cm} min={100} max={250} step="0.1" onChange={v => change('height_cm', v)} />
-        <NumberField label="Waist circumference" unit="cm" value={data.waist_cm} min={40} max={250} step="0.1" onChange={v => change('waist_cm', v)} />
       </div>
+      <h3 className="intake-subheading">Weight & body size</h3>
+      <div className="form-grid three-cols">
+        <NumberField label="Weight" unit="kg" value={data.weight_kg ?? null} min={20} max={350} step="0.1" onChange={v => change('weight_kg', v)} />
+        <NumberField label="Height" unit="cm" value={data.height_cm ?? null} min={100} max={250} step="0.1" onChange={v => change('height_cm', v)} />
+        <NumberField label="Waist circumference" unit="cm" value={data.waist_cm ?? null} min={40} max={250} step="0.1" onChange={v => change('waist_cm', v)} />
+      </div>
+      <div className={`bmi-readout ${bmi ? `bmi-${bmi.category.split(' ')[0].toLowerCase()}` : ''}`} role="status" aria-live="polite">{bmi ? <><span>BMI</span><strong>{bmi.value}<small> kg/m²</small></strong><em>{bmi.category}</em></> : <span>BMI is calculated when weight and height are entered.</span>}</div>
       <p className="field-note">Repeat BP values are a separate measurement, not a replacement for the first reading. Reassess according to the clinical context.</p>
     </div></details>
     <details className="intake-section" open><summary><span><span className="section-number">02</span> Symptoms & warning signs</span><span className="summary-tag">{data.symptoms.length} recorded</span></summary><div className="intake-section-content">
@@ -59,22 +64,30 @@ export default function ClinicalIntake({ data, onChange, disabled }: { data: Cli
       </div>
       <p className="field-note">Cancer support is limited to warning signs and referral considerations. This workspace does not provide oncology treatment plans.</p>
     </div></details>
-    <details className="intake-section"><summary><span><span className="section-number">04</span> Laboratory results</span><span className="summary-tag">Glucose, kidney, lipids</span></summary><div className="intake-section-content">
+    <details className="intake-section" open><summary><span><span className="section-number">04</span> Laboratory results</span><span className="summary-tag">Glucose · kidney · lipids</span></summary><div className="intake-section-content">
+      <h3 className="intake-subheading">Glucose</h3>
       <div className="form-grid three-cols">
-        <NumberField label="HbA1c" unit="%" value={data.hba1c} min={2} max={25} step="0.1" onChange={v => change('hba1c', v)} />
-        <NumberField label="Blood glucose" unit={data.glucose_unit} value={data.glucose} min={0.1} max={data.glucose_unit === 'mmol/L' ? 83.3 : 1500} step="0.1" onChange={v => change('glucose', v)} />
+        <Field label="Glucose sample" hint="Fasting = no calories for at least 8 hours"><select value={data.glucose_context ?? 'unknown'} onChange={e => change('glucose_context', e.target.value as ClinicalData['glucose_context'])}><option value="unknown">Timing not recorded</option><option value="fasting">Fasting blood sugar (FBS)</option><option value="random">Random blood sugar (RBS)</option></select></Field>
+        <NumberField label={data.glucose_context === 'fasting' ? 'Fasting blood sugar' : data.glucose_context === 'random' ? 'Random blood sugar' : 'Blood glucose'} unit={data.glucose_unit} value={data.glucose} min={0.1} max={data.glucose_unit === 'mmol/L' ? 83.3 : 1500} step="0.1" onChange={v => change('glucose', v)} />
         <Field label="Glucose unit" hint="Changing units does not convert the entered value"><select value={data.glucose_unit} onChange={e => { change('glucose_unit', e.target.value as ClinicalData['glucose_unit']) }}><option value="mmol/L">mmol/L</option><option value="mg/dL">mg/dL</option></select></Field>
+        <NumberField label="HbA1c" unit="%" value={data.hba1c} min={2} max={25} step="0.1" onChange={v => change('hba1c', v)} />
+      </div>
+      <h3 className="intake-subheading">Kidney, electrolytes & blood count</h3>
+      <div className="form-grid three-cols">
         <NumberField label="eGFR" unit="mL/min/1.73 m²" value={data.egfr} min={0} max={200} step="0.1" onChange={v => change('egfr', v)} />
         <NumberField label="Potassium" unit="mmol/L" value={data.potassium} min={1} max={10} step="0.1" onChange={v => change('potassium', v)} />
-        <Field label="Glucose sample timing"><select value={data.glucose_context ?? 'unknown'} onChange={e => change('glucose_context', e.target.value as ClinicalData['glucose_context'])}><option value="unknown">Unknown / not recorded</option><option value="fasting">Fasting (8 hours or more)</option><option value="random">Random</option></select></Field>
         <NumberField label="Creatinine" unit="µmol/L" value={data.creatinine_umol} min={10} max={3000} step="1" onChange={v => change('creatinine_umol', v)} />
         <NumberField label="Urine albumin:creatinine ratio" unit="mg/mmol" value={data.urine_acr_mg_mmol} min={0} max={3000} step="0.1" onChange={v => change('urine_acr_mg_mmol', v)} />
-        <NumberField label="Total cholesterol" unit="mmol/L" value={data.total_cholesterol_mmol} min={1} max={20} step="0.1" onChange={v => change('total_cholesterol_mmol', v)} />
-        <NumberField label="HDL cholesterol" unit="mmol/L" value={data.hdl_mmol} min={0.2} max={5} step="0.1" onChange={v => change('hdl_mmol', v)} />
-        <NumberField label="LDL cholesterol" unit="mmol/L" value={data.ldl_mmol} min={0.2} max={15} step="0.1" onChange={v => change('ldl_mmol', v)} />
         <NumberField label="Haemoglobin" unit="g/dL" value={data.hemoglobin_g_dl} min={3} max={25} step="0.1" onChange={v => change('hemoglobin_g_dl', v)} />
       </div>
       <p className="field-note">If eGFR is blank, it is calculated from creatinine with the race-free CKD-EPI 2021 equation (requires female or male sex). An entered laboratory eGFR always takes precedence.</p>
+      <h3 className="intake-subheading">Lipid profile</h3>
+      <div className="form-grid four-cols">
+        <NumberField label="Total cholesterol" unit="mmol/L" value={data.total_cholesterol_mmol ?? null} min={1} max={20} step="0.1" onChange={v => change('total_cholesterol_mmol', v)} />
+        <NumberField label="LDL cholesterol" unit="mmol/L" value={data.ldl_mmol ?? null} min={0.2} max={15} step="0.1" onChange={v => change('ldl_mmol', v)} />
+        <NumberField label="HDL cholesterol" unit="mmol/L" value={data.hdl_mmol ?? null} min={0.2} max={5} step="0.01" onChange={v => change('hdl_mmol', v)} />
+        <NumberField label="Triglycerides" unit="mmol/L" value={data.triglycerides_mmol ?? null} min={0.1} max={60} step="0.01" onChange={v => change('triglycerides_mmol', v)} />
+      </div>
       <p className="field-note">Confirm when each result was obtained. Results with uncertain timing require clinician verification. Record the renal result time below when requesting a medicine reference check.</p>
     </div></details>
     <details className="intake-section" open><summary><span><span className="section-number">05</span> Medicines & allergies</span><span className="summary-tag">Reconciliation</span></summary><div className="intake-section-content">

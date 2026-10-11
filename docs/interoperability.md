@@ -17,6 +17,9 @@ The collection has unique full URLs and internally resolvable patient and encoun
 | Potassium | LOINC 2823-3; UCUM `mmol/L` |
 | Glucose | [2339-0](https://loinc.org/2339-0/) for mg/dL; [15074-8](https://loinc.org/15074-8/) for mmol/L; original value and unit preserved |
 | eGFR | Explicit local code `egfr-unspecified-method`; UCUM `mL/min/{1.73_m2}`; no unsupported CKD-EPI/MDRD claim |
+| Weight and height | LOINC 29463-7 and 8302-2; UCUM `kg` and `cm` |
+| BMI | LOINC 39156-5; UCUM `kg/m2`; noted as derived from this encounter's weight and height, not separately measured |
+| Waist circumference and the lipid panel (total cholesterol, LDL, HDL, triglycerides) | Explicit local codes (`waist-circumference-unspecified-method`, `total-cholesterol-mmol-l`, `ldl-cholesterol-mmol-l`, `hdl-cholesterol-mmol-l`, `triglycerides-mmol-l`) with descriptive text; UCUM `cm` and `mmol/L`. LOINC lipid codes are unit- and assay-specific, and measurement site, direct-versus-calculated LDL and fasting state are not captured, so no standard code is asserted until the mapping is verified with the receiving system |
 
 Unknown measurement time is omitted, with an explanatory note. Record entry time is never substituted for measurement time. A single recorded observation time currently applies to the intake; independent specimen and repeat-reading times are not captured. Repeat BP includes this limitation in a note. Receiving systems must not derive longitudinal ordering more precise than the source supports. [HL7 Observation effective time](https://hl7.org/fhir/R4/observation-definitions.html#Observation.effective_x_).
 

@@ -23,7 +23,7 @@ export type ClinicalData = {
   medicine_availability: 'available' | 'limited' | 'unknown';
   dosing_requests?: DosingRequest[]; dosing_context?: DosingContext;
   weight_kg?: number | null; height_cm?: number | null; waist_cm?: number | null; creatinine_umol?: number | null; urine_acr_mg_mmol?: number | null;
-  total_cholesterol_mmol?: number | null; hdl_mmol?: number | null; ldl_mmol?: number | null; hemoglobin_g_dl?: number | null;
+  total_cholesterol_mmol?: number | null; hdl_mmol?: number | null; ldl_mmol?: number | null; triglycerides_mmol?: number | null; hemoglobin_g_dl?: number | null;
   glucose_context?: 'fasting' | 'random' | 'unknown'; known_ascvd?: TriState; prior_stroke_tia?: TriState; known_heart_failure?: TriState; known_atrial_fibrillation?: TriState;
   exacerbations_past_year?: number | null; reliever_use_per_week?: number | null; hypoglycaemia_episodes_3m?: number | null;
   eye_screen?: CareInterval; foot_exam?: CareInterval;
@@ -44,13 +44,15 @@ export type ConsultantSynthesis = {
   sources: Evidence[]
 }
 export type Evidence = { source_id: string; title: string; url: string; section: string; version: string }
-export type Recommendation = { id: string; rule_id: string; category: string; severity: 'info' | 'warning' | 'critical'; title: string; detail: string; evidence: Evidence[] }
+export type Recommendation = { id: string; rule_id: string; category: string; severity: 'info' | 'warning' | 'critical'; title: string; detail: string; basis?: string[]; evidence: Evidence[] }
 export type Urgency = 'routine' | 'soon' | 'urgent' | 'emergency'
 export type AiBriefing = { status: 'ready' | 'disabled' | 'unavailable' | 'blocked'; reason_code?: string; provider?: string; model?: string; prompt_version?: string; focus?: Recommendation[]; checklist?: string[]; source_ids?: string[] }
-export type Assessment = { id: string; urgency: Urgency; summary: string; recommendations: Recommendation[]; missing_data: string[]; warnings: string[]; model_info: { mode: string; provider?: string; model?: string; status: string }; evidence_version: string; generated_at: string; ai_briefing?: AiBriefing; dosing?: DosingAssessment; consultant?: ConsultantSynthesis }
+export type Assessment = { id: string; urgency: Urgency; summary: string; recommendations: Recommendation[]; missing_data: string[]; warnings: string[]; model_info: { mode: string; provider?: string; model?: string; status: string }; evidence_version: string; generated_at: string; ai_briefing?: AiBriefing; dosing?: DosingAssessment; consultant?: ConsultantSynthesis; derived?: { bmi: number | null; bmi_category: string | null }; care_plan?: CarePlan }
+export type CarePlan = { headline: string; problems: { name: string; status: string; tone: 'ok' | 'attention' | 'urgent' | 'unknown' }[]; medicines: { name: string; dose: string; class: string; note: string | null }[]; monitoring: { item: string; when: string; source_id: string }[] }
 export type DecisionAction = 'accept' | 'modify' | 'defer' | 'reject'
 export type Decision = { recommendation_id: string; action: DecisionAction; reason?: string; modified_text?: string }
 export type Encounter = { id: string; patient_id: string; version: number; status: 'draft' | 'reviewed'; data: ClinicalData; assessment: Assessment | null; created_at: string; updated_at: string; review?: { decisions: Decision[]; note?: string; reviewer_name?: string; reviewed_at?: string } }
 export type Referral = { id: string; encounter_id: string; patient_id: string; patient_name?: string; patient_external_id?: string; destination: string; reason: string; urgency: Urgency; status: 'requested' | 'accepted' | 'completed' | 'cancelled'; created_at: string; outcome?: string }
-export type Dashboard = { patients: number; encounters: number; reviewed: number; open_referrals: number; urgent_assessments: number }
+export type AttentionItem = { encounter_id: string; patient_id: string; patient_name: string; patient_external_id: string; updated_at: string; stage: 'intake' | 'review'; urgency: Urgency | null; recommendations: number }
+export type Dashboard = { patients: number; encounters: number; reviewed: number; open_referrals: number; urgent_assessments: number; drafts?: number; attention?: AttentionItem[] }
 export type AuditEvent = { id: string; action: string; entity_type: string; entity_id: string; actor_id: string; created_at: string; chain_hash: string }

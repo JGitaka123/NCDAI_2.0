@@ -38,7 +38,7 @@ def run():
         client.headers['X-CSRF-Token'] = auth_response.json()['csrf_token']
         report['checks'].append('authenticated session with secure HttpOnly Strict cookie')
         catalogue = request('GET', '/dosing/catalogue')
-        assert catalogue['version'] == 'ncdai-dose-reference-0.1.1' and len(catalogue['medicines']) == 4
+        assert catalogue['version'] == 'ncdai-dose-reference-0.2.0' and len(catalogue['medicines']) == 13
         report['dosing'] = {'version': catalogue['version'], 'manifest_sha256': catalogue['manifest_sha256']}
 
         record_id = 'HOSTED-' + uuid4().hex[:12]
@@ -115,7 +115,7 @@ def run():
         acute_data = {**reference_data, 'potassium': 5.7, 'acute_kidney_injury': 'yes'}
         acute = request('POST', '/encounters', 201, json={'patient_id': patient['id'], 'data': acute_data})
         acute = request('POST', f"/encounters/{acute['id']}/assess")
-        assert acute['assessment']['rules_version'] == 'ncdai-2-rules-0.2.0'
+        assert acute['assessment']['rules_version'] == 'ncdai-2-rules-0.4.0'
         assert acute['assessment']['urgency'] == 'urgent'
         assert acute['data']['acute_kidney_injury'] == 'yes'
         potassium = next(item for item in acute['assessment']['recommendations'] if item['rule_id'] == 'POTASSIUM_HIGH')

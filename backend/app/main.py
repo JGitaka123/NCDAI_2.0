@@ -80,7 +80,7 @@ def create_app(settings: Settings | None = None):
     def get_db(request: Request):
         # Local SQLite mutations must serialize before reads to avoid stale audit chains.
         path = request.scope["path"]
-        lock = write_lock if engine.dialect.name == "sqlite" and not path.endswith("/ai-briefing") and (request.method != "GET" or "/fhir/" in path or "/consultations/" in path or "/encounters/" in path or "/patients/" in path) else None
+        lock = write_lock if engine.dialect.name == "sqlite" and not path.endswith("/ai-briefing") and (request.method != "GET" or "/fhir/" in path or "/consultations/" in path or "/encounters/" in path or "/patients/" in path or "/study/" in path) else None
         if lock:
             lock.acquire()
         try:
@@ -171,7 +171,9 @@ def create_app(settings: Settings | None = None):
 
     def commit_change(db, user, action, entity_type, entity_id):
         db.flush()
-        append_audit(db, user, action, entity_type, entity_id)
+        event = append_audit(db, user, action, entity_type, entity_id)
+        from .study_capture import capture_event
+        capture_event(db, event)
         db.commit()
 
     def change_encounter(db, user, encounter, expected_version, **values):
@@ -422,7 +424,19 @@ def create_app(settings: Settings | None = None):
         reviewed = db.scalar(select(func.count()).select_from(Encounter).where(Encounter.facility_id == user.facility_id, Encounter.status == "reviewed"))
         open_referrals = db.scalar(select(func.count()).select_from(Referral).where(Referral.facility_id == user.facility_id, Referral.status.in_(["requested", "accepted"])))
         urgent = db.scalar(select(func.count()).select_from(Encounter).where(Encounter.facility_id == user.facility_id, Encounter.assessment["urgency"].as_string().in_(["urgent", "emergency"])))
-        return {"patients": patient_count, "encounters": count, "reviewed": reviewed, "open_referrals": open_referrals, "urgent_assessments": urgent}
+        attention = []
+        if user.role in {"clinician", "supervisor"}:
+            # Unreviewed drafts are the clinician's open work; most recent first.
+            rows = db.execute(select(Encounter, Patient).join(Patient, (Patient.id == Encounter.patient_id) & (Patient.facility_id == Encounter.facility_id))
+                              .where(Encounter.facility_id == user.facility_id, Encounter.status == "draft")
+                              .order_by(Encounter.updated_at.desc()).limit(8)).all()
+            attention = [{"encounter_id": encounter.id, "patient_id": patient.id, "patient_name": f"{patient.given_name} {patient.family_name}",
+                          "patient_external_id": patient.external_id, "updated_at": iso(encounter.updated_at),
+                          "stage": "review" if encounter.assessment else "intake",
+                          "urgency": (encounter.assessment or {}).get("urgency"),
+                          "recommendations": len((encounter.assessment or {}).get("recommendations") or [])} for encounter, patient in rows]
+        return {"patients": patient_count, "encounters": count, "reviewed": reviewed, "open_referrals": open_referrals,
+                "urgent_assessments": urgent, "drafts": count - reviewed, "attention": attention}
 
     @api.get("/api/audit/verify")
     def audit_verify(db: DB, user: PRIVILEGED):
@@ -463,6 +477,9 @@ def create_app(settings: Settings | None = None):
     from .account_routes import install_account_routes
     install_account_routes(api, get_db=get_db, authenticated=authenticated,
                            commit_change=commit_change, user_json=user_json, settings=settings)
+    from .study_routes import install_study_routes
+    install_study_routes(api, settings=settings, get_db=get_db, authenticated=authenticated,
+                         clinical_user=clinical_user, privileged=privileged, scoped=scoped, commit_change=commit_change)
     return api
 
 

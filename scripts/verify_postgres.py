@@ -145,8 +145,9 @@ def verify():
     def database_fingerprint(db_engine):
         snapshot={}
         with db_engine.connect() as conn:
-            for table in ("facilities","users","auth_sessions","login_attempts","patients","encounters","referrals","audit_events"):
-                rows=conn.execute(text(f"SELECT row_to_json(t)::text FROM (SELECT * FROM {table} ORDER BY id) t")).scalars().all()
+            for table in ("facilities","users","auth_sessions","login_attempts","patients","encounters","referrals","audit_events","consultation_requests","consultation_dispositions","study_records","study_events"):
+                key="request_id" if table=="consultation_dispositions" else "id"
+                rows=conn.execute(text(f"SELECT row_to_json(t)::text FROM (SELECT * FROM {table} ORDER BY {key}) t")).scalars().all()
                 snapshot[table]={"count":len(rows),"sha256":hashlib.sha256("\n".join(rows).encode()).hexdigest()}
         return snapshot
 
