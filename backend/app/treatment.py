@@ -134,7 +134,7 @@ def hypertension_options(ctx: dict) -> list[dict]:
     missing = [c for c in ("ccb", "ras", "thiazide") if c not in classes]
     if len(classes) <= 1:
         add = " or ".join(START_EXAMPLE[c] for c in missing[:2])
-        detail = (f"BP {sbp:g}/{dbp:g} mmHg on {', '.join(current)} ({"one first-line medicine class" if classes else "no first-line medicine class"}). Move to a two-drug combination: add {add}. "
+        detail = (f"BP {sbp:g}/{dbp:g} mmHg on {', '.join(current)} ({'one first-line medicine class' if classes else 'no first-line medicine class'}). Move to a two-drug combination: add {add}. "
                   + (f"Increasing the current medicine ({'; '.join(below_max)}) is an alternative if a single agent is preferred. " if below_max else "")
                   + ("A beta blocker alone is not a first-line step unless it has a specific indication (heart failure, angina, atrial fibrillation). "
                      if codes & BETA_BLOCKER and not classes else "")
