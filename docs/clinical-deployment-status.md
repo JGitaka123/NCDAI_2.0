@@ -48,9 +48,9 @@ The scheduled service-health workflow checks primary and consultant endpoints; i
 
 Neon management currently requires the owner's email verification before opening the console. The linked Free plan is confirmed, but its actual backup/PITR retention setting has not been inspected. Complete that verification and confirm retention/recovery arrangements before relying on this service as the sole record of patient care. Until it is confirmed, the hospital's existing record-keeping must continue alongside the application for every clinical-testing encounter, so that no patient record exists only in this service. This is a concrete remaining operational check, not a new regulatory approval request.
 
-**Clinical sign-off (11 October 2026):** the project owner reports that Dr David Kamau, clinical lead, approved the named treatment options as released in ruleset `ncdai-2-rules-0.4.0`. The approval is recorded as supplied; its written record is held by the project owner. Independent pharmacy adjudication of those options remains outstanding.
+**Clinical sign-off (11 October 2026):** the project owner reports that Dr David Kamau, clinical lead, approved the named treatment options as released in ruleset `ncdai-2-rules-0.4.0`. The project owner confirms that Dr Kamau's approvals cover both the clinical and the pharmacy review of those options. The approval is recorded as supplied; its written record is held by the project owner.
 
-Independent pharmacy adjudication of the exact implemented rules and exclusions, prospective usability/safety assessment and patient-outcome evaluation remain to be performed by the clinical study team. Approval and engineering test success are not substitutes for those results. Aifya/QAfya integration remains deferred until APIs are supplied.
+Prospective usability/safety assessment and patient-outcome evaluation remain to be performed by the clinical study team. Approval and engineering test success are not substitutes for those results. Aifya/QAfya integration remains deferred until APIs are supplied.
 
 ## Potassium source and implementation choice
 
