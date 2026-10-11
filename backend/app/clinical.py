@@ -12,6 +12,7 @@ import re
 from uuid import uuid4
 
 from .evidence import EVIDENCE_VERSION, REVIEW_STATUS, evidence
+from .reasoning import g_stage
 from .treatment import STATINS, cvd_status
 
 RULESET_VERSION = "ncdai-2-rules-0.4.0"
@@ -219,7 +220,7 @@ def assess(data: dict, age: int, sex: str) -> dict:
     if rr is not None and rr <= 8:
         add("RESP_SLOW", "acute_safety", "critical", "emergency", "Very low respiratory rate",
             f"Respiratory rate {rr:g}/min. Obtain immediate clinical assessment of airway, breathing and consciousness"
-            + (f"; with glucose {glucose:.1f} mmol/L recorded, exclude hypoglycaemia" if glucose is not None and glucose <= 3.9 else "")
+            + (f"; with glucose {glucose:.1f} mmol/L recorded, exclude hypoglycaemia" if glucose is not None and glucose <= 3.9 + 1e-9 else "")
             + ". This flag does not determine the cause or treatment.", "RCP_NEWS2", "NCDAI_SAFETY_SPEC", basis=[f"Respiratory rate {rr:g}/min"])
     if bp_at_least(180, 110) and symptoms & BP_DANGER_SYMPTOMS:
         add("BP_CRISIS", "acute_safety", "critical", "emergency", "Severe BP with warning symptoms",
@@ -422,10 +423,21 @@ def assess(data: dict, age: int, sex: str) -> dict:
     # Routine disease review is not allowed to compete with an emergency banner.
     acute = PRIORITY[result["urgency"]] >= PRIORITY["urgent"]
     cvd = cvd_state == "yes"
+    # Elective medicine options are withheld whenever the encounter is acute.
+    elective = data.get("acutely_unwell") != "yes"
     if not pregnant and not acute:
+        use_repeat = rsbp is not None and rdbp is not None
+        ctx = {"age": age, "sex": sex, "pregnancy": pregnancy, "meds": [{**m, "_code": c, "_label": med_names[c]} for m, c in zip(meds, codes)], "codes": code_set,
+               "control_bp": (rsbp, rdbp) if use_repeat else (sbp, dbp) if sbp is not None and dbp is not None else None,
+               "control_is_repeat": use_repeat, "diabetic": diabetic, "renal_disease": renal_disease, "cvd": cvd, "cvd_status": cvd_state,
+               "asthma": data.get("known_asthma") == "yes",
+               "tobacco": data.get("tobacco_use", "unknown"), "adherence": data.get("adherence", "unknown"),
+               "egfr": egfr, "hba1c": hba1c, "glucose": glucose, "glucose_timing": glucose_timing, "weight": weight,
+               "total_cholesterol": total_chol, "ldl": ldl, "hdl": hdl, "triglycerides": triglycerides}
+        htn_options = hypertension_options(ctx) if hypertensive and elective else []
         grade = "grade 2" if bp_at_least(160, 100) else "grade 1"
-        risk = [c for c in comorbid if c in {"diabetes", "chronic kidney disease", "cardiovascular disease"}]
-        next_step = ((" Treatment options for this patient are listed as a separate recommendation." if hypertensive else
+        risk = [c for c in comorbid if c in {"diabetes", "chronic kidney disease", "coronary or peripheral arterial disease", "previous stroke or TIA"}]
+        next_step = ((" Treatment options for this patient are listed as a separate recommendation." if htn_options else "" if hypertensive else
                       " If hypertension is not yet diagnosed, confirm persistent elevation (SBP ≥140 and/or DBP ≥90 mmHg on repeat readings, the Kenya protocol confirms in the second month) before diagnosing and treating.")
                      + (f" With {listing(risk)} on record, cardiovascular risk is high." if risk else ""))
         if bp_at_least(160, 100):
@@ -457,7 +469,7 @@ def assess(data: dict, age: int, sex: str) -> dict:
         elif not diabetic and ((hba1c is not None and 5.7 <= hba1c < 6.5) or (fasting_glucose is not None and 5.6 <= fasting_glucose < 7.0)):
             loss = f" For this patient ({weight:g} kg) that is {weight * 0.05:.0f}-{weight * 0.1:.0f} kg." if weight is not None and bmi is not None and bmi >= 25 else ""
             add("PREDIABETES", "prevention", "info", "routine", "Prediabetes range: lifestyle intervention",
-                f"{hba1c_basis or glucose_basis} is in the prediabetes range (HbA1c 5.7-6.4% or fasting glucose 5.6-6.9 mmol/L). Advise diet, 30 minutes of physical activity 5 times weekly and sleep hygiene; "
+                f"{hba1c_basis if hba1c is not None and 5.7 <= hba1c < 6.5 else glucose_basis} is in the prediabetes range (HbA1c 5.7-6.4% or fasting glucose 5.6-6.9 mmol/L). Advise diet, 30 minutes of physical activity 5 times weekly and sleep hygiene; "
                 f"if overweight aim to lose 5-10% of body weight in 12 months.{loss} Repeat HbA1c every 3-6 months. Metformin is considered if BMI is above 35 or there was gestational diabetes"
                 + (f" (BMI {bmi:g})." if bmi is not None else "."),
                 "KENYA_PREDIABETES", basis=[hba1c_basis, glucose_basis, f"BMI {bmi:g} kg/m²" if bmi is not None else None])
@@ -471,17 +483,15 @@ def assess(data: dict, age: int, sex: str) -> dict:
                 status = "No HbA1c or fasting glucose is recorded to judge control against the Kenya target (HbA1c <7.0%). "
             add("DIABETES_REVIEW", "diabetes", "warning" if hba1c is not None and hba1c >= 9 else "info",
                 "soon" if hba1c is not None and hba1c >= 9 else "routine", "Review diabetes control and complication screening",
-                status + ("Treatment options are listed separately. " if above_target else "")
+                status + ("Treatment options are listed separately. " if above_target and elective else "")
                 + (f"Ask about hypoglycaemia on {listing(glucose_lowering)}. " if glucose_lowering else "")
                 + "Complication screening: kidney function (eGFR" + (f", last {egfr:g}" if egfr is not None else ", not recorded") + ") and urine albumin, eyes, and feet (pulses, sensation, ulcers).",
                 "KENYA_DM_TREATMENT", "NCDAI_SAFETY_SPEC", basis=[hba1c_basis, glucose_basis, egfr_basis, "Glucose-lowering medicines: " + (listing(named({"metformin"} | SULFONYLUREA | SGLT2, test=is_insulin)) or "none recorded")])
-        # Elective medicine options are withheld whenever the encounter is acute.
-        elective = data.get("acutely_unwell") != "yes"
         statin_indicated = diabetic or cvd or renal_disease or (total_chol is not None and total_chol >= 8)
         if not statin_indicated and ((hdl is not None and hdl < 0.9) or (triglycerides is not None and triglycerides > 2.82)):
             add("LIPID_RISK_FACTOR", "prevention", "info", "routine", "Abnormal lipids: estimate cardiovascular risk",
-                ", ".join(item for item in (f"HDL {hdl:g} mmol/L (below 0.90)" if hdl is not None and hdl < 0.9 else None,
-                                            f"triglycerides {triglycerides:g} mmol/L (above 2.82)" if triglycerides is not None and triglycerides > 2.82 else None) if item).capitalize()
+                "; ".join(item for item in (f"HDL {hdl:g} mmol/L (below 0.90)" if hdl is not None and hdl < 0.9 else None,
+                                            f"Triglycerides {triglycerides:g} mmol/L (above 2.82)" if triglycerides is not None and triglycerides > 2.82 else None) if item)
                 + ". These are cardiovascular and diabetes risk factors. Estimate 10-year CVD risk with the WHO chart (age, sex, smoking, systolic BP and cholesterol); a statin is advised above 20%. "
                 "Screen for diabetes if not done and advise diet, activity and weight management.",
                 "KENYA_DM_SCREENING", "KENYA_CVD_RISK", basis=[f"HDL {hdl:g} mmol/L" if hdl is not None else None, f"Triglycerides {triglycerides:g} mmol/L" if triglycerides is not None else None])
@@ -503,15 +513,7 @@ def assess(data: dict, age: int, sex: str) -> dict:
                 basis=[f"BMI {bmi:g} kg/m² ({bmi_category})" if bmi is not None else None, f"Weight {weight:g} kg" if weight is not None else None,
                        f"Height {height:g} cm" if height is not None else None, f"Waist {waist:g} cm" if waist is not None else None])
         if elective:
-            use_repeat = rsbp is not None and rdbp is not None
-            ctx = {"age": age, "sex": sex, "pregnancy": pregnancy, "meds": [{**m, "_code": c, "_label": med_names[c]} for m, c in zip(meds, codes)], "codes": code_set,
-                   "control_bp": (rsbp, rdbp) if use_repeat else (sbp, dbp) if sbp is not None and dbp is not None else None,
-                   "control_is_repeat": use_repeat, "diabetic": diabetic, "renal_disease": renal_disease, "cvd": cvd, "cvd_status": cvd_state,
-                   "asthma": data.get("known_asthma") == "yes",
-                   "tobacco": data.get("tobacco_use", "unknown"), "adherence": data.get("adherence", "unknown"),
-                   "egfr": egfr, "hba1c": hba1c, "glucose": glucose, "glucose_timing": glucose_timing, "weight": weight,
-                   "total_cholesterol": total_chol, "ldl": ldl, "hdl": hdl, "triglycerides": triglycerides}
-            options = ((hypertension_options(ctx) if hypertensive else []) + (diabetes_options(ctx) if diabetic else [])
+            options = (htn_options + (diabetes_options(ctx) if diabetic else [])
                        + lipid_options(ctx) + respiratory_options(ctx))
             for option in options:
                 add(option["rule_id"], option.get("category", "treatment"), option["severity"], option["urgency"], option["title"], option["detail"],
@@ -519,7 +521,7 @@ def assess(data: dict, age: int, sex: str) -> dict:
             if statin_indicated and not code_set & STATINS and cvd_state == "unknown":
                 missing.append("known_cvd_for_statin_choice")
         if renal_disease or (egfr is not None and egfr < 60):
-            category = None if egfr is None else "G3a" if egfr >= 45 else "G3b" if egfr >= 30 else "G4" if egfr >= 15 else "G5"
+            category = None if egfr is None else g_stage(egfr)
             nephrotoxic = named(NSAID)
             add("CKD_REVIEW", "kidney", "warning", "soon", "Review kidney status and chronicity",
                 (f"eGFR {egfr:g} (KDIGO category {category})" if egfr is not None else "Known chronic kidney disease with no eGFR recorded") + ("; CKD is recorded" if renal_disease and egfr is not None else "") + ". "
@@ -620,7 +622,7 @@ def assess(data: dict, age: int, sex: str) -> dict:
         "routine": "Complete the supervised NCD review and agree follow-up; this result does not provide clinical clearance.",
     }[result["urgency"]]
     from .care_plan import build as build_care_plan
-    result["care_plan"] = build_care_plan(data, age, sex, [{**m, "_code": c, "_label": str(m.get("name") or c)} for m, c in zip(meds, codes)], result)
+    result["care_plan"] = build_care_plan({**data, "egfr": egfr, "glucose": glucose, "glucose_unit": "mmol/L"}, age, sex, [{**m, "_code": c, "_label": str(m.get("name") or c)} for m, c in zip(meds, codes)], result)
     from .dosing import attach_dosing
     from .reasoning import build as build_consultant
     result = attach_dosing(result, data, age, sex)

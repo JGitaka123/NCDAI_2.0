@@ -5,6 +5,7 @@ collects the monitoring the cited sources specify. It adds no advice beyond the
 recommendations, which remain the items the clinician decides on. Intervals
 appear only where a source states one.
 """
+from .reasoning import g_stage
 from .treatment import (ACE, ARB, BETA_BLOCKER, CCB, DPP4, HTN_TABLE4, OTHER_BP, SGLT2, STATINS, SULFONYLUREA, THIAZIDE, TZD,
                         _dose_position, _statin_position, cvd_status, is_insulin)
 
@@ -84,7 +85,7 @@ def build(data: dict, age: int, sex: str, meds: list[dict], assessment: dict) ->
                 + (f"; lipids {lipids} mmol/L{target}" if lipids else "; no lipid profile recorded"),
                 "attention" if not statins or above or not lipids else "ok")
     if egfr is not None and egfr < 60 or yes("known_ckd"):
-        category = None if egfr is None else "G3a" if egfr >= 45 else "G3b" if egfr >= 30 else "G4" if egfr >= 15 else "G5"
+        category = None if egfr is None else g_stage(egfr)
         problem("Kidney function", (f"eGFR {egfr:g} (KDIGO {category})" if egfr is not None else "Known CKD; no eGFR recorded")
                 + ("" if yes("known_ckd") else ": chronicity not yet established"), "urgent" if egfr is not None and egfr < 30 else "attention")
     if derived.get("bmi") is not None:

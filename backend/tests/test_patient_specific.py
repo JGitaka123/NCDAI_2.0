@@ -56,7 +56,7 @@ def test_lipid_specialist_thresholds_and_aspirin_primary_prevention():
 
 def test_asthma_without_inhaled_corticosteroid():
     result = rules(assess(data(known_asthma="yes", medications=[med("salbutamol", 100, unit="mcg", frequency="as needed")]), 30, "female"))
-    assert "Salbutamol is the only asthma inhaler recorded" in result["TX_ASTHMA_ICS"]["detail"]
+    assert "Salbutamol is recorded without an inhaled corticosteroid" in result["TX_ASTHMA_ICS"]["detail"]
     assert "budesonide-formoterol" in result["TX_ASTHMA_ICS"]["detail"]
     assert "TX_ASTHMA_ICS" not in rules(assess(data(known_asthma="yes", medications=[med("salbutamol", 100, unit="mcg"), med("beclometasone", 200, unit="mcg")]), 30, "female"))
 
@@ -109,3 +109,46 @@ def test_every_new_rule_and_gap_is_known_to_the_ai_contract():
         gaps |= set(result["missing_data"])
     assert produced - RULE_IDS == set() and gaps - GAP_IDS == set()
     assert "known_cvd_for_statin_choice" in gaps
+
+
+def test_kdigo_category_covers_g1_to_g5():
+    # KDIGO 2024 GFR categories: G1 >=90, G2 60-89, G3a 45-59, G3b 30-44, G4 15-29, G5 <15.
+    for egfr, stage in ((95, "G1"), (75, "G2"), (59, "G3a"), (44, "G3b"), (29, "G4"), (12, "G5")):
+        result = assess(data(known_ckd="yes", egfr=egfr), 60, "male")
+        if egfr >= 30:  # below 30 the urgent renal flag replaces the routine review
+            assert f"KDIGO category {stage})" in rules(result)["CKD_REVIEW"]["detail"]
+        kidney = [p for p in result["care_plan"]["problems"] if p["name"] == "Kidney function"][0]
+        assert f"(KDIGO {stage})" in kidney["status"]
+
+
+def test_patient_summary_uses_calculated_egfr_and_converted_glucose():
+    result = assess(data(creatinine_umol=300), 70, "female")
+    assert any(p["name"] == "Kidney function" for p in result["care_plan"]["problems"])
+    fasting = assess(data(known_diabetes="yes", glucose=180, glucose_unit="mg/dL", glucose_context="fasting"), 55, "male")
+    diabetes = [p for p in fasting["care_plan"]["problems"] if p["name"] == "Type 2 diabetes"][0]
+    assert diabetes["status"].startswith("Fasting glucose 10 mmol/L")
+
+
+def test_prediabetes_quotes_the_measurement_in_range():
+    detail = rules(assess(data(hba1c=5.0, glucose=6.0, glucose_context="fasting"), 45, "male"))["PREDIABETES"]["detail"]
+    assert detail.startswith("Fasting glucose 6.0 mmol/L is in the prediabetes range")
+
+
+def test_established_cvd_marks_high_cardiovascular_risk_in_bp_advice():
+    detail = rules(assess(data(systolic_bp=150, diastolic_bp=92, known_ascvd="yes"), 60, "male"))["BP_REVIEW"]["detail"]
+    assert "With coronary or peripheral arterial disease on record, cardiovascular risk is high." in detail
+
+
+def test_treatment_options_are_only_announced_when_listed():
+    at_target_repeat = rules(assess(data(known_hypertension="yes", systolic_bp=150, diastolic_bp=92, repeat_systolic_bp=132, repeat_diastolic_bp=82,
+                                         medications=[med("amlodipine", 5)]), 60, "male"))
+    assert "TX_HTN_STEP_UP" not in at_target_repeat and "separate recommendation" not in at_target_repeat["BP_REVIEW"]["detail"]
+    unwell = rules(assess(data(known_diabetes="yes", hba1c=8.2, acutely_unwell="yes", medications=[med("metformin", 500)]), 55, "male"))
+    assert not any(r.startswith("TX_") for r in unwell)
+    if "DIABETES_REVIEW" in unwell:
+        assert "listed separately" not in unwell["DIABETES_REVIEW"]["detail"]
+
+
+def test_lipid_risk_text_keeps_unit_case():
+    detail = rules(assess(data(hdl_mmol=0.8, total_cholesterol_mmol=5.0, triglycerides_mmol=3.0), 50, "female"))["LIPID_RISK_FACTOR"]["detail"]
+    assert detail.startswith("HDL 0.8 mmol/L (below 0.90); Triglycerides 3 mmol/L (above 2.82).")
