@@ -1,6 +1,6 @@
 # Hosted NCDAI 2.0 release
 
-1 October 2026 · Mary Help supervised testing · Application version 0.1
+11 October 2026 · Mary Help supervised testing · Application version 0.1
 
 **Open the application: [https://ncdai-2.vercel.app](https://ncdai-2.vercel.app).** The original coral `#FF5757` and unchanged NCDAI logo are restored. Sign-in is required for clinical records. Private account details are delivered separately and are not in this repository.
 
@@ -9,20 +9,30 @@
 | Item | Recorded value |
 |---|---|
 | Vercel account/project | `jessegitaka-7527s-projects / ncdai-2` |
-| Deployed application commit | `7dc960bc3f3c7d9c255bc6b581629cddd9874ce5` |
-| Deployment | `dpl_91RnnyUg7Gyh4ZL3AzY2vgSYWkP3` |
-| Vercel inspection | [Deployment details](https://vercel.com/jessegitaka-7527s-projects/ncdai-2/91RnnyUg7Gyh4ZL3AzY2vgSYWkP3) |
+| Deployed application commit | `0897b949cb6b4555af6d5119314c0cb40aa46f1f` (PR #10) |
+| Deployment | `dpl_5cQ3kv5nxLEiMCMEutYVnqFnR9LM` |
+| Vercel inspection | [Deployment details](https://vercel.com/jessegitaka-7527s-projects/ncdai-2/5cQ3kv5nxLEiMCMEutYVnqFnR9LM) |
 | Runtime | Vite frontend and Python 3.12 FastAPI services; API function inspected in `fra1` |
 | Database | Dedicated Neon `ncdai-2-db`, Free plan, Frankfurt requested at provisioning; server reports PostgreSQL `18.6 (2078fcb)` |
-| Schema revision | `20260913_mary_help`; consultant `consultant-20260913-1` |
+| Schema revision | `20260914_study`; consultant `consultant-20260913-1` |
 | Application database role | `ncdai_app`, separate from the migration owner |
-| Clinical rules | `ncdai-2-rules-0.2.0` |
-| Consultant reasoning | `ncdai-consultant-1.0.0` |
-| Evidence set | `ncdai-2026-09-29.1` |
+| Clinical rules | `ncdai-2-rules-0.4.0` |
+| Consultant reasoning | `ncdai-consultant-1.1.0-review` |
+| Evidence set | `ncdai-2026-10-11.1` |
 | AI provider/model | DeepSeek / `deepseek-v4-pro` |
-| Prompt contract | `ncdai-briefing-select-v1.5` |
+| Prompt contract | `ncdai-briefing-select-v1.7` |
 
 The existing `aifya-web` project was not replaced. NCDAI has its own project, database and canonical domain. Repository changes were pushed to `codex/ncdai-2-platform`; deployment is explicit through the Vercel CLI, rather than automatically publishing every push.
+
+## 11 October 2026 release
+
+PR #10 merged the September treatment-options work into the deployed line: named Kenya MOH hypertension and diabetes steps and NICE NG238 statin options, the patient summary, prospective study capture, BMI, triglyceride and fasting/random glucose intake and the faster review flow, alongside the consultant synthesis and offline mobile engine (parity-tested against the backend). Dr David Kamau, clinical lead, approved the named treatment options (reported by the project owner); independent pharmacy adjudication remains outstanding.
+
+- **Database:** a `pg_dump` snapshot was taken first (private `.runtime/pre-study-20261011T112217Z.dump`), then `alembic upgrade` moved `20260913_mary_help` to `20260914_study` at about 11:22 UTC. It added only `study_records` and `study_events`, each with an immutability trigger. `ncdai_app` was granted SELECT and INSERT on those two tables only; UPDATE and DELETE were verified absent. Existing rows were unchanged (46 patients, 51 encounters, 418 audit events).
+- **Deploy:** the [manual deploy workflow](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/38135400913) passed the exact-commit quality gate ([quality run](https://github.com/JGitaka123/NCDAI_2.0/actions/runs/38134560492)) and staged the build, but its HTTP checks received the Vercel Deployment Protection login page, so it correctly stopped before promotion.
+- **Manual promotion:** the same checks were repeated with `vercel curl --deployment` (automatic protection bypass). Readiness returned 200 with rules loaded against the migrated schema, and `/`, `/mobile/`, the manifest, the service worker and liveness all returned 200. The deployment was then promoted with `vercel promote`. Canonical readiness and security headers were confirmed afterwards, and `frontend/tests/browser/live-check.mjs` passed at phone width with no console or CSP errors.
+- **Health-check window:** canonical readiness reported 503 for roughly five minutes, between the migration and the promotion, because the previous build expects the earlier schema revision.
+- **Workflow fix:** the workflow now sends a `VERCEL_AUTOMATION_BYPASS_SECRET` repository secret as the `x-vercel-protection-bypass` header for its staged checks, and fails before staging if the secret is absent.
 
 ## Current Mary Help release
 
