@@ -1,13 +1,14 @@
 // NCDAI offline clinical engine: a line-for-line port of backend/app/clinical.py
-// (safety rules, without the dose-reference module) and backend/app/reasoning.py
-// (consultant synthesis). backend/tests/test_engine_parity.py runs both engines on
-// the same cases and requires identical output; change them together.
+// (safety rules, without the dose-reference module), backend/app/treatment.py
+// (guideline treatment options), backend/app/care_plan.py (patient summary) and
+// backend/app/reasoning.py (consultant synthesis). backend/tests/test_engine_parity.py
+// runs both engines on the same cases and requires identical output; change them together.
 // Plain browser script: needs evidence.js loaded first; exposes self.NCDAIEngine.
 (function (root) {
   'use strict'
   var REGISTRY = root.NCDAI_EVIDENCE
   if (!REGISTRY) throw new Error('Load evidence.js before engine.js')
-  var RULESET_VERSION = 'ncdai-2-rules-0.2.0'
+  var RULESET_VERSION = 'ncdai-2-rules-0.4.0'
   var REASONING_VERSION = 'ncdai-consultant-1.1.0-review'
   var SOURCES = {}
   REGISTRY.sources.forEach(function (source) { SOURCES[source.source_id] = source })
@@ -30,6 +31,9 @@
   function fmt(value) { var r = r1(value); return Number.isInteger(r) ? String(r) : r.toFixed(1) }
   function fmt0(value) { return String(Math.floor(value + 0.5)) }
   function cap(text) { return text.slice(0, 1).toUpperCase() + text.slice(1) }
+  // Python str.capitalize(): first character upper case, the rest lower case.
+  function pyCapitalize(text) { return text.slice(0, 1).toUpperCase() + text.slice(1).toLowerCase() }
+  // Python ", ".join(names[:-1]) + " and " + names[-1] (the clinical.py listing helper).
   function join(items) {
     if (!items.length) return ''
     if (items.length === 1) return items[0]
@@ -39,7 +43,36 @@
   function unique(values) { var out = []; values.forEach(function (v) { if (out.indexOf(v) < 0) out.push(v) }); return out }
   function isNum(value) { return typeof value === 'number' }
   function isInt(value) { return typeof value === 'number' && Number.isInteger(value) }
-  // Python f"{x:.Nf}": exact binary value, round half to even.
+  // Python isinstance(x, (int, float)): bool is an int subclass.
+  function isPyNumber(value) { return typeof value === 'number' || typeof value === 'boolean' }
+  // Python truthiness: None, False, 0, '' and empty containers are false; NaN is true.
+  function truthy(value) {
+    if (value == null || value === false || value === 0 || value === '') return false
+    if (Array.isArray(value)) return value.length > 0
+    if (typeof value === 'object') return Object.keys(value).length > 0
+    return true
+  }
+  // Python str() for the scalar values these rules print.
+  function pyStr(value) { return value === true ? 'True' : value === false ? 'False' : value == null ? 'None' : String(value) }
+  // Python float() for a recorded dose.
+  function pyFloat(value) {
+    if (typeof value === 'boolean') return value ? 1 : 0
+    if (typeof value === 'number') return value
+    if (typeof value === 'string' && /^\s*[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?\s*$/.test(value)) return Number(value.trim())
+    throw new Error('could not convert dose to float')
+  }
+  // Exact decimal expansion of a finite double: |x| = digits x 10^-scale.
+  function exactDecimal(x) {
+    var view = new DataView(new ArrayBuffer(8))
+    view.setFloat64(0, Math.abs(x))
+    var hi = view.getUint32(0), lo = view.getUint32(4), exponent = (hi >>> 20) & 0x7ff
+    var mantissa = (BigInt(hi & 0xfffff) << 32n) | BigInt(lo)
+    if (exponent === 0) exponent = 1; else mantissa |= 1n << 52n
+    var shift = exponent - 1075
+    if (shift >= 0) return { digits: (mantissa << BigInt(shift)).toString(), scale: 0 }
+    return { digits: (mantissa * 5n ** BigInt(-shift)).toString(), scale: -shift }
+  }
+  // Python f"{x:.Nf}" and "%.Nf": exact binary value, round half to even.
   function pyFixed(x, digits) {
     var negative = x < 0 || Object.is(x, -0), view = new DataView(new ArrayBuffer(8))
     view.setFloat64(0, Math.abs(x))
@@ -56,12 +89,41 @@
     var text = q.toString().padStart(digits + 1, '0')
     return (negative ? '-' : '') + (digits ? text.slice(0, -digits) + '.' + text.slice(-digits) : text)
   }
-  // Python f"{x:g}" for values in clinical ranges.
+  // Python round(x, digits) on a float: correctly rounded, ties to even.
+  function pyRound(x, digits) { return Number(pyFixed(x, digits)) }
+  // Python f"{x:g}": 6 significant digits rounded half to even on the exact binary
+  // value, trailing zeros stripped, exponent form outside 1e-4 <= |x| < 1e6.
   function pyG(x) {
-    var text = x.toPrecision(6)
-    if (text.indexOf('e') >= 0) return text
-    return text.indexOf('.') >= 0 ? text.replace(/0+$/, '').replace(/\.$/, '') : text
+    if (typeof x === 'boolean') x = x ? 1 : 0
+    var negative = x < 0 || Object.is(x, -0)
+    if (Number.isNaN(x)) return 'nan'
+    if (!Number.isFinite(x)) return negative ? '-inf' : 'inf'
+    if (x === 0) return negative ? '-0' : '0'
+    var precision = 6, exact = exactDecimal(x), digits = exact.digits
+    var exp10 = digits.length - 1 - exact.scale, keep
+    if (digits.length > precision) {
+      keep = digits.slice(0, precision)
+      var rest = digits.slice(precision), first = rest.charCodeAt(0) - 48
+      var up = first > 5 || (first === 5 && (/[1-9]/.test(rest.slice(1)) || (keep.charCodeAt(precision - 1) - 48) % 2 === 1))
+      if (up) {
+        keep = (BigInt(keep) + 1n).toString()
+        if (keep.length > precision) { keep = keep.slice(0, precision); exp10 += 1 }
+      }
+    } else keep = digits + '0'.repeat(precision - digits.length)
+    var text
+    if (exp10 >= -4 && exp10 < precision) {
+      var whole = exp10 >= 0 ? keep.slice(0, exp10 + 1) : '0'
+      var frac = (exp10 >= 0 ? keep.slice(exp10 + 1) : '0'.repeat(-exp10 - 1) + keep).replace(/0+$/, '')
+      text = frac ? whole + '.' + frac : whole
+    } else {
+      var tail = keep.slice(1).replace(/0+$/, '')
+      text = keep.charAt(0) + (tail ? '.' + tail : '') + 'e' + (exp10 < 0 ? '-' : '+') + String(Math.abs(exp10)).padStart(2, '0')
+    }
+    return (negative ? '-' : '') + text
   }
+  // (x / 100) ** 2 in clinical.py. Python delegates float ** to the platform pow(), which
+  // equals x * x for heights recorded to 0.1 cm (checked for 100.0-250.0 cm).
+  function sq(value) { return value * value }
   function parseInstant(value) {
     var text = String(value)
     if (!/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?([zZ]|[+-]\d{2}:?\d{2})$/.test(text)) throw new Error('Invalid observation timestamp')
@@ -86,8 +148,28 @@
   var SEVERITY = { critical: 0, warning: 1, info: 2 }
   var ACUTE_SYMPTOMS = set(['chest_pain', 'breathlessness', 'neurological_deficit', 'confusion', 'seizure'])
   var BP_DANGER_SYMPTOMS = set(['severe_headache', 'visual_disturbance', 'vomiting'])
+  // Why each gap matters, shown with the gap so the request is specific to this patient.
+  var GAP_REASONS = {
+    repeat_blood_pressure: 'a raised reading must be confirmed before diagnosis or treatment changes',
+    egfr: 'kidney function decides metformin, sulfonylurea and statin choices',
+    egfr_for_metformin_review: 'metformin is recorded and depends on kidney function',
+    egfr_for_RAS_medication_review: 'an ACE inhibitor/ARB is recorded',
+    potassium_for_RAS_medication_review: 'an ACE inhibitor/ARB is recorded',
+    pregnancy_status_for_RAS_medication_review: 'ACE inhibitors/ARBs are harmful in pregnancy',
+    pregnancy_status: 'several NCD medicines are unsafe in pregnancy',
+    glycaemic_measurement: 'an HbA1c or fasting glucose is needed to judge diabetes control',
+    glucose_context: 'fasting (>=7.0) and random (>=11.1) diagnostic thresholds differ',
+    lipid_profile: 'needed to choose and monitor statin treatment',
+    weight_and_height: 'BMI guides weight targets and treatment',
+    known_cvd_for_statin_choice: 'established cardiovascular disease changes the statin dose to atorvastatin 80 mg',
+    current_observations: 'the recorded measurements are more than 24 hours old',
+    observed_at: 'measurement time is needed to judge whether results are current',
+  }
   var KNOWN_FIELDS = ['known_hypertension', 'known_diabetes', 'known_asthma', 'known_copd', 'known_ckd', 'known_cancer']
+  var INHALER_NAMES = ['salbutamol', 'formoterol', 'salmeterol', 'ipratropium', 'tiotropium', 'beclometasone', 'beclomethasone', 'budesonide', 'fluticasone']
   function ingredient(value) { var n = normal(value); return has(C_ALIASES, n) ? C_ALIASES[n] : n }
+  function underscoresToSpaces(text) { return text.replace(/_/g, ' ') }
+  function anyCode() { return true }
 
   function assess(data, age, sex, options) {
     options = options || {}
@@ -106,10 +188,12 @@
       generated_at: new Date(nowMs).toISOString(),
     }
     var recs = result.recommendations, missing = []
-    function add(ruleId, category, severity, urgency, title, detail) {
+    // sources: evidence IDs; basis lists the recorded values that triggered the
+    // rule, so the clinician sees why it applies to this patient (falsy items dropped).
+    function add(ruleId, category, severity, urgency, title, detail, sources, basis) {
       if (recs.some(function (r) { return r.rule_id === ruleId })) throw new Error('Duplicate rule identifier')
       recs.push({ id: ruleId, rule_id: ruleId, category: category, severity: severity, title: title, detail: detail,
-        evidence: evidence.apply(null, Array.prototype.slice.call(arguments, 6)) })
+        basis: (basis || []).filter(truthy), evidence: evidence.apply(null, sources) })
       if (PRIORITY[urgency] > PRIORITY[result.urgency]) result.urgency = urgency
     }
     function num(key, minimum, maximum) {
@@ -126,6 +210,7 @@
     })
     var egfr = num('egfr', 0, 200), potassium = num('potassium', 1, 10)
     var creatinine = num('creatinine_umol', 10, 3000), calculatedEgfr = null
+    // An entered laboratory eGFR always wins; a calculated value never hides it.
     if (egfr == null && creatinine != null) { calculatedEgfr = ckdEpi2021(creatinine, age, sex); egfr = calculatedEgfr }
     var pulse = num('pulse', 20, 250)
     var hba1c = num('hba1c', 2, 25)
@@ -137,6 +222,14 @@
       glucose = unit === 'mg/dL' ? glucose / 18.0 : glucose
       if (glucose > 83.34) throw new Error('Glucose outside supported range; verify its units')
     }
+    var glucoseTiming = get(data, 'glucose_context', 'unknown')
+    if (['fasting', 'random', 'unknown'].indexOf(glucoseTiming) < 0) throw new Error('Unrecognized glucose sample timing')
+    var weight = num('weight_kg', 20, 350), height = num('height_cm', 100, 250), waist = num('waist_cm', 40, 250)
+    var totalChol = num('total_cholesterol_mmol', 1, 20), ldl = num('ldl_mmol', 0.2, 15)
+    var hdl = num('hdl_mmol', 0.2, 5), triglycerides = num('triglycerides_mmol', 0.1, 60)
+    var bmi = weight != null && height != null ? pyRound(weight / sq(height / 100), 1) : null
+    var bmiCategory = bmi == null ? null : bmi < 18.5 ? 'underweight' : bmi < 25 ? 'healthy' : bmi < 30 ? 'overweight' : 'obesity'
+    result.derived = { bmi: bmi, bmi_category: bmiCategory }
     var symptoms = set(get(data, 'symptoms') || [])
     var meds = get(data, 'medications') || []
     var codes = meds.map(function (m) { return ingredient(get(m, 'code')) })
@@ -144,70 +237,174 @@
     var allergies = set((get(data, 'allergies') || []).map(ingredient))
     var pregnancy = get(data, 'pregnancy_status', 'unknown')
     if (['yes', 'no', 'unknown', 'not_applicable'].indexOf(pregnancy) < 0) throw new Error('Unrecognized pregnancy status')
-    KNOWN_FIELDS.concat(['acutely_unwell', 'acute_kidney_injury']).forEach(function (field) {
+    KNOWN_FIELDS.concat(['known_ascvd', 'prior_stroke_tia', 'acutely_unwell', 'acute_kidney_injury']).forEach(function (field) {
       if (['yes', 'no', 'unknown'].indexOf(get(data, field, 'unknown')) < 0) throw new Error('Unrecognized ' + field + ' status')
     })
     var pregnant = pregnancy === 'yes'
     var diabetic = get(data, 'known_diabetes') === 'yes'
     var hypertensive = get(data, 'known_hypertension') === 'yes'
     var renalDisease = get(data, 'known_ckd') === 'yes'
+    var cvdState = cvdStatus(data)
+    // Use all readings independently. Do not silently average away a danger sign.
     var highs = [sbp, rsbp].filter(function (v) { return v != null }), highd = [dbp, rdbp].filter(function (v) { return v != null })
     var highestSbp = highs.length ? Math.max.apply(null, highs) : null, highestDbp = highd.length ? Math.max.apply(null, highd) : null
     function bpAtLeast(s, d) { return (highestSbp != null && highestSbp >= s) || (highestDbp != null && highestDbp >= d) }
-    function anyIn(values, group) { return values.some(function (v) { return group.has(v) }) }
-    var sym = Array.from(symptoms)
+    function reading(s, d) {
+      return s != null && d != null ? pyG(s) + '/' + pyG(d) : s != null ? pyG(s) + '/–' : d != null ? '–/' + pyG(d) : null
+    }
+    function found(group) { return sortedStrings(intersection(symptoms, group).map(underscoresToSpaces)) }
 
-    if (anyIn(sym, ACUTE_SYMPTOMS)) add('EMERGENCY_SYMPTOMS', 'acute_safety', 'critical', 'emergency', 'Immediate acute assessment',
-      'Recorded acute warning symptoms need immediate clinician assessment and the local emergency pathway. Normal BP or glucose cannot rule out an emergency.', 'WHO_HEARTS_D_2020', 'NCDAI_SAFETY_SPEC')
-    if ([sbp, rsbp].some(function (v) { return v != null && v <= 90 })) add('LOW_BP', 'acute_safety', 'warning', 'urgent', 'Low systolic BP needs assessment',
-      'Assess perfusion, symptoms, medicines and change from baseline now; verify the measurement. This is an isolated vital-sign flag, not a shock diagnosis or NEWS2 score.', 'RCP_NEWS2', 'NCDAI_SAFETY_SPEC')
-    if (pulse != null && (pulse <= 40 || pulse >= 131)) add('PULSE_EXTREME', 'acute_safety', 'warning', 'urgent', 'Marked pulse abnormality',
-      'Confirm pulse, assess symptoms and rhythm, and obtain prompt clinical review. The complete early-warning assessment is outside this screen.', 'RCP_NEWS2', 'NCDAI_SAFETY_SPEC')
+    var bpBasis = [reading(sbp, dbp) ? 'BP ' + reading(sbp, dbp) + ' mmHg' : null,
+      reading(rsbp, rdbp) ? 'Repeat BP ' + reading(rsbp, rdbp) + ' mmHg' : null]
+    var timingLabel = has({ fasting: 1, random: 1 }, glucoseTiming) ? { fasting: 'Fasting', random: 'Random' }[glucoseTiming] : 'Unspecified-timing'
+    var glucoseBasis = glucose != null ? timingLabel + ' glucose ' + pyFixed(glucose, 1) + ' mmol/L'
+      + (unit === 'mg/dL' ? ' (entered ' + pyG(get(data, 'glucose')) + ' mg/dL)' : '') : null
+    var hba1cBasis = hba1c != null ? 'HbA1c ' + pyG(hba1c) + '%' : null
+    var egfrBasis = egfr != null ? 'eGFR ' + pyG(egfr) + ' mL/min/1.73 m²' : null
+    var potassiumBasis = potassium != null ? 'Potassium ' + pyG(potassium) + ' mmol/L' : null
+    var symptomBasis = symptoms.size ? 'Symptoms: ' + sortedStrings(Array.from(symptoms).map(underscoresToSpaces)).join(', ') : null
+    var medNames = new Map()
+    meds.forEach(function (m, i) { medNames.set(codes[i], truthy(get(m, 'name')) ? pyStr(get(m, 'name')) : codes[i]) })
+
+    // Recorded names for a class, so guidance refers to this patient's own medicines.
+    function named(members, test) {
+      return unique(codes).filter(function (c) { return (members != null && members.has(c)) || (test != null && test(c)) })
+        .map(function (c) { return medNames.get(c) })
+    }
+
+    var bpLowering = named(union(C_ACE, C_ARB, T_CCB, T_THIAZIDE, T_BETA_BLOCKER, T_OTHER_BP, set(['furosemide'])))
+    var glucoseLowering = named(C_SULFONYLUREA, isInsulin)
+    var comorbid = [['known_hypertension', 'hypertension'], ['known_diabetes', 'diabetes'], ['known_ckd', 'chronic kidney disease'],
+      ['known_ascvd', 'coronary or peripheral arterial disease'], ['prior_stroke_tia', 'previous stroke or TIA'], ['known_copd', 'COPD'], ['known_asthma', 'asthma']]
+      .filter(function (p) { return get(data, p[0]) === 'yes' }).map(function (p) { return p[1] })
+
+    var acuteFound = found(ACUTE_SYMPTOMS)
+    if (acuteFound.length) add('EMERGENCY_SYMPTOMS', 'acute_safety', 'critical', 'emergency', 'Immediate acute assessment',
+      'Recorded now: ' + join(acuteFound) + '. These need immediate clinician assessment and the local emergency pathway'
+      + (comorbid.length ? '; with ' + join(comorbid) + ' on record, consider acute coronary syndrome, stroke and metabolic causes' : '')
+      + '. Normal BP or glucose cannot rule out an emergency.',
+      ['WHO_HEARTS_D_2020', 'NCDAI_SAFETY_SPEC'], [symptomBasis].concat(bpBasis, [glucoseBasis]))
+    var systolics = [sbp, rsbp].filter(function (v) { return v != null })
+    if (systolics.some(function (v) { return v <= 90 })) add('LOW_BP', 'acute_safety', 'warning', 'urgent', 'Low systolic BP needs assessment',
+      'Lowest systolic reading ' + pyG(Math.min.apply(null, systolics)) + ' mmHg. Assess perfusion, symptoms, hydration and change from baseline now, and verify the measurement. '
+      + (bpLowering.length ? 'BP-lowering medicines recorded: ' + join(bpLowering) + '; review whether they contribute before the next doses. ' : 'No BP-lowering medicine is recorded, so look for other causes. ')
+      + 'This is an isolated vital-sign flag, not a shock diagnosis or NEWS2 score.', ['RCP_NEWS2', 'NCDAI_SAFETY_SPEC'],
+      bpBasis.concat(['BP-lowering medicines: ' + (join(bpLowering) || 'none recorded')]))
+    if (pulse != null && (pulse <= 40 || pulse >= 131)) {
+      var slow = pulse <= 40, blockers = named(T_BETA_BLOCKER)
+      add('PULSE_EXTREME', 'acute_safety', 'warning', 'urgent', 'Marked pulse abnormality',
+        'Pulse ' + pyG(pulse) + '/min (' + (slow ? 'bradycardia' : 'tachycardia') + '). Confirm manually, check rhythm with an ECG and assess symptoms now. '
+        + (slow ? (blockers.length ? join(blockers) + ' is recorded and can slow the heart; review it urgently. ' : '')
+          : 'Look for fever, dehydration, hypoxaemia, pain, bleeding and arrhythmia. ')
+        + 'The complete early-warning assessment is outside this screen.', ['RCP_NEWS2', 'NCDAI_SAFETY_SPEC'],
+        ['Pulse ' + pyG(pulse) + '/min'].concat(slow && blockers.length ? ['On ' + join(blockers)] : []))
+    }
     if (rr != null && rr <= 8) add('RESP_SLOW', 'acute_safety', 'critical', 'emergency', 'Very low respiratory rate',
-      'Obtain immediate clinical assessment of airway, breathing and consciousness. This flag does not determine the cause or treatment.', 'RCP_NEWS2', 'NCDAI_SAFETY_SPEC')
-    if (bpAtLeast(180, 110) && anyIn(sym, BP_DANGER_SYMPTOMS)) add('BP_CRISIS', 'acute_safety', 'critical', 'emergency', 'Severe BP with warning symptoms',
-      'Assess possible acute organ injury immediately. Repeat BP when feasible without delaying urgent care; this alert does not diagnose a hypertensive emergency.', 'WHO_HEARTS_D_2020', 'NCDAI_SAFETY_SPEC')
+      'Respiratory rate ' + pyG(rr) + '/min. Obtain immediate clinical assessment of airway, breathing and consciousness'
+      + (glucose != null && glucose <= 3.9 ? '; with glucose ' + pyFixed(glucose, 1) + ' mmol/L recorded, exclude hypoglycaemia' : '')
+      + '. This flag does not determine the cause or treatment.', ['RCP_NEWS2', 'NCDAI_SAFETY_SPEC'], ['Respiratory rate ' + pyG(rr) + '/min'])
+    var dangerFound = found(BP_DANGER_SYMPTOMS)
+    if (bpAtLeast(180, 110) && dangerFound.length) add('BP_CRISIS', 'acute_safety', 'critical', 'emergency', 'Severe BP with warning symptoms',
+      'Highest BP ' + reading(highestSbp, highestDbp) + ' mmHg with ' + join(dangerFound) + '. Assess for hypertension-mediated organ damage now '
+      + '(fundoscopy, neurological and cardiac examination, ECG, creatinine and urine). The Kenya protocol manages hypertensive emergencies at level 4 and above: stabilise and refer. '
+      + 'Repeat BP when feasible without delaying care; this alert does not diagnose a hypertensive emergency.',
+      ['KENYA_HTN_STEPS', 'WHO_HEARTS_D_2020', 'NCDAI_SAFETY_SPEC'], bpBasis.concat([symptomBasis]))
     else if (bpAtLeast(180, 110)) add('BP_SEVERE', 'hypertension', 'critical', 'urgent', 'Severe blood pressure reading',
-      'Arrange same-day clinical assessment for organ injury, repeat measurement and a supervised management plan. Symptoms not documented cannot be assumed absent.', 'WHO_HTN_2021', 'NCDAI_SAFETY_SPEC')
+      'Highest BP ' + reading(highestSbp, highestDbp) + ' mmHg is grade 3 (≥180/110). Without organ damage the Kenya protocol treats this as a hypertensive urgency: rest in a quiet room for at least 30 minutes, '
+      + (bpLowering.length ? 'optimise the current oral medicines (' + join(bpLowering) + ')' : 'initiate oral treatment')
+      + ', recheck BP after 1 hour, review baseline investigations and review again in 48-72 hours, aiming for 140/90 or less within 24 hours. '
+      + 'Examine for organ damage today; symptoms not documented cannot be assumed absent.',
+      ['KENYA_HTN_STEPS', 'WHO_HTN_2021', 'NCDAI_SAFETY_SPEC'], bpBasis.concat(['BP-lowering medicines: ' + (join(bpLowering) || 'none recorded')]))
     if (pregnant) {
+      var teratogens = named(union(C_ACE, C_ARB, T_STATINS))
       add('PREGNANCY_SCOPE', 'scope', 'warning', 'urgent', 'Use the pregnancy care pathway',
-        'Obtain obstetric review. Adult non-pregnancy NCD treatment logic is withheld; maternal and fetal assessment require a separate approved pathway.', 'NICE_PREGNANCY', 'WHO_HTN_2021')
+        'Pregnancy is recorded. Obtain obstetric review; adult non-pregnancy NCD treatment options are withheld.'
+        + (teratogens.length ? ' Medicines needing review in pregnancy: ' + join(teratogens) + '.' : ''),
+        ['NICE_PREGNANCY', 'WHO_HTN_2021'], ['Pregnant'].concat(teratogens.length ? ['On ' + join(teratogens)] : []))
       if (bpAtLeast(160, 110)) add('PREGNANCY_SEVERE_BP', 'acute_safety', 'critical', 'emergency', 'Severe BP in pregnancy',
-        'Activate immediate obstetric assessment for this severe reading. Repeat promptly without delaying escalation.', 'NICE_PREGNANCY')
-      else if (anyIn(sym, BP_DANGER_SYMPTOMS)) add('PREGNANCY_WARNING', 'acute_safety', 'critical', 'emergency', 'Pregnancy warning symptoms',
-        'Promptly assess possible pregnancy complications using the obstetric emergency pathway, even when BP is unavailable or below the severe threshold.', 'NICE_PREGNANCY', 'NCDAI_SAFETY_SPEC')
+        'BP ' + reading(highestSbp, highestDbp) + ' mmHg in pregnancy. Activate immediate obstetric assessment for this severe reading and repeat promptly without delaying escalation.', ['NICE_PREGNANCY'], bpBasis)
+      else if (dangerFound.length) add('PREGNANCY_WARNING', 'acute_safety', 'critical', 'emergency', 'Pregnancy warning symptoms',
+        pyCapitalize(join(dangerFound)) + ' in pregnancy. Promptly assess possible pre-eclampsia using the obstetric emergency pathway, even when BP is unavailable or below the severe threshold.',
+        ['NICE_PREGNANCY', 'NCDAI_SAFETY_SPEC'], [symptomBasis].concat(bpBasis))
     }
     if (glucose != null && glucose <= 3.9 + 1e-9) {
       var danger = glucose < 3 || symptoms.has('confusion') || symptoms.has('seizure')
+      var cause = '', sulfonylureas = named(C_SULFONYLUREA), insulins = named(null, isInsulin)
+      if (sulfonylureas.length) cause += ' ' + join(sulfonylureas) + ' is recorded: sulfonylurea hypoglycaemia can recur, so observe longer; the Kenya flowchart advises stopping a sulfonylurea after recurrent hypoglycaemia.'
+      if (insulins.length) cause += ' ' + join(insulins) + ' is recorded: find the cause, then reduce the insulin dose by 10-20%.'
       add('HYPOGLYCEMIA', 'acute_safety', 'critical', danger ? 'emergency' : 'urgent', 'Low glucose requires action now',
-        'Glucose is ' + pyFixed(glucose, 2) + ' mmol/L. Assess consciousness and treat immediately through the local hypoglycaemia protocol; recheck and investigate the cause. No automatic dose or route is generated.',
-        'KENYA_NCD_PROTOCOLS', 'WHO_HEARTS_D_2020', 'NCDAI_SAFETY_SPEC')
+        'Glucose ' + pyFixed(glucose, 2) + ' mmol/L (hypoglycaemia is 3.9 or below). Treat now (Kenya 4.8): if responsive and able to swallow, give 15-20 g oral carbohydrate and recheck capillary glucose in 15 minutes, '
+        + 'repeating until above 3.9, then a meal or snack within 30 minutes. If responsive but nil by mouth, give 15-20 g (30-40 ml) of 50% dextrose IV. If not responsive, give 25 g (50 ml) of 50% dextrose IV, '
+        + 'or glucagon 1 mg IM if there is no IV access, inform the consultant and recheck every 15 minutes; if glucose stays low, refer on a 10% dextrose 500 ml infusion.'
+        + cause + ' Then evaluate the cause and teach the patient how to prevent further episodes.',
+        ['KENYA_HYPOGLYCAEMIA', 'KENYA_DM_TREATMENT'], [glucoseBasis, symptomBasis].concat(glucoseLowering.length ? ['On ' + join(glucoseLowering)] : []))
     } else if (symptoms.has('hypoglycemia_symptoms')) {
       add('SUSPECTED_HYPOGLYCEMIA', 'acute_safety', 'warning', 'urgent', 'Assess reported hypoglycaemia symptoms now',
-        'Check a current glucose and clinical state. A missing or older normal result does not resolve these symptoms; follow the local acute assessment protocol.', 'KENYA_NCD_PROTOCOLS')
+        'Hypoglycaemia symptoms are recorded' + (glucoseLowering.length ? ' in a patient on ' + join(glucoseLowering) : '')
+        + '. Check a capillary glucose now; if it is 3.9 mmol/L or below, give 15-20 g oral carbohydrate and recheck in 15 minutes (Kenya 4.8). A missing or older normal result does not resolve these symptoms.',
+        ['KENYA_HYPOGLYCAEMIA'], [symptomBasis].concat(glucoseLowering.length ? ['On ' + join(glucoseLowering)] : []))
       missing.push('current_glucose_for_symptoms')
     }
     if (glucose != null && glucose >= 18) {
-      var crisis = symptoms.has('vomiting') || symptoms.has('dehydration') || symptoms.has('confusion')
+      var crisisFound = sortedStrings(intersection(symptoms, set(['vomiting', 'dehydration', 'confusion'])))
+      var crisis = crisisFound.length > 0, sglt2 = named(C_SGLT2)
       add(crisis ? 'HYPERGLYCEMIC_CRISIS' : 'GLUCOSE_HIGH', 'acute_safety', 'critical', crisis ? 'emergency' : 'urgent',
         crisis ? 'Assess possible hyperglycaemic crisis' : 'Markedly elevated glucose',
-        'Obtain acute clinical assessment, hydration status and ketones where available. Laboratory and clinical assessment must establish the cause; no insulin or fluid dose is generated.', 'WHO_HEARTS_D_2020', 'NCDAI_SAFETY_SPEC')
+        'Glucose ' + pyFixed(glucose, 1) + ' mmol/L' + (crisis ? ' with ' + join(crisisFound) : '')
+        + (!diabetic ? ' in a patient without a recorded diabetes diagnosis' : '') + '. Assess hydration and conscious level and check urine or blood ketones now'
+        + (sglt2.length ? '; ' + join(sglt2) + ' is recorded, so ketoacidosis is possible even at lower glucose' : '')
+        + '. The Kenya protocol manages DKA and HHS at level 4 facilities and above: stabilise and refer. No insulin or fluid dose is generated here.',
+        ['KENYA_HYPOGLYCAEMIA', 'WHO_HEARTS_D_2020', 'NCDAI_SAFETY_SPEC'], [glucoseBasis, symptomBasis])
     }
-    if (intersects(codeSet, C_SGLT2) && (symptoms.has('vomiting') || symptoms.has('dehydration'))) add('SGLT2_ACUTE_ILLNESS', 'medication_safety', 'critical', 'urgent', 'Acute illness with an SGLT2 inhibitor',
-      'Assess for ketoacidosis, including when glucose is not markedly high. Obtain urgent clinician medication review and ketone assessment; a normal glucose cannot provide clearance.', 'SGLT2_LABEL', 'NCDAI_SAFETY_SPEC')
-    if (spo2 != null && spo2 < 95) add('RESP_HYPOXEMIA', 'respiratory', spo2 < 92 ? 'critical' : 'warning', spo2 < 92 ? 'emergency' : 'urgent', 'Low oxygen saturation needs assessment',
-      'Recorded SpO2 is ' + pyG(spo2) + '%. Check signal quality and assess immediately if below 92%. Confirm baseline, oxygen use and clinical state; this tool does not set an oxygen dose or target.', 'WHO_PEN_2020', 'NCDAI_SAFETY_SPEC')
+    var sickFound = sortedStrings(intersection(symptoms, set(['vomiting', 'dehydration'])))
+    if (intersects(codeSet, C_SGLT2) && sickFound.length) add('SGLT2_ACUTE_ILLNESS', 'medication_safety', 'critical', 'urgent', 'Acute illness with an SGLT2 inhibitor',
+      join(named(C_SGLT2)) + ' with ' + join(sickFound) + '. Assess for ketoacidosis, including when glucose is not markedly high; '
+      + 'pause the SGLT2 inhibitor during the illness (sick-day rule) and check ketones. A normal glucose cannot provide clearance.', ['SGLT2_LABEL', 'NCDAI_SAFETY_SPEC'], [symptomBasis])
+    if (spo2 != null && spo2 < 95) {
+      var copd = get(data, 'known_copd') === 'yes'
+      add('RESP_HYPOXEMIA', 'respiratory', spo2 < 92 ? 'critical' : 'warning', spo2 < 92 ? 'emergency' : 'urgent',
+        'Low oxygen saturation needs assessment',
+        'SpO2 ' + pyG(spo2) + '%' + (rr != null ? ' with respiratory rate ' + pyG(rr) + '/min' : '') + '. Check the probe and signal, then assess immediately if below 92%. '
+        + (copd ? "COPD is recorded: compare with the patient's usual saturation; long-term oxygen is considered only when SaO2 is 88% or below on two occasions three weeks apart. " : 'Confirm baseline, oxygen use and clinical state. ')
+        + 'This tool does not set an oxygen dose or target.', [copd ? 'KENYA_COPD' : 'WHO_PEN_2020', 'NCDAI_SAFETY_SPEC'], ['SpO2 ' + pyG(spo2) + '%', copd ? 'Known COPD' : null])
+    }
     if (rr != null && rr > 25) add('RESP_TACHYPNEA', 'respiratory', 'warning', 'urgent', 'Raised respiratory rate',
-      'Assess respiratory effort and acute causes now; a chronic respiratory diagnosis must not obscure other causes of rapid breathing.', 'WHO_PEN_2020', 'NCDAI_SAFETY_SPEC')
-    if (symptoms.has('wheeze')) add('RESP_WHEEZE', 'respiratory', 'warning', 'urgent', 'Assess current wheeze',
-      'Evaluate exacerbation severity, oxygenation and the existing action plan. Review alternative diagnoses and arrange supervised acute management.', 'WHO_PEN_2020')
+      'Respiratory rate ' + pyG(rr) + '/min' + (spo2 != null ? ', SpO2 ' + pyG(spo2) + '%' : '') + '. Assess respiratory effort and acute causes now (infection, asthma or COPD exacerbation, heart failure, acidosis); '
+      + 'a chronic respiratory diagnosis must not obscure other causes of rapid breathing.', ['WHO_PEN_2020', 'NCDAI_SAFETY_SPEC'], ['Respiratory rate ' + pyG(rr) + '/min'])
+    var inhalers = named(null, function (c) { return INHALER_NAMES.some(function (n) { return c.indexOf(n) >= 0 }) })
+    if (symptoms.has('wheeze')) {
+      var context = get(data, 'known_asthma') === 'yes' ? 'asthma' : get(data, 'known_copd') === 'yes' ? 'COPD' : null
+      add('RESP_WHEEZE', 'respiratory', 'warning', 'urgent', 'Assess current wheeze',
+        'Wheeze today' + (context ? ' in known ' + context : ' without a recorded asthma or COPD diagnosis') + '. Assess severity (ability to speak, respiratory rate, SpO2), give the acute reliever per the local pathway and review response. '
+        + (inhalers.length ? 'Current inhalers: ' + join(inhalers) + '; check technique and adherence. ' : 'No inhaler is recorded. ')
+        + (!context ? 'Consider heart failure and other causes of wheeze. ' : ''), [context === 'asthma' ? 'KENYA_ASTHMA' : context ? 'KENYA_COPD' : 'WHO_PEN_2020'],
+        [symptomBasis, spo2 != null ? 'SpO2 ' + pyG(spo2) + '%' : null, 'Inhalers: ' + (join(inhalers) || 'none recorded')])
+    }
+    var smoker = get(data, 'tobacco_use') === 'current'
     if (symptoms.has('hemoptysis')) add('HEMOPTYSIS', 'referral', 'warning', 'urgent', 'Assess coughing blood today',
-      'Establish bleeding amount, stability and respiratory status, and investigate infection including TB and other causes. Escalate immediately if unstable; no cancer diagnosis is inferred.', 'NCI_CANCER_SYMPTOMS', 'NCDAI_SAFETY_SPEC')
-    if (anyIn(sym, set(['unexplained_weight_loss', 'persistent_cough', 'breast_lump', 'abnormal_bleeding']))) add('CANCER_WARNING', 'referral', 'warning', symptoms.has('abnormal_bleeding') ? 'urgent' : 'soon', 'Arrange diagnostic assessment of warning symptoms',
-      'Confirm symptom duration, bleeding severity, examination findings and relevant risk history; establish a tracked diagnostic/referral plan. These symptoms can have non-cancer causes, including infection.', 'NCI_CANCER_SYMPTOMS', 'WHO_CANCER_DIAGNOSIS')
+      'Coughing blood is recorded' + (smoker ? ' in a current smoker' : '') + (spo2 != null ? ', with SpO2 ' + pyG(spo2) + '%' : '')
+      + '. Establish the amount, haemodynamic stability and respiratory status; test sputum for TB and arrange a chest X-ray. Escalate immediately if unstable. No cancer diagnosis is inferred.',
+      ['NCI_CANCER_SYMPTOMS', 'NCDAI_SAFETY_SPEC'], [symptomBasis, smoker ? 'Current smoker' : null])
+    var warningSigns = set(intersection(symptoms, set(['unexplained_weight_loss', 'persistent_cough', 'breast_lump', 'abnormal_bleeding'])))
+    if (warningSigns.size) {
+      var actions = []
+      if (warningSigns.has('breast_lump')) actions.push('breast lump: examine both breasts and axillae and refer to a surgeon, who arranges imaging and biopsy with a radiologist')
+      if (warningSigns.has('abnormal_bleeding')) actions.push((sex === 'female' ? 'abnormal bleeding: identify the site; for vaginal bleeding do a speculum examination and biopsy and refer to a gynaecologic oncologist; ' : 'abnormal bleeding: identify the site; ')
+        + 'blood in the stool needs referral for colonoscopy, and blood in the urine referral to a urologist')
+      if (warningSigns.has('unexplained_weight_loss')) actions.push('unexplained weight loss' + (weight != null ? ' (current weight ' + pyG(weight) + ' kg; compare with previous records)' : '')
+        + ': with changed bowel habit, anaemia or blood in the stool refer for colonoscopy; with upper abdominal pain or new indigestion refer urgently for endoscopy (OGD); also consider TB, HIV and uncontrolled diabetes')
+      if (warningSigns.has('persistent_cough')) actions.push('persistent cough' + (smoker ? ' in a current smoker' : '') + ': test sputum for TB and arrange a chest X-ray; persistent hoarseness needs ENT referral')
+      add('CANCER_WARNING', 'referral', 'warning', symptoms.has('abnormal_bleeding') ? 'urgent' : 'soon', 'Arrange diagnostic assessment of warning symptoms',
+        'Kenya Table 9 actions for this patient: ' + actions.join('; ') + '. Record symptom duration and set a tracked referral. These symptoms can have non-cancer causes, including infection.',
+        ['KENYA_CANCER_SIGNS', 'WHO_CANCER_DIAGNOSIS'], [symptomBasis, smoker ? 'Current smoker' : null])
+    }
+    var renalReview = named(union(set(['metformin']), C_SULFONYLUREA, C_SGLT2, C_NSAID, C_ACE, C_ARB, set(['spironolactone'])))
     if (egfr != null && egfr < 30) add('RENAL_SEVERE', 'kidney', 'critical', 'urgent', 'Severely reduced kidney function',
-      'Arrange prompt clinical assessment and referral planning; assess acute deterioration, urine output and previous results. A single result cannot establish chronicity.', 'WHO_HEARTS_D_2020', 'KDIGO_CKD_2024')
+      'eGFR ' + pyG(egfr) + ' (KDIGO category ' + (egfr < 15 ? 'G5' : 'G4') + '). Arrange prompt clinical assessment and referral planning; assess acute deterioration, hydration, urine output and previous results. '
+      + (renalReview.length ? 'Review these recorded medicines against this eGFR today: ' + join(renalReview) + '. ' : '')
+      + 'A single result cannot establish chronicity.', ['WHO_HEARTS_D_2020', 'KDIGO_CKD_2024'], [egfrBasis].concat(renalReview.length ? ['On ' + join(renalReview)] : []))
     if (potassium != null && potassium >= 5.5) {
+      // A negative dosing-context entry cannot cancel a positive acute finding.
       var acuteK = get(data, 'acutely_unwell') === 'yes' || get(data, 'acute_kidney_injury') === 'yes' || get(get(data, 'dosing_context') || {}, 'acute_illness') === 'yes'
       ;['acutely_unwell', 'acute_kidney_injury'].forEach(function (field) { if (get(data, field, 'unknown') === 'unknown') missing.push(field) })
       var detail
@@ -215,84 +412,225 @@
       else if (acuteK) detail = 'Arrange same-day hospital assessment because acute illness or acute kidney injury is recorded. Escalate immediately if unstable; do not wait for routine repeat testing.'
       else if (potassium >= 6) detail = 'Arrange same-day clinical review and repeat potassium within one day. Assess whether hospital care is needed.'
       else detail = 'For an unexpected result, repeat potassium within three days, or sooner as clinically indicated. Confirm clinical stability and previous results before setting follow-up.'
-      detail += ' Assess clinical state, ECG needs, sample validity and medicines. Unknown acute illness or kidney injury must be assessed now; if present, consider hospital assessment today. No potassium-lowering dose is generated.'
+      var raising = named(union(C_ACE, C_ARB, set(['spironolactone']), C_NSAID))
+      detail = 'Potassium ' + pyG(potassium) + ' mmol/L' + (egfr != null ? ', eGFR ' + pyG(egfr) : '') + '. ' + detail
+      detail += raising.length ? ' Potassium-raising medicines recorded: ' + join(raising) + '; review them now.' : ''
+      detail += ' Assess clinical state, ECG, sample validity (haemolysis) and diet. Unknown acute illness or kidney injury must be assessed now; if present, consider hospital assessment today. No potassium-lowering dose is generated.'
       add('POTASSIUM_HIGH', 'acute_safety', potassium >= 6 || acuteK ? 'critical' : 'warning',
-        potassium >= 6.5 ? 'emergency' : potassium >= 6 || acuteK ? 'urgent' : 'soon', 'Elevated potassium', detail, 'UKKA_POTASSIUM_2026')
+        potassium >= 6.5 ? 'emergency' : potassium >= 6 || acuteK ? 'urgent' : 'soon', 'Elevated potassium', detail, ['UKKA_POTASSIUM_2026'],
+        [potassiumBasis, 'Acutely unwell: ' + pyStr(get(data, 'acutely_unwell', 'unknown')), 'Acute kidney injury: ' + pyStr(get(data, 'acute_kidney_injury', 'unknown'))]
+          .concat(raising.length ? ['On ' + join(raising)] : []))
     }
-    if (potassium != null && potassium < 3.5) add('POTASSIUM_LOW', 'acute_safety', potassium < 3 ? 'critical' : 'warning',
-      potassium < 2.5 ? 'emergency' : potassium < 3 ? 'urgent' : 'soon', 'Reduced potassium',
-      'Review symptoms, ECG, medicines and magnesium. Below 2.5 mmol/L requires immediate supervised assessment; no electrolyte replacement dose is generated.', 'NHS_LOW_POTASSIUM')
+    if (potassium != null && potassium < 3.5) {
+      var wasting = named(union(T_THIAZIDE, set(['furosemide'])))
+      add('POTASSIUM_LOW', 'acute_safety', potassium < 3 ? 'critical' : 'warning',
+        potassium < 2.5 ? 'emergency' : potassium < 3 ? 'urgent' : 'soon', 'Reduced potassium',
+        'Potassium ' + pyG(potassium) + ' mmol/L. ' + (wasting.length ? 'Potassium-lowering diuretics recorded: ' + join(wasting) + '; review the dose and need. ' : '')
+        + 'Review symptoms, ECG, vomiting or diarrhoea, and magnesium. Below 2.5 mmol/L requires immediate supervised assessment; no electrolyte replacement dose is generated.', ['NHS_LOW_POTASSIUM'],
+        [potassiumBasis].concat(wasting.length ? ['On ' + join(wasting)] : []))
+    }
     if (symptoms.has('foot_ulcer')) add('FOOT_ULCER', 'referral', 'warning', 'urgent', 'Assess foot ulcer and limb risk',
-      'Assess infection, perfusion and systemic illness today. Infection, gangrene or critical ischaemia warrants urgent referral; absence of these findings has not been established.', 'WHO_HEARTS_D_2020', 'NCDAI_SAFETY_SPEC')
+      'Foot ulcer recorded' + (diabetic ? ' in a patient with diabetes (' + (hba1cBasis || glucoseBasis || 'no current glycaemic result') + ')' : '')
+      + '. Today assess infection (spreading redness, pus, fever), foot pulses and perfusion, and systemic illness; offload the foot. Infection, gangrene or critical ischaemia warrants urgent referral; absence of these findings has not been established.',
+      ['WHO_HEARTS_D_2020', 'NCDAI_SAFETY_SPEC'], [symptomBasis, diabetic ? hba1cBasis : null])
     if (codeSet.has('metformin')) {
       if (egfr == null) missing.push('egfr_for_metformin_review')
       else if (egfr < 30) add('METFORMIN_RENAL', 'medication_safety', 'critical', 'urgent', 'Metformin renal contraindication flag',
-        "Recorded eGFR is below the metformin label's renal limit. Obtain urgent prescriber review of current therapy; the system does not issue a prescription change.", 'METFORMIN_LABEL')
+        medNames.get('metformin') + ' is recorded with eGFR ' + pyG(egfr) + ", below the label's renal limit of 30. Obtain urgent prescriber review to stop it; the system does not issue a prescription change.", ['METFORMIN_LABEL'], [egfrBasis, 'On metformin'])
       else if (egfr < 45) add('METFORMIN_REVIEW', 'medication_safety', 'warning', 'soon', 'Review metformin with reduced eGFR',
-        "Review benefit, risk and monitoring of existing metformin therapy. Initiation is not recommended in this renal range by the referenced label.", 'METFORMIN_LABEL')
+        medNames.get('metformin') + ' is recorded with eGFR ' + pyG(egfr) + ' (30-44). Review benefit, risk and the current dose, and monitor kidney function more often. Starting metformin is not recommended in this range.', ['METFORMIN_LABEL'], [egfrBasis, 'On metformin'])
     }
     if (codeSet.has('glibenclamide') && age >= 60) add('GLIBENCLAMIDE_OLDER_ADULT', 'medication_safety', 'warning', 'soon', 'Review glibenclamide in an older adult',
-      'The referenced WHO protocol advises avoiding glibenclamide from age 60. Review the current regimen and hypoglycaemia risk with the prescriber.', 'WHO_HEARTS_MEDS_2018')
+      'Age ' + age + ' on ' + medNames.get('glibenclamide') + ". The WHO protocol advises avoiding glibenclamide from age 60 because of hypoglycaemia; the Kenya flowchart's sulfonylurea options are gliclazide 40-160 mg or glimepiride 1-4 mg. "
+      + 'Review hypoglycaemia history with the prescriber.', ['WHO_HEARTS_MEDS_2018', 'KENYA_DM_TREATMENT'], ['Age ' + age, 'On glibenclamide'])
     if (intersects(codeSet, C_SULFONYLUREA) && egfr != null && egfr < 60) add('SULFONYLUREA_RENAL', 'medication_safety', 'warning', 'soon', 'Review sulfonylurea with impaired kidney function',
-      'Renal impairment can increase hypoglycaemia risk. Review the exact medicine, prior episodes, eating pattern and monitoring; do not infer a safe dose from this screen.', 'NICE_DIABETES_2026', 'NCDAI_SAFETY_SPEC')
-    if (intersects(codeSet, union(C_ACE, C_ARB))) {
+      join(named(C_SULFONYLUREA)) + ' with eGFR ' + pyG(egfr) + '. Reduced kidney function increases hypoglycaemia risk. Ask about hypoglycaemic episodes, meal pattern and monitoring; do not infer a safe dose from this screen.',
+      ['NICE_DIABETES_2026', 'NCDAI_SAFETY_SPEC'], [egfrBasis, 'On ' + join(named(C_SULFONYLUREA))])
+    var rasClass = union(C_ACE, C_ARB)
+    if (intersects(codeSet, rasClass)) {
       if (pregnant) add('RAS_PREGNANCY', 'medication_safety', 'critical', 'urgent', 'ACE inhibitor/ARB in pregnancy',
-        'Arrange urgent prescriber and obstetric review of the recorded renin-angiotensin-system medicine because of fetal risk. No replacement drug is selected automatically.', 'NICE_PREGNANCY', 'LISINOPRIL_LABEL')
+        join(named(rasClass)) + ' is recorded in pregnancy. Arrange urgent prescriber and obstetric review because of fetal risk. No replacement drug is selected automatically.',
+        ['NICE_PREGNANCY', 'LISINOPRIL_LABEL'], ['Pregnant', 'On ' + join(named(rasClass))])
       if (pregnancy === 'unknown') missing.push('pregnancy_status_for_RAS_medication_review')
       if (egfr == null) missing.push('egfr_for_RAS_medication_review')
       if (potassium == null) missing.push('potassium_for_RAS_medication_review')
     }
+    if (pregnant && intersects(codeSet, T_STATINS)) add('STATIN_PREGNANCY', 'medication_safety', 'critical', 'urgent', 'Statin recorded in pregnancy',
+      join(named(T_STATINS)) + ' is recorded and statins are contraindicated in pregnancy (NICE 1.5.9). Arrange prescriber review to stop it; do not restart until breastfeeding has finished.',
+      ['NICE_LIPIDS_NG238'], ['Pregnant', 'On ' + join(named(T_STATINS))])
     if (intersects(codeSet, C_ACE) && intersects(codeSet, C_ARB)) add('DUAL_RAS', 'medication_safety', 'warning', 'soon', 'Combined ACE inhibitor and ARB recorded',
-      'Reconcile both medicines and seek prescriber review for renal, potassium and hypotension risk.', 'LISINOPRIL_LABEL')
-    if (intersects(codeSet, union(C_ACE, C_ARB)) && codeSet.has('spironolactone')) add('POTASSIUM_MEDICATION_RISK', 'medication_safety', 'warning', 'soon', 'Potassium-raising combination',
-      'Verify indication, kidney function and potassium monitoring for this combination; no dose change is inferred.', 'LISINOPRIL_LABEL')
-    if (intersects(codeSet, C_NSAID) && intersects(codeSet, union(C_ACE, C_ARB))) add('NSAID_RENAL', 'medication_safety', 'warning', 'soon', 'NSAID with ACE inhibitor/ARB',
-      'Review renal risk, hydration and non-prescription medicines. Concurrent diuretic use adds concern; arrange supervised medication reconciliation.', 'LISINOPRIL_LABEL')
+      join(named(C_ACE)) + ' and ' + join(named(C_ARB)) + ' are both recorded. Combining an ACE inhibitor with an ARB raises renal, potassium and hypotension risk; reconcile and seek prescriber review to stop one.',
+      ['LISINOPRIL_LABEL'], ['On ' + join(named(rasClass)), potassiumBasis, egfrBasis])
+    if (intersects(codeSet, rasClass) && codeSet.has('spironolactone')) add('POTASSIUM_MEDICATION_RISK', 'medication_safety', 'warning', 'soon', 'Potassium-raising combination',
+      join(named(rasClass)) + ' with ' + medNames.get('spironolactone') + (potassium != null ? '; latest potassium ' + pyG(potassium) + ' mmol/L' : '; no potassium is recorded') + (egfr != null ? ', eGFR ' + pyG(egfr) : '')
+      + '. Verify the indication and arrange regular potassium and kidney-function monitoring; no dose change is inferred.', ['LISINOPRIL_LABEL'], [potassiumBasis, egfrBasis])
+    if (intersects(codeSet, C_NSAID) && intersects(codeSet, rasClass)) {
+      var diuretics = named(union(T_THIAZIDE, set(['furosemide', 'spironolactone'])))
+      add('NSAID_RENAL', 'medication_safety', 'warning', 'soon', 'NSAID with ACE inhibitor/ARB',
+        join(named(C_NSAID)) + ' with ' + join(named(rasClass)) + (diuretics.length ? ' and ' + join(diuretics) + " (the 'triple whammy' for acute kidney injury)" : '') + (egfr != null ? '; eGFR ' + pyG(egfr) : '')
+        + '. Review the need for the NSAID, check over-the-counter use and hydration, and arrange supervised medication reconciliation.', ['LISINOPRIL_LABEL'],
+        ['On ' + join(named(union(C_NSAID, rasClass))), egfrBasis])
+    }
     var conflicts = sortedStrings(intersection(codeSet, allergies))
     var extra = new Set()
     meds.forEach(function (m, i) { if (allergies.has(ingredient(get(m, 'name')))) extra.add(codes[i]) })
     conflicts = conflicts.concat(sortedStrings(Array.from(extra).filter(function (c) { return conflicts.indexOf(c) < 0 })))
     if (conflicts.length) add('ALLERGY_CONFLICT', 'medication_safety', 'critical', 'urgent', 'Medicine overlaps a recorded allergy',
-      'Potential exact-match conflict: ' + conflicts.join(', ') + '. Confirm the substance, reaction and severity with a clinician before administration decisions.', 'NCDAI_SAFETY_SPEC')
-    var counts = {}
-    codes.forEach(function (c) { counts[c] = (counts[c] || 0) + 1 })
-    var duplicate = sortedStrings(Object.keys(counts).filter(function (c) { return counts[c] > 1 }))
+      'Potential exact-match conflict: ' + conflicts.join(', ') + '. Confirm the substance, reaction and severity with a clinician before administration decisions.', ['NCDAI_SAFETY_SPEC'])
+    var counts = new Map()
+    codes.forEach(function (c) { counts.set(c, (counts.get(c) || 0) + 1) })
+    var duplicate = sortedStrings(Array.from(counts.keys()).filter(function (c) { return counts.get(c) > 1 }))
     if (duplicate.length) add('DUPLICATE_MEDICATION', 'medication_safety', 'warning', 'soon', 'Possible duplicate medicine entries',
-      'Reconcile duplicate ingredient codes: ' + duplicate.join(', ') + '. Separate schedules may be intentional; never combine doses automatically.', 'NCDAI_SAFETY_SPEC')
+      'Reconcile duplicate ingredient codes: ' + duplicate.join(', ') + '. Separate schedules may be intentional; never combine doses automatically.', ['NCDAI_SAFETY_SPEC'])
     var unsupported = sortedStrings(Array.from(codeSet).filter(function (c) { return !C_SUPPORTED.has(c) }))
     if (unsupported.length) add('MEDICATION_UNSUPPORTED', 'medication_safety', 'warning', 'soon', 'Medicines outside the rule dictionary',
-      'Manual pharmacist/prescriber review required for: ' + unsupported.join(', ') + '. Absence of an interaction alert does not establish compatibility.', 'NCDAI_SAFETY_SPEC')
+      'Manual pharmacist/prescriber review required for: ' + unsupported.map(function (c) { return medNames.get(c) }).join(', ') + '. Absence of an interaction alert does not establish compatibility.', ['NCDAI_SAFETY_SPEC'])
 
+    // Routine disease review is not allowed to compete with an emergency banner.
     var acute = PRIORITY[result.urgency] >= PRIORITY.urgent
+    var cvd = cvdState === 'yes'
     if (!pregnant && !acute) {
+      var grade = bpAtLeast(160, 100) ? 'grade 2' : 'grade 1'
+      var risk = comorbid.filter(function (c) { return c === 'diabetes' || c === 'chronic kidney disease' || c === 'cardiovascular disease' })
+      var nextStep = (hypertensive ? ' Treatment options for this patient are listed as a separate recommendation.'
+        : ' If hypertension is not yet diagnosed, confirm persistent elevation (SBP ≥140 and/or DBP ≥90 mmHg on repeat readings, the Kenya protocol confirms in the second month) before diagnosing and treating.')
+        + (risk.length ? ' With ' + join(risk) + ' on record, cardiovascular risk is high.' : '')
       if (bpAtLeast(160, 100)) add('BP_HIGH', 'hypertension', 'warning', 'soon', 'Prompt BP treatment review',
-        'Confirm measurement and arrange clinician review without delay, including adherence and contraindications. Do not derive a new prescription from this reading alone.', 'WHO_HTN_2021')
+        'Highest reading ' + reading(highestSbp, highestDbp) + ' mmHg is in the ' + grade + ' hypertension range (≥160/100). Confirm the measurement and review adherence and contraindications without delay; '
+        + 'the Kenya protocol starts medicine for grade 2 hypertension alongside lifestyle changes.' + nextStep, ['KENYA_HTN_STEPS', 'WHO_HTN_2021'], bpBasis)
       else if (bpAtLeast(140, 90)) add('BP_REVIEW', 'hypertension', 'warning', 'soon', 'Raised BP needs confirmation and review',
-        'Confirm the reading and previous diagnosis; review the care plan, medicines and adherence with the clinician.', 'WHO_HTN_2021')
+        'Highest reading ' + reading(highestSbp, highestDbp) + ' mmHg is in the grade 1 hypertension range (140-159/90-99). Confirm the reading with correct technique and review medicines and adherence.' + nextStep,
+        ['KENYA_HTN_STEPS', 'WHO_HTN_2021'], bpBasis)
       else if (hypertensive) add('HTN_FOLLOWUP', 'hypertension', 'info', 'routine', 'Continue an individualized BP review plan',
-        'Review the agreed target, tolerability and follow-up timing. Diabetes or kidney/CV disease may change targets; incomplete data cannot establish control.', 'WHO_HTN_2021')
+        (highestSbp != null ? 'BP ' + reading(highestSbp, highestDbp) + ' mmHg is at the Kenya target (<140/90)' : 'No BP is recorded at this visit')
+        + (bpLowering.length ? ' on ' + join(bpLowering) : '') + '. Continue the current plan; once at target the protocol reviews every 4-6 months, sooner for symptoms such as headache or a persistent cough (ACE inhibitor). '
+        + 'Incomplete data cannot establish control.', ['KENYA_HTN_STEPS'], bpBasis.concat(['Medicines: ' + (join(bpLowering) || 'none recorded')]))
+      var fastingGlucose = glucoseTiming === 'fasting' ? glucose : null
       if (hba1c != null && hba1c >= 6.5 && !diabetic) add('DIABETES_CONFIRM', 'diabetes', 'warning', 'soon', 'Confirm possible diabetes',
-        'Review diagnostic context and confirmatory testing; do not diagnose from this value alone, particularly where HbA1c reliability is uncertain.', 'KENYA_NCD_PROTOCOLS')
-      else if (glucose != null && glucose >= 11.1 && !diabetic) add('DIABETES_CONFIRM', 'diabetes', 'warning', 'soon', 'Clarify elevated glucose and diagnosis',
-        'Establish fasting/random status, symptoms and confirmatory testing. A single unspecified glucose measurement is not a diagnosis.', 'KENYA_NCD_PROTOCOLS')
-      if (diabetic) add('DIABETES_REVIEW', 'diabetes', hba1c != null && hba1c >= 9 ? 'warning' : 'info',
-        hba1c != null && hba1c >= 9 ? 'soon' : 'routine', 'Review diabetes control and complication screening',
-        'Review the individualized glycaemic goal, hypoglycaemia, adherence, kidney/eye/foot checks and follow-up. A high HbA1c prompts review, not automatic intensification.', 'KENYA_NCD_PROTOCOLS', 'NCDAI_SAFETY_SPEC')
-      if (renalDisease || (egfr != null && egfr < 60)) add('CKD_REVIEW', 'kidney', 'warning', 'soon', 'Review kidney status and chronicity',
-        'Check prior eGFR, urine albumin and possible acute causes; confirm persistent abnormality rather than labeling one low result as CKD.', 'KDIGO_CKD_2024')
-      if (get(data, 'known_asthma') === 'yes' || get(data, 'known_copd') === 'yes') add('RESP_CHRONIC_REVIEW', 'respiratory', 'info', 'soon', 'Review chronic respiratory care',
-        'Confirm diagnosis with appropriate testing, inhaler technique, adherence, triggers, exacerbation history and a written action plan.', 'WHO_PEN_2020')
+        'HbA1c ' + pyG(hba1c) + '% meets the diagnostic threshold (≥6.5%). Without classic symptoms, arrange a confirmatory test on a different day (HbA1c or fasting blood sugar) before diagnosing; '
+        + 'HbA1c can be unreliable with anaemia or haemoglobin variants.', ['KENYA_DM_DIAGNOSIS'], [hba1cBasis, glucoseBasis])
+      else if (fastingGlucose != null && fastingGlucose >= 7.0 && !diabetic) add('DIABETES_CONFIRM', 'diabetes', 'warning', 'soon', 'Confirm possible diabetes (fasting glucose)',
+        'Fasting glucose ' + pyFixed(fastingGlucose, 1) + ' mmol/L meets the diagnostic threshold (≥7.0). Without classic symptoms, arrange a confirmatory fasting blood sugar or HbA1c on a different day before diagnosing.',
+        ['KENYA_DM_DIAGNOSIS'], [glucoseBasis])
+      else if (glucose != null && glucoseTiming !== 'fasting' && glucose >= 11.1 && !diabetic) add('DIABETES_CONFIRM', 'diabetes', 'warning', 'soon', 'Clarify elevated glucose and diagnosis',
+        (glucoseTiming === 'random' ? 'Random' : 'Unspecified-timing') + ' glucose ' + pyFixed(glucose, 1) + ' mmol/L is ≥11.1. With polyuria, polydipsia or weight loss this supports diabetes; '
+        + 'without symptoms, a confirmatory fasting blood sugar (≥7.0 mmol/L) or HbA1c (≥6.5%) on another day is needed; record it in Laboratory results.', ['KENYA_DM_DIAGNOSIS'], [glucoseBasis])
+      else if (!diabetic && ((hba1c != null && 5.7 <= hba1c && hba1c < 6.5) || (fastingGlucose != null && 5.6 <= fastingGlucose && fastingGlucose < 7.0))) {
+        var loss = weight != null && bmi != null && bmi >= 25 ? ' For this patient (' + pyG(weight) + ' kg) that is ' + pyFixed(weight * 0.05, 0) + '-' + pyFixed(weight * 0.1, 0) + ' kg.' : ''
+        add('PREDIABETES', 'prevention', 'info', 'routine', 'Prediabetes range: lifestyle intervention',
+          (hba1cBasis || glucoseBasis) + ' is in the prediabetes range (HbA1c 5.7-6.4% or fasting glucose 5.6-6.9 mmol/L). Advise diet, 30 minutes of physical activity 5 times weekly and sleep hygiene; '
+          + 'if overweight aim to lose 5-10% of body weight in 12 months.' + loss + ' Repeat HbA1c every 3-6 months. Metformin is considered if BMI is above 35 or there was gestational diabetes'
+          + (bmi != null ? ' (BMI ' + pyG(bmi) + ').' : '.'),
+          ['KENYA_PREDIABETES'], [hba1cBasis, glucoseBasis, bmi != null ? 'BMI ' + pyG(bmi) + ' kg/m²' : null])
+      }
+      if (diabetic) {
+        var aboveTarget = (hba1c != null && hba1c >= 7) || (hba1c == null && fastingGlucose != null && fastingGlucose > 7.2)
+        var status
+        if (hba1c != null) status = 'HbA1c ' + pyG(hba1c) + '% is ' + (hba1c >= 7 ? pyFixed(hba1c - 7, 1) + ' points above' : 'within') + ' the Kenya target (<7.0%). '
+        else if (fastingGlucose != null) status = 'Fasting glucose ' + pyFixed(fastingGlucose, 1) + ' mmol/L is ' + (fastingGlucose > 7.2 ? 'above' : 'within') + ' the Kenya fasting target (4.4-7.2). '
+        else status = 'No HbA1c or fasting glucose is recorded to judge control against the Kenya target (HbA1c <7.0%). '
+        add('DIABETES_REVIEW', 'diabetes', hba1c != null && hba1c >= 9 ? 'warning' : 'info',
+          hba1c != null && hba1c >= 9 ? 'soon' : 'routine', 'Review diabetes control and complication screening',
+          status + (aboveTarget ? 'Treatment options are listed separately. ' : '')
+          + (glucoseLowering.length ? 'Ask about hypoglycaemia on ' + join(glucoseLowering) + '. ' : '')
+          + 'Complication screening: kidney function (eGFR' + (egfr != null ? ', last ' + pyG(egfr) : ', not recorded') + ') and urine albumin, eyes, and feet (pulses, sensation, ulcers).',
+          ['KENYA_DM_TREATMENT', 'NCDAI_SAFETY_SPEC'],
+          [hba1cBasis, glucoseBasis, egfrBasis, 'Glucose-lowering medicines: ' + (join(named(union(set(['metformin']), C_SULFONYLUREA, C_SGLT2), isInsulin)) || 'none recorded')])
+      }
+      // Elective medicine options are withheld whenever the encounter is acute.
+      var elective = get(data, 'acutely_unwell') !== 'yes'
+      var statinIndicated = diabetic || cvd || renalDisease || (totalChol != null && totalChol >= 8)
+      if (!statinIndicated && ((hdl != null && hdl < 0.9) || (triglycerides != null && triglycerides > 2.82))) add('LIPID_RISK_FACTOR', 'prevention', 'info', 'routine', 'Abnormal lipids: estimate cardiovascular risk',
+        pyCapitalize([hdl != null && hdl < 0.9 ? 'HDL ' + pyG(hdl) + ' mmol/L (below 0.90)' : null,
+          triglycerides != null && triglycerides > 2.82 ? 'triglycerides ' + pyG(triglycerides) + ' mmol/L (above 2.82)' : null].filter(truthy).join(', '))
+        + '. These are cardiovascular and diabetes risk factors. Estimate 10-year CVD risk with the WHO chart (age, sex, smoking, systolic BP and cholesterol); a statin is advised above 20%. '
+        + 'Screen for diabetes if not done and advise diet, activity and weight management.',
+        ['KENYA_DM_SCREENING', 'KENYA_CVD_RISK'], [hdl != null ? 'HDL ' + pyG(hdl) + ' mmol/L' : null, triglycerides != null ? 'Triglycerides ' + pyG(triglycerides) + ' mmol/L' : null])
+      var central = waist != null && ((sex === 'female' && waist >= 90) || (sex === 'male' && waist >= 100))
+      if ((bmi != null && bmi >= 25) || central) {
+        var goal = ''
+        if (weight != null) {
+          goal = ' A 5-10% loss for this patient is ' + pyFixed(weight * 0.05, 0) + '-' + pyFixed(weight * 0.1, 0) + ' kg over 12 months'
+          if (height != null) goal += '; a BMI below 25 corresponds to under ' + pyFixed(25 * sq(height / 100), 0) + ' kg at ' + pyG(height) + ' cm'
+          goal += '.'
+        }
+        add('WEIGHT_MANAGEMENT', 'prevention', 'info', 'routine',
+          (bmi != null && bmi >= 30 ? 'Obesity' : bmi != null && bmi >= 25 ? 'Overweight' : 'Raised waist circumference') + ': agree a weight plan',
+          (bmi != null ? 'BMI ' + pyG(bmi) + ' kg/m² (' + bmiCategory + ')' : 'BMI not calculable')
+          + (waist != null ? ', waist ' + pyG(waist) + ' cm' + (central ? ' (above the Kenya cut-off of ' + (sex === 'female' ? '90' : '100') + ' cm)' : '') : '') + '. '
+          + (hypertensive || diabetic ? 'Weight loss will help lower ' + join([hypertensive ? 'blood pressure' : '', diabetic ? 'glucose' : ''].filter(truthy)) + ' and cardiovascular risk. '
+            : 'Overweight is a diabetes and cardiovascular risk factor; screen for diabetes and estimate CVD risk. ')
+          + 'Advise reduced salt, sugar and saturated fat and moderate aerobic activity 30 minutes on 5-7 days weekly.' + goal + ' Record weight at each visit.',
+          ['KENYA_HTN_LIFESTYLE', 'KENYA_DM_SCREENING'],
+          [bmi != null ? 'BMI ' + pyG(bmi) + ' kg/m² (' + bmiCategory + ')' : null, weight != null ? 'Weight ' + pyG(weight) + ' kg' : null,
+            height != null ? 'Height ' + pyG(height) + ' cm' : null, waist != null ? 'Waist ' + pyG(waist) + ' cm' : null])
+      }
+      if (elective) {
+        var useRepeat = rsbp != null && rdbp != null
+        var ctx = { age: age, sex: sex, pregnancy: pregnancy,
+          meds: meds.map(function (m, i) { return Object.assign({}, m, { _code: codes[i], _label: medNames.get(codes[i]) }) }), codes: codeSet,
+          control_bp: useRepeat ? [rsbp, rdbp] : sbp != null && dbp != null ? [sbp, dbp] : null,
+          control_is_repeat: useRepeat, diabetic: diabetic, renal_disease: renalDisease, cvd: cvd, cvd_status: cvdState,
+          asthma: get(data, 'known_asthma') === 'yes',
+          tobacco: get(data, 'tobacco_use', 'unknown'), adherence: get(data, 'adherence', 'unknown'),
+          egfr: egfr, hba1c: hba1c, glucose: glucose, glucose_timing: glucoseTiming, weight: weight,
+          total_cholesterol: totalChol, ldl: ldl, hdl: hdl, triglycerides: triglycerides }
+        var treatmentOptions = (hypertensive ? hypertensionOptions(ctx) : []).concat(diabetic ? diabetesOptions(ctx) : [],
+          lipidOptions(ctx), respiratoryOptions(ctx))
+        treatmentOptions.forEach(function (option) {
+          add(option.rule_id, has(option, 'category') ? option.category : 'treatment', option.severity, option.urgency, option.title, option.detail,
+            option.sources, option.basis)
+        })
+        if (statinIndicated && !intersects(codeSet, T_STATINS) && cvdState === 'unknown') missing.push('known_cvd_for_statin_choice')
+      }
+      if (renalDisease || (egfr != null && egfr < 60)) {
+        var category = egfr == null ? null : egfr >= 45 ? 'G3a' : egfr >= 30 ? 'G3b' : egfr >= 15 ? 'G4' : 'G5'
+        var nephrotoxic = named(C_NSAID)
+        add('CKD_REVIEW', 'kidney', 'warning', 'soon', 'Review kidney status and chronicity',
+          (egfr != null ? 'eGFR ' + pyG(egfr) + ' (KDIGO category ' + category + ')' : 'Known chronic kidney disease with no eGFR recorded') + (renalDisease && egfr != null ? '; CKD is recorded' : '') + '. '
+          + (!renalDisease ? 'Repeat eGFR and check urine albumin: CKD requires abnormality for more than 3 months, so compare with previous results and look for acute causes. ' : 'Check urine albumin and the trend against previous results. ')
+          + (nephrotoxic.length ? 'Avoid NSAIDs: ' + join(nephrotoxic) + ' is recorded. ' : '')
+          + (renalReview.length ? 'Review doses of ' + join(renalReview) + ' for this eGFR.' : ''), ['KDIGO_CKD_2024'],
+          [egfrBasis, renalDisease ? 'Known CKD' : null].concat(renalReview.length ? ['On ' + join(renalReview)] : []))
+      }
+      if (get(data, 'known_asthma') === 'yes' || get(data, 'known_copd') === 'yes') {
+        var text, respSources
+        if (get(data, 'known_copd') === 'yes') {
+          text = 'COPD recorded' + (inhalers.length ? ', current inhalers: ' + join(inhalers) : ', no inhaler recorded') + '. Grade by exacerbations and breathlessness (Kenya 6.8): '
+            + 'group A (0-1 exacerbation a year, breathless only on strenuous exercise or hills) uses a bronchodilator; group B (breathless walking on level ground) uses LABA+LAMA; '
+            + 'group E (2 or more moderate exacerbations, or 1 hospital admission, a year) uses LABA+LAMA with specialist referral. '
+            + (smoker ? 'Smoking cessation is the most important step for this patient. ' : '') + 'Offer influenza, pneumococcal and COVID-19 vaccination and an exercise programme.'
+          respSources = ['KENYA_COPD']
+        } else {
+          text = 'Asthma recorded' + (inhalers.length ? ', current inhalers: ' + join(inhalers) : ', no inhaler recorded') + '. Review symptom frequency, night waking, reliever use and exacerbations to set the Kenya step; '
+            + 'check inhaler technique, adherence, triggers and a written action plan.' + (smoker ? ' Smoking worsens control; offer cessation support.' : '')
+          respSources = ['KENYA_ASTHMA']
+        }
+        add('RESP_CHRONIC_REVIEW', 'respiratory', 'info', 'soon', 'Review chronic respiratory care', text, respSources,
+          [get(data, 'known_copd') === 'yes' ? 'Known COPD' : 'Known asthma', 'Inhalers: ' + (join(inhalers) || 'none recorded'), smoker ? 'Current smoker' : null])
+      }
       if (get(data, 'known_cancer') === 'yes') add('CANCER_SCOPE', 'continuity', 'info', 'soon', 'Coordinate with the treating cancer team',
-        'Reconcile the oncology plan, supportive care needs and referral follow-through. Cancer staging and treatment are outside this release.', 'WHO_CANCER_DIAGNOSIS', 'NCDAI_SAFETY_SPEC')
-      if (get(data, 'tobacco_use') === 'current') add('TOBACCO_SUPPORT', 'prevention', 'info', 'routine', 'Offer tobacco cessation support',
-        'Discuss readiness and access to a locally approved cessation service and document the agreed support plan.', 'WHO_PEN_2020')
-      if (get(data, 'adherence') === 'missed') add('ADHERENCE_REVIEW', 'continuity', 'info', 'soon', 'Explore missed medicine use',
-        'Discuss barriers, affordability, adverse effects and understanding before treatment changes; agree a feasible plan with the patient.', 'NCDAI_SAFETY_SPEC', 'WHO_HTN_2021')
+        'Known cancer is recorded. Reconcile the oncology plan, supportive care and pain needs, and referral follow-through; check interactions of ' + (join(named(null, anyCode)) || 'current medicines') + ' with cancer treatment. Cancer staging and treatment are outside this release.',
+        ['WHO_CANCER_DIAGNOSIS', 'NCDAI_SAFETY_SPEC'])
+      if (smoker) add('TOBACCO_SUPPORT', 'prevention', 'info', 'routine', 'Offer tobacco cessation support',
+        'Current tobacco use' + (comorbid.length ? ' with ' + join(comorbid) + ', which smoking makes more dangerous' : '') + '. Advise stopping clearly, assess readiness, and refer to a cessation programme with pharmacological support where available; record the agreed plan.',
+        ['KENYA_HTN_LIFESTYLE', 'WHO_PEN_2020'], ['Current smoker'].concat(comorbid.length ? ['Known ' + join(comorbid)] : []))
+      if (get(data, 'adherence') === 'missed') {
+        var allMeds = named(null, anyCode)
+        add('ADHERENCE_REVIEW', 'continuity', 'info', 'soon', 'Explore missed medicine use',
+          'Missed doses reported' + (allMeds.length ? ' across ' + allMeds.length + ' recorded medicine' + (allMeds.length !== 1 ? 's' : '') + ' (' + join(allMeds) + ')' : '')
+          + '. Ask which doses are missed and why (cost, side effects, stock, understanding). Simplify where possible, for example once-daily or single-pill combinations, before adding treatment.',
+          ['NCDAI_SAFETY_SPEC', 'KENYA_HTN_STEPS'], ['Adherence: missed doses'].concat(allMeds.length ? ['On ' + join(allMeds)] : []))
+      }
     }
+
     if (sbp == null) missing.push('systolic_bp')
     if (dbp == null) missing.push('diastolic_bp')
     if (bpAtLeast(140, 90) && (rsbp == null || rdbp == null)) missing.push('repeat_blood_pressure')
     if (diabetic && hba1c == null && glucose == null) missing.push('glycaemic_measurement')
+    if (glucose != null && glucoseTiming === 'unknown' && !diabetic && glucose >= 5.6) missing.push('glucose_context')
+    if ((diabetic || hypertensive || renalDisease || cvdState === 'yes') && totalChol == null && ldl == null) missing.push('lipid_profile')
+    if ((diabetic || hypertensive) && bmi == null) missing.push('weight_and_height')
     if ((diabetic || renalDisease) && egfr == null) missing.push('egfr')
     if (symptoms.has('wheeze') || symptoms.has('breathlessness')) {
       if (spo2 == null) missing.push('oxygen_saturation')
@@ -302,7 +640,7 @@
     ;['medications_reviewed', 'allergies_reviewed', 'symptoms_reviewed'].forEach(function (field) { if (get(data, field) !== true) missing.push(field) })
     KNOWN_FIELDS.forEach(function (field) { if (get(data, field, 'unknown') === 'unknown') missing.push(field) })
     if (get(data, 'medicine_availability', 'unknown') !== 'available') result.warnings.push('Confirm medicine stock, cost and access; availability is unverified or limited.')
-    if (meds.some(function (m) { return get(m, 'dose') == null || !get(m, 'unit') || !get(m, 'frequency') })) result.warnings.push('One or more medication schedules are incomplete; dose safety has not been evaluated.')
+    if (meds.some(function (m) { return get(m, 'dose') == null || !truthy(get(m, 'unit')) || !truthy(get(m, 'frequency')) })) result.warnings.push('One or more medication schedules are incomplete; dose safety has not been evaluated.')
     if (calculatedEgfr != null) result.warnings.push('eGFR ' + fmt(calculatedEgfr) + ' mL/min/1.73 m² was calculated from creatinine (CKD-EPI 2021) and used by these rules; confirm the result date and trend.')
     result.warnings.push('Medication checks are limited to selected ingredients and exact allergy matches; cross-reactivity, all interactions and dose appropriateness are not covered.')
     var observed = get(data, 'observed_at')
@@ -317,9 +655,10 @@
     }
     result.missing_data = sortedStrings(unique(missing))
     if (missing.length) add('DATA_COMPLETENESS', 'data_quality', 'warning', 'soon', 'Complete essential assessment information',
-      'Review the missing-data list. Unknown, unreviewed and absent findings are distinct. Emergency assessment must not wait for routine documentation.', 'NCDAI_SAFETY_SPEC')
+      'Still needed for this patient: ' + result.missing_data.map(function (item) { return underscoresToSpaces(item) + (has(GAP_REASONS, item) ? ' (' + GAP_REASONS[item] + ')' : '') }).join('; ')
+      + '. Unknown, unreviewed and absent findings are distinct. Emergency assessment must not wait for routine documentation.', ['NCDAI_SAFETY_SPEC'])
     if (!recs.length) add('CLINICIAN_REVIEW', 'scope', 'info', 'routine', 'Complete clinician review',
-      'No configured high-priority rule triggered from the supplied structured fields. Review the patient and full record; this screen does not establish safety or exclude disease.', 'NCDAI_SAFETY_SPEC')
+      'No configured high-priority rule triggered from the supplied structured fields. Review the patient and full record; this screen does not establish safety or exclude disease.', ['NCDAI_SAFETY_SPEC'])
     recs.sort(function (a, b) { return SEVERITY[a.severity] - SEVERITY[b.severity] || (a.rule_id < b.rule_id ? -1 : a.rule_id > b.rule_id ? 1 : 0) })
     result.summary = {
       emergency: 'Immediate clinician assessment and the appropriate emergency pathway are advised.',
@@ -327,8 +666,534 @@
       soon: 'Clinician review and completion of identified checks are advised; timing needs clinical confirmation.',
       routine: 'Complete the supervised NCD review and agree follow-up; this result does not provide clinical clearance.',
     }[result.urgency]
+    result.care_plan = buildCarePlan(data, age, sex, meds.map(function (m, i) {
+      return Object.assign({}, m, { _code: codes[i], _label: truthy(get(m, 'name')) ? pyStr(get(m, 'name')) : codes[i] })
+    }), result)
+    // The backend attaches its dose-reference module here; it is not ported (excluded from parity).
+    // Consultant synthesis reads the final urgency; it never changes findings.
     result.consultant = build(data, age, sex, result)
     return result
+  }
+
+  // ---- treatment options (treatment.py) -----------------------------------
+  // Guideline treatment options for confirmed hypertension and type 2 diabetes,
+  // statins, aspirin and asthma. Deterministic and advisory; the caller (assess)
+  // withholds them in acute, urgent or pregnancy contexts. Mirrors treatment.py
+  // function by function: change both together.
+  var T_CCB = set(['amlodipine', 'felodipine', 'nifedipine'])
+  var T_THIAZIDE = set(['hydrochlorothiazide', 'chlorthalidone', 'indapamide'])
+  var T_ACE = set(['lisinopril', 'enalapril', 'ramipril', 'captopril', 'perindopril'])
+  var T_ARB = set(['losartan', 'valsartan', 'candesartan', 'telmisartan', 'irbesartan'])
+  var T_RAS = union(T_ACE, T_ARB)
+  var T_BETA_BLOCKER = set(['atenolol', 'bisoprolol', 'carvedilol', 'metoprolol', 'propranolol', 'labetalol', 'nebivolol'])
+  var T_OTHER_BP = set(['spironolactone', 'methyldopa', 'hydralazine', 'clonidine', 'prazosin', 'minoxidil', 'furosemide'])
+  var T_STATINS = set(['atorvastatin', 'simvastatin', 'rosuvastatin', 'pravastatin', 'lovastatin'])
+  var T_SULFONYLUREA = set(['glibenclamide', 'gliclazide', 'glimepiride', 'glipizide'])
+  var T_DPP4 = set(['sitagliptin', 'vildagliptin', 'linagliptin', 'saxagliptin'])
+  var T_SGLT2 = set(['empagliflozin', 'dapagliflozin', 'canagliflozin'])
+  var T_TZD = set(['pioglitazone'])
+  var T_BP_ANY = union(T_CCB, T_THIAZIDE, T_RAS, T_BETA_BLOCKER, T_OTHER_BP)
+  var T_GLUCOSE_ORAL = union(set(['metformin']), T_SULFONYLUREA, T_DPP4, T_SGLT2, T_TZD)
+  var T_INSULIN_NAMES = set(['glargine', 'detemir', 'degludec', 'mixtard', 'insulatard', 'actrapid', 'humulin', 'novomix'])
+
+  // Kenya MOH Table 4 (printed page 16, PDF page 25): once-daily start and maximum, mg.
+  // Enalapril, captopril, perindopril and nifedipine have ranges, salts or divided
+  // schedules and are deliberately not compared.
+  var HTN_TABLE4 = {
+    amlodipine: [5, 10], felodipine: [5, 10], chlorthalidone: [25, 50],
+    hydrochlorothiazide: [12.5, 25], indapamide: [2.5, 5], lisinopril: [10, 40],
+    ramipril: [2.5, 10], candesartan: [8, 32], irbesartan: [150, 300],
+    losartan: [50, 100], telmisartan: [40, 80], valsartan: [80, 160],
+  }
+  var CLASS_LABEL = { ccb: 'calcium channel blocker', thiazide: 'thiazide/thiazide-like diuretic', ras: 'ACE inhibitor/ARB' }
+  var START_EXAMPLE = {
+    ccb: 'amlodipine 5 mg once daily (maximum 10 mg)',
+    thiazide: 'hydrochlorothiazide 12.5 mg once daily (maximum 25 mg) or chlorthalidone 25 mg once daily (maximum 50 mg)',
+    ras: 'losartan 50 mg once daily (maximum 100 mg) or lisinopril 10 mg once daily (maximum 40 mg)',
+  }
+  var STEP_NOTE = 'Kenya protocol: stay on each step for at least 3 months before escalating; first exclude non-adherence, '
+    + 'white-coat hypertension and incorrect measurement technique. Target <140/90 mmHg; review monthly until at target.'
+  var RAS_CHECK = 'Before an ACE inhibitor/ARB: confirm the patient is not pregnant or planning pregnancy, '
+    + 'and check potassium and eGFR at baseline and after starting.'
+
+  // Established cardiovascular disease from the recorded history: coronary or
+  // peripheral arterial disease, or a previous stroke/TIA. 'unknown' unless both
+  // are recorded, so an incomplete history is never read as absence.
+  function cvdStatus(data) {
+    var ascvd = get(data, 'known_ascvd', 'unknown'), stroke = get(data, 'prior_stroke_tia', 'unknown')
+    if (ascvd === 'yes' || stroke === 'yes') return 'yes'
+    return ascvd === 'no' && stroke === 'no' ? 'no' : 'unknown'
+  }
+  function isInsulin(code) { return code.indexOf('insulin') >= 0 || T_INSULIN_NAMES.has(code) }
+  // Free-text frequencies are only compared when they unambiguously mean once daily.
+  function onceDaily(frequency) {
+    var text = pyStr(truthy(frequency) ? frequency : '').trim().toLowerCase()
+    return /^(?:od|o\.d\.?|once( a)? daily|once( a)? day|daily|1 ?x ?daily|every morning|nocte|once)$/.test(text)
+  }
+  function unitText(med) { var u = get(med, 'unit'); return pyStr(truthy(u) ? u : '').trim().toLowerCase() }
+  // [current_mg, maximum_mg] only when the schedule is unambiguous, else null.
+  function dosePosition(med) {
+    var code = med._code, dose = get(med, 'dose')
+    if (!has(HTN_TABLE4, code) || dose == null || unitText(med) !== 'mg' || !onceDaily(get(med, 'frequency'))) return null
+    return [pyFloat(dose), HTN_TABLE4[code][1]]
+  }
+  // Recorded name, dose and schedule, e.g. 'Amlodipine 5 mg once daily'.
+  function regimen(med) {
+    var dose = get(med, 'dose')
+    return [med._label, isPyNumber(dose) ? pyG(dose) : null, get(med, 'unit'), get(med, 'frequency')].filter(truthy).map(pyStr).join(' ')
+  }
+  function mg(value) { return pyG(value) + ' mg' }
+  function label(med) { return med._label }
+
+  function hypertensionOptions(ctx) {
+    var meds = ctx.meds, codes = ctx.codes
+    var readings = ctx.control_bp
+    if (readings == null) return []
+    var sbp = readings[0], dbp = readings[1]
+    var thresholdSbp = ctx.age >= 80 && !(ctx.diabetic || ctx.renal_disease) ? 150 : 140
+    if (sbp < thresholdSbp && dbp < 90) return []
+    var classes = set([['ccb', T_CCB], ['thiazide', T_THIAZIDE], ['ras', T_RAS]].filter(function (p) { return intersects(codes, p[1]) }).map(function (p) { return p[0] }))
+    var onAny = intersects(codes, T_BP_ANY)
+    var current = sortedStrings(meds.filter(function (m) { return T_BP_ANY.has(m._code) }).map(regimen))
+    var basis = ['BP used for control: ' + pyG(sbp) + '/' + pyG(dbp) + ' mmHg' + (ctx.control_is_repeat ? ' (repeat reading)' : ''),
+      'Current antihypertensives: ' + (current.length ? current.join(', ') : 'none recorded'),
+      'Target: <' + thresholdSbp + '/90 mmHg', 'Adherence: ' + underscoresToSpaces(ctx.adherence)]
+    var sources = ['KENYA_HTN_STEPS', 'KENYA_DOSES_HTN']
+    if (onAny && ctx.adherence === 'missed') {
+      return [{ rule_id: 'TX_HTN_ADHERENCE', severity: 'warning', urgency: 'soon',
+        title: 'BP above target with missed doses: address adherence before escalating',
+        detail: 'BP ' + pyG(sbp) + '/' + pyG(dbp) + ' mmHg is above target while missed doses are reported. The Kenya protocol requires '
+          + 'non-adherence to be excluded before up-titration. Agree a plan for barriers, cost and side effects, '
+          + 'consider a once-daily or single-pill combination, and recheck BP in about 4 weeks before adding medicines.',
+        sources: sources, basis: basis }]
+    }
+    if (!onAny) {
+      var grade = sbp < 160 && dbp < 100 ? 1 : 2
+      var highRisk = ctx.diabetic || ctx.renal_disease || ctx.cvd || ctx.tobacco === 'current'
+      var lead = 'Grade ' + (grade === 1 ? grade : '2 or higher') + ' hypertension (BP ' + pyG(sbp) + '/' + pyG(dbp) + ' mmHg) with no antihypertensive recorded. '
+      if (grade === 1 && !highRisk && ctx.age < 80) {
+        lead += 'Without other cardiovascular risk factors the protocol allows lifestyle management for up to 3 months first; '
+          + 'if BP remains at or above 140/90 mmHg, start medicine. '
+      }
+      var startDetail = lead + 'Step 1 options: a low-dose two-drug combination, for example amlodipine 5 mg + losartan 50 mg once daily, '
+        + 'amlodipine 5 mg + lisinopril 10 mg once daily, or amlodipine 5 mg + hydrochlorothiazide 12.5 mg once daily. '
+        + 'Monotherapy (for example amlodipine 5 mg once daily) is reserved for low-risk grade 1 hypertension (the protocol notes systolic at or above 150 mmHg), adults aged 80 or over, or frail patients. '
+        + 'Use a single-pill combination where available. ' + RAS_CHECK + ' ' + STEP_NOTE
+      return [{ rule_id: 'TX_HTN_START', severity: 'warning', urgency: 'soon',
+        title: 'Consider starting antihypertensive treatment (Kenya step 1)', detail: startDetail, sources: sources, basis: basis }]
+    }
+    if (classes.has('ccb') && classes.has('thiazide') && classes.has('ras')) {
+      return [{ rule_id: 'TX_HTN_SPECIALIST', severity: 'warning', urgency: 'soon',
+        title: 'BP above target on triple therapy: step 4 needs a physician',
+        detail: 'BP ' + pyG(sbp) + '/' + pyG(dbp) + ' mmHg despite triple therapy (' + current.join(', ') + '). '
+          + 'Confirm full doses and adherence and exclude secondary causes. Step 4 adds spironolactone or another diuretic, '
+          + 'a beta blocker or a centrally acting agent, and must be started with a physician. Refer: patients not at target '
+          + 'after 3 months of treatment are a referral indication.',
+        sources: sources.concat(['KENYA_HTN_LIFESTYLE']), basis: basis }]
+    }
+    var belowMax = []
+    meds.forEach(function (med) {
+      var position = dosePosition(med)
+      if (position && position[0] < position[1]) belowMax.push(med._label + ' ' + mg(position[0]) + ' once daily to up to ' + mg(position[1]))
+    })
+    var unclear = meds.filter(function (m) { return has(HTN_TABLE4, m._code) && dosePosition(m) == null }).map(label)
+    var missingClasses = ['ccb', 'ras', 'thiazide'].filter(function (c) { return !classes.has(c) })
+    var detail, title
+    if (classes.size <= 1) {
+      var addition = missingClasses.slice(0, 2).map(function (c) { return START_EXAMPLE[c] }).join(' or ')
+      detail = 'BP ' + pyG(sbp) + '/' + pyG(dbp) + ' mmHg on ' + current.join(', ') + ' (one medicine class). Move to a two-drug combination: add ' + addition + '. '
+        + (belowMax.length ? 'Increasing the current medicine (' + belowMax.join('; ') + ') is an alternative if a single agent is preferred. ' : '')
+        + (intersects(codes, T_BETA_BLOCKER) && !classes.size
+          ? 'A beta blocker alone is not a first-line step unless it has a specific indication (heart failure, angina, atrial fibrillation). ' : '')
+        + (missingClasses.indexOf('ras') >= 0 ? RAS_CHECK + ' ' : '') + STEP_NOTE
+      return [{ rule_id: 'TX_HTN_STEP_UP', severity: 'warning', urgency: 'soon',
+        title: 'BP above target: add a second medicine class (Kenya step 1-2)', detail: detail, sources: sources, basis: basis }]
+    }
+    if (belowMax.length) {
+      detail = 'BP ' + pyG(sbp) + '/' + pyG(dbp) + ' mmHg on ' + current.join(', ') + '. Step 2 is full-dose dual therapy: increase '
+        + belowMax.join('; ') + '. ' + STEP_NOTE
+      title = 'BP above target: increase to full-dose dual therapy (Kenya step 2)'
+    } else {
+      detail = 'BP ' + pyG(sbp) + '/' + pyG(dbp) + ' mmHg on ' + current.join(', ')
+        + (unclear.length ? ' (doses not compared because the schedule is unclear for: ' + unclear.join(', ') + '; confirm they are at the maximum first)' : ' at the maximum Table 4 doses')
+        + '. Step 3 is triple therapy: add the missing ' + CLASS_LABEL[missingClasses[0]] + ', for example ' + START_EXAMPLE[missingClasses[0]] + '. '
+        + (missingClasses[0] === 'ras' ? RAS_CHECK + ' ' : '') + STEP_NOTE
+      title = 'BP above target: add a ' + CLASS_LABEL[missingClasses[0]] + ' (Kenya step 3)'
+    }
+    return [{ rule_id: 'TX_HTN_STEP_UP', severity: 'warning', urgency: 'soon', title: title, detail: detail, sources: sources, basis: basis }]
+  }
+
+  function diabetesOptions(ctx) {
+    var codes = ctx.codes, egfr = ctx.egfr, hba1c = ctx.hba1c
+    var fasting = ctx.glucose_timing === 'fasting' ? ctx.glucose : null
+    var metformin = codes.has('metformin')
+    var insulin = Array.from(codes).some(isInsulin)
+    var oral = [['metformin', set(['metformin'])], ['sulfonylurea', T_SULFONYLUREA], ['DPP-4 inhibitor', T_DPP4],
+      ['SGLT2 inhibitor', T_SGLT2], ['pioglitazone', T_TZD]].filter(function (p) { return intersects(codes, p[1]) }).map(function (p) { return p[0] })
+    var current = sortedStrings(ctx.meds.filter(function (m) { return T_GLUCOSE_ORAL.has(m._code) || isInsulin(m._code) }).map(regimen))
+    var above, measure
+    if (hba1c != null) { above = hba1c >= 7.0; measure = 'HbA1c ' + pyG(hba1c) + '%' }
+    else if (fasting != null) { above = fasting > 7.2; measure = 'fasting glucose ' + pyFixed(fasting, 1) + ' mmol/L' }
+    else { above = null; measure = 'no HbA1c or fasting glucose recorded' }
+    var basis = ['Glycaemic control: ' + measure, 'Target: HbA1c <7.0%; fasting glucose 4.4-7.2 mmol/L',
+      'Current glucose-lowering medicines: ' + (current.length ? current.join(', ') : 'none recorded'),
+      'eGFR: ' + (egfr != null ? pyG(egfr) + ' mL/min/1.73 m²' : 'not recorded')]
+    if (ctx.weight != null) basis.push('Weight: ' + pyG(ctx.weight) + ' kg')
+    var sources = ['KENYA_DM_TREATMENT']
+    var options = []
+    var cardiorenal = ctx.cvd || ctx.renal_disease || (egfr != null && egfr < 60)
+    var detail, title, rule
+    if (!metformin && !oral.length && !insulin) {
+      if (egfr == null) {
+        detail = 'Metformin is first-line treatment for type 2 diabetes: start 500 mg once daily with food and titrate to 1 g twice daily as tolerated. '
+          + 'Record an eGFR before starting, because kidney function decides whether metformin can be used.'
+      } else if (egfr > 45) {
+        detail = 'eGFR ' + pyG(egfr) + '. Start metformin 500 mg once daily with food and titrate upwards to 1 g twice daily as tolerated. '
+          + 'Review GI tolerance, kidney function and vitamin B12 over time.'
+      } else if (egfr > 30) {
+        detail = 'eGFR ' + pyG(egfr) + '. The Kenya flowchart permits metformin above 30, but the product label advises against starting it at eGFR 30-45. '
+          + 'Individualize with the prescriber; if started, keep the dose low and monitor kidney function.'
+      } else {
+        detail = 'eGFR ' + pyG(egfr) + ': metformin is contraindicated. For GFR ≤30 the Kenya flowchart lists an SGLT2 inhibitor, a DPP-4 inhibitor '
+          + 'or pioglitazone. Seek physician review for medicine choice and dosing in advanced kidney disease.'
+      }
+      if (cardiorenal && (egfr == null || egfr > 30)) {
+        detail += ' With cardiovascular or kidney disease, the protocol advises adding an SGLT2 inhibitor alongside metformin even if HbA1c is at target.'
+      }
+      options.push({ rule_id: 'TX_DM_METFORMIN', severity: 'warning', urgency: 'soon',
+        title: egfr == null || egfr > 30 ? 'No glucose-lowering medicine recorded: consider metformin (Kenya first line)' : 'Metformin contraindicated: physician choice of alternative',
+        detail: detail, sources: sources.concat(['METFORMIN_LABEL']), basis: basis })
+      return options
+    }
+    if (above) {
+      if (insulin) {
+        detail = cap(measure) + ' is above target on ' + current.join(', ') + '. Basal or NPH insulin: titrate by 2-4 units every 3 days to a fasting glucose of 4-7 mmol/L; '
+          + 'for hypoglycaemia, find the cause and reduce by 10-20%. If HbA1c stays above target with a normal fasting glucose, '
+          + 'add prandial insulin 4 units with the largest meal (or 10% of the basal dose), increasing by 1-2 units twice weekly. '
+          + 'Insulin changes are made at level 4 facilities and above.'
+        title = 'Glycaemia above target on insulin: titrate per Kenya insulin protocol'
+        rule = 'TX_DM_INSULIN'
+      } else if (!metformin && (egfr == null || egfr > 30)) {
+        detail = cap(measure) + ' on ' + oral.join(', ') + ' without metformin, the first-line medicine. Unless it was stopped for '
+          + 'intolerance or a contraindication, add metformin 500 mg once daily with food, titrating to 1 g twice daily as tolerated. '
+          + (egfr == null ? 'Record an eGFR before starting. ' : egfr <= 45 ? 'Avoid starting it at eGFR 30-45 (product label). ' : '')
+        title = 'Glycaemia above target without metformin: consider adding metformin'
+        rule = 'TX_DM_INTENSIFY'
+      } else if (oral.length <= 1) {
+        detail = cap(measure) + ' on ' + (current.join(', ') || 'current therapy') + '. Add a second medicine: a sulfonylurea '
+          + '(gliclazide 40-160 mg or glimepiride 1-4 mg; watch for hypoglycaemia and stop if recurrent) where cost matters, '
+          + 'or a DPP-4 inhibitor or SGLT2 inhibitor where hypoglycaemia risk matters. '
+          + (cardiorenal && (egfr || 0) > 30 ? 'With cardiovascular or kidney disease and eGFR above 30, an SGLT2 inhibitor is preferred. ' : '')
+          + (ctx.age >= 60 ? 'Avoid glibenclamide at age 60 or over. ' : '')
+          + 'Confirm adherence and reassess HbA1c in about 3 months.'
+        title = 'Glycaemia above target: add a second glucose-lowering medicine (Kenya 4.5)'
+        rule = 'TX_DM_INTENSIFY'
+      } else {
+        var dose = ''
+        if (ctx.weight != null) dose = ' (for ' + pyG(ctx.weight) + ' kg, 0.1-0.2 IU/kg is ' + pyFixed(ctx.weight * 0.1, 0) + '-' + pyFixed(ctx.weight * 0.2, 0) + ' units)'
+        detail = cap(measure) + ' on ' + oral.length + ' oral medicines (' + current.join(', ') + '). '
+          + (oral.length === 2 && !intersects(codes, T_TZD) ? 'Options: add pioglitazone 15-30 mg (avoid in heart failure), or ' : 'Consider: ')
+          + 'start basal or NPH insulin at bedtime, 10 units a day or 0.1-0.2 IU/kg/day' + dose + ', titrated by 2-4 units every 3 days '
+          + 'to a fasting glucose of 4-7 mmol/L. Insulin is started at level 4 facilities and above; refer if not available here.'
+        title = 'Glycaemia above target on combination therapy: consider a third agent or basal insulin'
+        rule = 'TX_DM_INTENSIFY'
+      }
+      options.push({ rule_id: rule, severity: 'warning', urgency: 'soon', title: title, detail: detail, sources: sources, basis: basis })
+    }
+    if (!options.length && metformin && !intersects(codes, T_SGLT2) && (ctx.cvd || ctx.renal_disease) && egfr != null && egfr > 30 && !insulin) {
+      options.push({ rule_id: 'TX_DM_CARDIORENAL', severity: 'info', urgency: 'routine',
+        title: 'Cardiovascular or kidney disease with diabetes: consider an SGLT2 inhibitor',
+        detail: 'eGFR ' + pyG(egfr) + '. The Kenya protocol advises starting an SGLT2 inhibitor with metformin in people with high cardiovascular risk '
+          + 'or CKD and GFR above 30, even when HbA1c is within target. Counsel on genital hygiene and sick-day rules '
+          + '(pause during vomiting or dehydration).',
+        sources: sources.concat(['SGLT2_LABEL']), basis: basis })
+    }
+    return options
+  }
+
+  // NICE NG238 "Terms used": statin intensity by daily dose (mg).
+  var STATIN_INTENSITY = {
+    atorvastatin: [[20, 80, 'high'], [10, 10, 'medium']],
+    rosuvastatin: [[10, 40, 'high'], [5, 5, 'medium']],
+    simvastatin: [[20, 40, 'medium'], [10, 10, 'low']],
+    fluvastatin: [[80, 80, 'medium'], [20, 40, 'low']],
+    pravastatin: [[5, 40, 'low']],
+  }
+  var STATIN_MONITORING = 'Check a full lipid profile and liver transaminase (ALT or AST) 2-3 months after starting or changing the dose, '
+    + 'transaminase again at 12 months, and a lipid profile annually (NICE 1.11).'
+
+  // [daily mg or null, intensity or null]; dose is read only when unambiguous.
+  function statinPosition(med) {
+    var dose = get(med, 'dose')
+    if (dose == null || unitText(med) !== 'mg' || !onceDaily(get(med, 'frequency'))) return [null, null]
+    var bands = has(STATIN_INTENSITY, med._code) ? STATIN_INTENSITY[med._code] : []
+    for (var i = 0; i < bands.length; i++) {
+      if (!isPyNumber(dose)) throw new TypeError('statin dose must be a number')
+      if (bands[i][0] <= +dose && +dose <= bands[i][1]) return [pyFloat(dose), bands[i][2]]
+    }
+    return [pyFloat(dose), null]
+  }
+  function nonHdlOf(tc, hdl) { return tc != null && hdl != null ? pyRound(tc - hdl, 1) : null }
+
+  function lipidOptions(ctx) {
+    var meds = ctx.meds
+    var tc = ctx.total_cholesterol, ldl = ctx.ldl, hdl = ctx.hdl, tg = ctx.triglycerides
+    var nonHdl = nonHdlOf(tc, hdl)
+    var egfr = ctx.egfr, cvd = ctx.cvd
+    var ckd = ctx.renal_disease || (egfr != null && egfr < 60)
+    var lipidBasis = [tc != null ? 'Total cholesterol ' + pyG(tc) + ' mmol/L' : null, ldl != null ? 'LDL ' + pyG(ldl) + ' mmol/L' : null,
+      hdl != null ? 'HDL ' + pyG(hdl) + ' mmol/L' : null, nonHdl != null ? 'Non-HDL ' + pyG(nonHdl) + ' mmol/L (total minus HDL)' : null,
+      tg != null ? 'Triglycerides ' + pyG(tg) + ' mmol/L' : null].filter(truthy)
+    var options = []
+    // Specialist thresholds apply whatever else is decided (NICE 1.4.5-1.4.7).
+    var referral = []
+    if (tg != null && tg > 20) referral.push('triglycerides ' + pyG(tg) + ' mmol/L are above 20: arrange urgent specialist review unless explained by alcohol or poor glycaemic control')
+    else if (tg != null && tg >= 10) referral.push('triglycerides ' + pyG(tg) + ' mmol/L (10-20): repeat a fasting sample after 5 days and within 2 weeks, look for secondary causes, and seek specialist advice if still above 10')
+    if ((tc != null && tc > 9.0) || (nonHdl != null && nonHdl > 7.5)) {
+      referral.push('total cholesterol above 9.0 or non-HDL above 7.5 mmol/L: arrange specialist assessment for a familial lipid disorder, even without a family history')
+    }
+    if (referral.length) {
+      options.push({ rule_id: 'LIPID_SPECIALIST', severity: 'warning', urgency: 'soon', category: 'referral',
+        title: 'Lipid result meets a specialist-referral threshold',
+        detail: 'For this patient: ' + referral.join('; ') + '. First exclude secondary causes (excess alcohol, uncontrolled diabetes, hypothyroidism, liver disease, nephrotic syndrome).',
+        sources: ['NICE_LIPIDS_NG238'], basis: lipidBasis })
+    }
+    var statins = meds.filter(function (m) { return T_STATINS.has(m._code) })
+    var reasons = [[cvd, 'established cardiovascular disease'], [ctx.diabetic, 'diabetes'], [ctx.renal_disease, 'chronic kidney disease'],
+      [tc != null && tc >= 8, tc != null ? 'total cholesterol ' + pyG(tc) + ' mmol/L (at least 8)' : '']]
+      .filter(function (p) { return p[0] }).map(function (p) { return p[1] })
+    var pregnancyNote = ''
+    if (ctx.sex === 'female' && ctx.age < 55) {
+      pregnancyNote = ' Statins are contraindicated in pregnancy: ' + (ctx.pregnancy !== 'no' && ctx.pregnancy !== 'not_applicable' ? 'confirm pregnancy status before prescribing. ' : '')
+        + 'Advise stopping if pregnancy is possible, stopping 3 months before trying to conceive, and not taking it while breastfeeding.'
+    }
+    if (!statins.length && reasons.length) {
+      var dose, why, target
+      if (ckd) {
+        dose = 'atorvastatin 20 mg once daily'
+        why = 'NICE 1.8.1 offers atorvastatin 20 mg for primary or secondary prevention in chronic kidney disease'
+          + (egfr != null ? ' (eGFR ' + pyG(egfr) + ').' : '.')
+          + ' If the lipid target is not met, the dose may be increased while eGFR is 30 or above; below 30, agree higher doses with a renal specialist.'
+        target = 'Target: LDL 2.0 mmol/L or less (non-HDL 2.6 or less) with cardiovascular disease; otherwise a reduction in non-HDL cholesterol of more than 40%.'
+      } else if (cvd) {
+        dose = 'atorvastatin 80 mg once daily'
+        why = 'NICE 1.7.2 offers atorvastatin 80 mg for established cardiovascular disease whatever the cholesterol level. Use a lower dose if it could '
+          + 'interact with other medicines, adverse effects are likely, or the patient prefers it (1.7.3).'
+        target = 'Target: LDL 2.0 mmol/L or less, or non-HDL 2.6 mmol/L or less (NICE 1.7.1).'
+      } else {
+        dose = 'atorvastatin 20 mg once daily'
+        why = 'NICE 1.6.7 recommends atorvastatin 20 mg for primary prevention. The Kenya protocol counts established diabetes or kidney disease '
+          + 'as more than 20% 10-year CVD risk, for which it advises a statin.'
+        target = 'Target: more than 40% reduction in non-HDL cholesterol (NICE 1.6.1)'
+          + (nonHdl != null ? '; from the current ' + pyG(nonHdl) + ' mmol/L that means below ' + pyFixed(nonHdl * 0.6, 1) + ' mmol/L.' : '; record a baseline full lipid profile first.')
+      }
+      var ageNote = ctx.age >= 85 && !cvd ? ' At 85 or older, consider rather than offer, weighing frailty and life expectancy (NICE 1.6.9).' : ''
+      var startDetail = 'Recorded ' + reasons.join(' and ') + ', with no statin on the medicine list. Suggested: ' + dose + '. ' + why + ' ' + target + ' '
+        + 'Before starting: full lipid profile, ALT or AST, renal function and HbA1c; ask about unexplained muscle symptoms (check creatine kinase if present). '
+        + 'A transaminase below 3 times the upper limit of normal does not rule out a statin. ' + STATIN_MONITORING + pregnancyNote + ageNote
+      options.push({ rule_id: 'TX_STATIN_START', severity: 'warning', urgency: 'soon', category: 'treatment',
+        title: 'Start a statin: ' + dose, detail: startDetail, sources: ['NICE_LIPIDS_NG238', 'KENYA_CVD_RISK'],
+        basis: reasons.map(function (r) { return r.slice(0, 5) !== 'total' ? 'Known ' + r : null })
+          .concat(lipidBasis, [egfr != null ? 'eGFR ' + pyG(egfr) + ' mL/min/1.73 m²' : null, 'No statin recorded']) })
+    } else if (statins.length) {
+      var med = statins[0]
+      var position = statinPosition(med), daily = position[0], level = position[1]
+      var current = daily != null ? med._label + ' ' + pyG(daily) + ' mg daily' : med._label + ' (dose or schedule unclear)'
+      var intensity = level ? ' (' + level + ' intensity)' : ''
+      var above = (ldl != null && ldl > 2.0) || (nonHdl != null && nonHdl > 2.6)
+      var steps = null, title = null
+      if (cvd && above) {
+        if (ckd && egfr != null && egfr < 30) {
+          steps = 'eGFR is below 30: agree any dose increase with a renal specialist (NICE 1.8.3).'
+        } else if (daily != null && ((med._code === 'atorvastatin' && daily >= 80) || (med._code === 'rosuvastatin' && daily >= 40))) {
+          steps = 'Already on the maximum dose of a high-intensity statin: confirm adherence, then consider adding ezetimibe (NICE 1.7.9, TA385).'
+        } else {
+          steps = 'Confirm adherence and timing, then move to a high-intensity statin at the maximum tolerated dose, for example atorvastatin 80 mg once daily'
+            + (ckd ? ' (with CKD and eGFR 30 or above, increase atorvastatin stepwise from 20 mg)' : '') + ' (NICE 1.9.1).'
+        }
+        title = 'Lipids above the secondary-prevention target: intensify statin'
+      } else if (cvd && (level === 'low' || level === 'medium')) {
+        steps = 'Discuss switching to a high-intensity statin such as atorvastatin 80 mg once daily (NICE 1.11.12)'
+          + (ldl == null && nonHdl == null ? '; check a lipid profile to judge control.' : '.')
+        title = 'Cardiovascular disease on a lower-intensity statin'
+      } else if (cvd && ldl == null && nonHdl == null) {
+        steps = 'No LDL or non-HDL is recorded: check a full lipid profile against the target of LDL 2.0 or less / non-HDL 2.6 or less (NICE 1.7.1).'
+        title = 'Check lipid control on statin'
+      }
+      if (steps) {
+        options.push({ rule_id: 'TX_STATIN_OPTIMISE', severity: above ? 'warning' : 'info', urgency: 'soon', category: 'treatment',
+          title: title, detail: 'Currently on ' + current + intensity + '. ' + steps + ' ' + STATIN_MONITORING,
+          sources: ['NICE_LIPIDS_NG238'], basis: ['Current statin: ' + current + intensity].concat(lipidBasis, ['Known cardiovascular disease']) })
+      }
+    }
+    var aspirin = meds.filter(function (m) { return m._code === 'aspirin' })
+    if (aspirin.length && ctx.cvd_status !== 'yes') {
+      options.push({ rule_id: 'TX_ASPIRIN_REVIEW', severity: 'info', urgency: 'routine', category: 'treatment',
+        title: 'Review aspirin without recorded cardiovascular disease',
+        detail: aspirin[0]._label + ' is recorded but cardiovascular disease is '
+          + (ctx.cvd_status === 'no' ? 'recorded as absent' : 'not documented')
+          + '. NICE 1.2.1 advises not routinely offering aspirin for primary prevention. Confirm the indication (for example a previous heart attack, stroke or stent); '
+          + 'if there is none, discuss stopping it, particularly with a history of bleeding or dyspepsia.',
+        sources: ['NICE_LIPIDS_NG238'], basis: ['On ' + aspirin[0]._label, 'Cardiovascular disease: ' + ctx.cvd_status] })
+    }
+    return options
+  }
+
+  var T_RESPIRATORY = ['salbutamol', 'formoterol', 'salmeterol', 'ipratropium', 'tiotropium', 'montelukast', 'beclometasone', 'beclomethasone', 'budesonide', 'fluticasone']
+  var T_ICS = ['beclometasone', 'beclomethasone', 'budesonide', 'fluticasone', 'ciclesonide', 'mometasone']
+  function contains(code, names) { return names.some(function (name) { return code.indexOf(name) >= 0 }) }
+  function hasIcs(code) { return contains(code, T_ICS) }
+
+  // Kenya 6.7: SABA or LABA monotherapy is not recommended; every step includes ICS.
+  function respiratoryOptions(ctx) {
+    if (!ctx.asthma) return []
+    var meds = ctx.meds
+    if (meds.some(function (m) { return hasIcs(m._code) })) return []
+    var labels = meds.filter(function (m) { return contains(m._code, T_RESPIRATORY) }).map(label)
+    var saba = meds.filter(function (m) { return m._code.indexOf('salbutamol') >= 0 }).map(label)
+    var laba = meds.filter(function (m) { return m._code.indexOf('formoterol') >= 0 || m._code.indexOf('salmeterol') >= 0 }).map(label)
+    var problem
+    if (laba.length) problem = laba.join(', ') + ' (a long-acting beta agonist) is recorded without an inhaled corticosteroid; LABA monotherapy is not recommended in asthma.'
+    else if (saba.length) problem = saba.join(', ') + ' is the only asthma inhaler recorded; SABA monotherapy is not recommended.'
+    else problem = 'No asthma inhaler is recorded.'
+    var detail = problem + ' Every step of the Kenya protocol includes an inhaled corticosteroid. Choose the step from the symptom pattern: '
+      + 'symptoms less than twice a month, as-needed low-dose budesonide-formoterol (or salbutamol-beclometasone); twice a month or more but not most days, '
+      + 'add regular low-dose ICS (beclometasone or budesonide) or use as-needed budesonide-formoterol; most days or night waking weekly, regular low-dose '
+      + 'ICS-formoterol or ICS-LABA; with low lung function as well, medium-dose ICS-formoterol and specialist consultation. '
+      + 'Check inhaler technique (add a spacer if needed), adherence and triggers, and rinse the mouth after ICS.'
+    return [{ rule_id: 'TX_ASTHMA_ICS', severity: 'warning', urgency: 'soon', category: 'treatment',
+      title: 'Asthma without an inhaled corticosteroid: add ICS (Kenya step chart)', detail: detail,
+      sources: ['KENYA_ASTHMA'], basis: ['Known asthma', 'Inhalers recorded: ' + (labels.length ? labels.join(', ') : 'none')] }]
+  }
+
+  // ---- patient summary (care_plan.py) --------------------------------------
+  // Display-only: restates this patient's values against their targets and
+  // collects the monitoring the cited sources specify. Reads the raw recorded
+  // values (not the validated floats) exactly as care_plan.py does.
+  var CARE_CLASSES = [
+    [T_CCB, 'Calcium channel blocker'], [T_THIAZIDE, 'Thiazide-type diuretic'], [T_ACE, 'ACE inhibitor'], [T_ARB, 'ARB'],
+    [T_BETA_BLOCKER, 'Beta blocker'], [T_OTHER_BP, 'Other BP-lowering'], [set(['metformin']), 'Biguanide'], [T_SULFONYLUREA, 'Sulfonylurea'],
+    [T_DPP4, 'DPP-4 inhibitor'], [T_SGLT2, 'SGLT2 inhibitor'], [T_TZD, 'Thiazolidinedione'], [T_STATINS, 'Statin'], [set(['aspirin']), 'Antiplatelet'],
+  ]
+  var CARE_INHALERS = ['salbutamol', 'formoterol', 'salmeterol', 'ipratropium', 'tiotropium', 'beclometasone', 'beclomethasone', 'budesonide', 'fluticasone']
+
+  function classOf(code) {
+    if (isInsulin(code)) return 'Insulin'
+    for (var i = 0; i < CARE_CLASSES.length; i++) if (CARE_CLASSES[i][0].has(code)) return CARE_CLASSES[i][1]
+    if (contains(code, CARE_INHALERS)) return 'Inhaler'
+    return 'Other'
+  }
+
+  function buildCarePlan(data, age, sex, meds, assessment) {
+    var rules = set(assessment.recommendations.map(function (rec) { return rec.rule_id }))
+    var derived = truthy(assessment.derived) ? assessment.derived : {}
+    function yes(field) { return (field === 'known_cvd' ? cvdStatus(data) : get(data, field)) === 'yes' }
+    var sbp = get(data, 'systolic_bp', null), dbp = get(data, 'diastolic_bp', null)
+    var rsbp = get(data, 'repeat_systolic_bp', null), rdbp = get(data, 'repeat_diastolic_bp', null)
+    var isRepeat = rsbp != null && rdbp != null
+    var control = isRepeat ? [rsbp, rdbp] : sbp != null && dbp != null ? [sbp, dbp] : null
+    var hba1c = get(data, 'hba1c', null), egfr = get(data, 'egfr', null)
+    var fasting = get(data, 'glucose_context') === 'fasting' && get(data, 'glucose_unit') === 'mmol/L' ? get(data, 'glucose', null) : null
+    var codes = set(meds.map(function (m) { return m._code }))
+    var problems = []
+    function problem(name, status, tone) { problems.push({ name: name, status: status, tone: tone }) }
+
+    var critical = assessment.recommendations.filter(function (rec) { return rec.severity === 'critical' }).map(function (rec) { return rec.title })
+    if (critical.length) {
+      problem('Acute findings', assessment.urgency === 'urgent' || assessment.urgency === 'emergency'
+        ? critical.join('; ') + '. Routine treatment options are withheld until these are addressed.' : critical.join('; '), 'urgent')
+    }
+    if (yes('pregnancy_status')) problem('Pregnancy', 'Recorded; obstetric pathway applies', 'urgent')
+    if (yes('known_hypertension')) {
+      var target = age >= 80 && !(yes('known_diabetes') || yes('known_ckd')) ? 150 : 140
+      if (control) {
+        var bpAbove = control[0] >= target || control[1] >= 90
+        problem('Hypertension', 'BP ' + pyG(control[0]) + '/' + pyG(control[1]) + ' mmHg' + (isRepeat ? ' (repeat)' : '') + ': ' + (bpAbove ? 'above' : 'at') + ' target (<' + target + '/90)', bpAbove ? 'attention' : 'ok')
+      } else problem('Hypertension', 'No BP recorded at this visit', 'unknown')
+    } else if (control && (control[0] >= 140 || control[1] >= 90)) {
+      problem('Raised blood pressure', 'BP ' + pyG(control[0]) + '/' + pyG(control[1]) + ' mmHg without a recorded diagnosis: confirm on repeat readings', 'attention')
+    }
+    if (yes('known_diabetes')) {
+      if (hba1c != null) problem('Type 2 diabetes', 'HbA1c ' + pyG(hba1c) + '%: ' + (hba1c >= 7 ? pyFixed(hba1c - 7, 1) + ' above' : 'within') + ' target (<7.0%)', hba1c >= 7 ? 'attention' : 'ok')
+      else if (fasting != null) problem('Type 2 diabetes', 'Fasting glucose ' + pyG(fasting) + ' mmol/L: ' + (fasting > 7.2 ? 'above' : 'within') + ' target (4.4-7.2)', fasting > 7.2 ? 'attention' : 'ok')
+      else problem('Type 2 diabetes', 'No HbA1c or fasting glucose recorded', 'unknown')
+    } else if (rules.has('DIABETES_CONFIRM')) problem('Possible diabetes', 'Diagnostic threshold met once: confirmatory test needed', 'attention')
+    else if (rules.has('PREDIABETES')) problem('Prediabetes', 'In the prediabetes range: lifestyle intervention', 'attention')
+    var statins = meds.filter(function (m) { return T_STATINS.has(m._code) })
+    var highRisk = [['known_cvd', 'cardiovascular disease'], ['known_diabetes', 'diabetes'], ['known_ckd', 'kidney disease']]
+      .filter(function (p) { return yes(p[0]) }).map(function (p) { return p[1] })
+    var tc = get(data, 'total_cholesterol_mmol', null), hdl = get(data, 'hdl_mmol', null), ldl = get(data, 'ldl_mmol', null)
+    var nonHdl = nonHdlOf(tc, hdl)
+    var lipids = [ldl != null ? 'LDL ' + pyG(ldl) : null, nonHdl != null ? 'non-HDL ' + pyG(nonHdl) : null,
+      tc != null && nonHdl == null ? 'total ' + pyG(tc) : null].filter(truthy).join(', ')
+    if (highRisk.length || statins.length || (tc != null && tc >= 8)) {
+      var therapy
+      if (statins.length) {
+        var position = statinPosition(statins[0])
+        therapy = 'on ' + statins[0]._label + (position[0] != null ? ' ' + pyG(position[0]) + ' mg (' + (position[1] || 'unclassified') + ' intensity)' : '')
+      } else therapy = 'no statin recorded'
+      var lipidTarget = yes('known_cvd') ? ' (target LDL ≤2.0 or non-HDL ≤2.6)' : ''
+      var lipidAbove = yes('known_cvd') && ((ldl != null && ldl > 2.0) || (nonHdl != null && nonHdl > 2.6))
+      problem('Cardiovascular risk', (highRisk.length ? 'High, from ' + highRisk.join(' and ') + '; ' : '') + therapy
+        + (lipids ? '; lipids ' + lipids + ' mmol/L' + lipidTarget : '; no lipid profile recorded'),
+        !statins.length || lipidAbove || !lipids ? 'attention' : 'ok')
+    }
+    if ((egfr != null && egfr < 60) || yes('known_ckd')) {
+      var category = egfr == null ? null : egfr >= 45 ? 'G3a' : egfr >= 30 ? 'G3b' : egfr >= 15 ? 'G4' : 'G5'
+      problem('Kidney function', (egfr != null ? 'eGFR ' + pyG(egfr) + ' (KDIGO ' + category + ')' : 'Known CKD; no eGFR recorded')
+        + (yes('known_ckd') ? '' : ': chronicity not yet established'), egfr != null && egfr < 30 ? 'urgent' : 'attention')
+    }
+    if (get(derived, 'bmi') != null) {
+      var bmi = derived.bmi
+      problem('Weight', 'BMI ' + pyG(bmi) + ' kg/m² (' + derived.bmi_category + ')' + (get(data, 'weight_kg') != null ? ', ' + pyG(data.weight_kg) + ' kg' : ''),
+        bmi >= 18.5 && bmi < 25 ? 'ok' : 'attention')
+    }
+    var inhalers = meds.filter(function (m) { return classOf(m._code) === 'Inhaler' }).map(label)
+    if (yes('known_asthma')) {
+      problem('Asthma', 'Inhalers: ' + (inhalers.length ? inhalers.join(', ') : 'none recorded') + (rules.has('TX_ASTHMA_ICS') ? '; no inhaled corticosteroid' : ''),
+        rules.has('TX_ASTHMA_ICS') ? 'attention' : 'ok')
+    }
+    if (yes('known_copd')) problem('COPD', 'Inhalers: ' + (inhalers.length ? inhalers.join(', ') : 'none recorded'), inhalers.length ? 'ok' : 'attention')
+    if (get(data, 'tobacco_use') === 'current') problem('Tobacco', 'Current smoker', 'attention')
+    if (get(data, 'adherence') === 'missed') problem('Adherence', 'Missed doses reported', 'attention')
+
+    var medicines = meds.map(function (m) {
+      var doseValue = get(m, 'dose')
+      var dose = [isPyNumber(doseValue) ? pyG(doseValue) : null, get(m, 'unit'), get(m, 'frequency')].filter(truthy).map(pyStr).join(' ') || 'dose not recorded'
+      var note = null
+      var position = dosePosition(m)
+      if (position) note = position[0] >= position[1] ? 'at the Table 4 maximum' : 'below the Table 4 maximum of ' + pyG(position[1]) + ' mg'
+      else if (T_STATINS.has(m._code)) {
+        var level = statinPosition(m)[1]
+        note = level ? level + ' intensity (NICE)' : null
+      }
+      return { name: m._label, dose: dose, class: classOf(m._code), note: note }
+    })
+
+    var monitoring = []
+    function monitor(item, when, source) { monitoring.push({ item: item, when: when, source_id: source }) }
+    if (yes('known_hypertension')) monitor('Blood pressure', 'Monthly until below 140/90 mmHg, then every 4-6 months', 'KENYA_HTN_STEPS')
+    if (intersects(codes, union(T_ACE, T_ARB)) || rules.has('TX_HTN_START') || rules.has('TX_HTN_STEP_UP')) {
+      monitor('Potassium and creatinine/eGFR', 'After starting or changing an ACE inhibitor or ARB', 'LOSARTAN_LABEL')
+    }
+    if (statins.length || rules.has('TX_STATIN_START')) {
+      monitor('Full lipid profile and ALT/AST', '2-3 months after starting or changing a statin', 'NICE_LIPIDS_NG238')
+      monitor('ALT/AST', 'At 12 months, then only if clinically indicated', 'NICE_LIPIDS_NG238')
+      monitor('Full lipid profile', 'Annually, at the medication review', 'NICE_LIPIDS_NG238')
+    }
+    if (highRisk.length) monitor('Cardiovascular risk review', 'Every 3 months; refer if risk has not fallen after 6 months', 'KENYA_CVD_RISK')
+    if (Array.from(codes).some(isInsulin) || rules.has('TX_DM_INSULIN')) monitor('Fasting glucose', 'Titrate basal insulin by 2-4 units every 3 days to 4-7 mmol/L', 'KENYA_DM_TREATMENT')
+    if (rules.has('PREDIABETES')) monitor('HbA1c', 'Every 3-6 months while in the prediabetes range', 'KENYA_PREDIABETES')
+    if (egfr != null && egfr < 60 && !yes('known_ckd')) monitor('eGFR and urine albumin', 'Repeat to confirm: CKD needs abnormality for more than 3 months', 'KDIGO_CKD_2024')
+    if (codes.has('metformin') || rules.has('TX_DM_METFORMIN')) monitor('Kidney function and vitamin B12', 'During long-term metformin treatment', 'METFORMIN_LABEL')
+
+    var conditions = [['known_hypertension', 'hypertension'], ['known_diabetes', 'type 2 diabetes'], ['known_ckd', 'chronic kidney disease'],
+      ['known_cvd', 'cardiovascular disease'], ['known_asthma', 'asthma'], ['known_copd', 'COPD'], ['known_cancer', 'cancer']]
+      .filter(function (p) { return yes(p[0]) }).map(function (p) { return p[1] })
+    var person = sex === 'female' ? 'woman' : sex === 'male' ? 'man' : 'adult'
+    var headline = age + '-year-old ' + person + (conditions.length ? ' with ' + join(conditions) : ' with no recorded NCD diagnosis')
+      + (meds.length ? ' on ' + meds.length + ' recorded medicine' + (meds.length !== 1 ? 's' : '') : ', no medicines recorded') + '. Clinical priority: ' + assessment.urgency + '.'
+    return { headline: headline, problems: problems, medicines: medicines, monitoring: monitoring }
   }
 
   // ---- consultant synthesis (reasoning.py) --------------------------------
