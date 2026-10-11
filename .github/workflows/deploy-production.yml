@@ -104,10 +104,18 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --global vercel@59.14.0
-      - name: Check the deployment credential
+      - name: Check the deployment credentials
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
+          # Staged deployments sit behind Vercel Deployment Protection; without the
+          # automation bypass the checks below only see the Vercel login page and
+          # nothing could be verified. Fail before staging anything.
+          if [ -z "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]; then
+            echo "::error::VERCEL_AUTOMATION_BYPASS_SECRET is not set. In Vercel open $VERCEL_PROJECT > Settings > Deployment Protection > Protection Bypass for Automation, create a secret, and add it as the VERCEL_AUTOMATION_BYPASS_SECRET repository secret."
+            exit 1
+          fi
           if [ -z "${VERCEL_TOKEN:-}" ]; then
             echo "::error::VERCEL_TOKEN is not set. Add it as a repository secret."
             exit 1
@@ -138,9 +146,16 @@ jobs:
       - name: HTTP checks
         env:
           SITE: ${{ steps.deploy.outputs.url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
           set -euo pipefail
+          # Send the bypass as a header, never in the URL, so it stays out of logs.
+          curl() { command curl -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" "$@"; }
           ready=$(curl -sS -w '\n%{http_code}' "$SITE/api/health/ready")
+          if echo "$ready" | grep -q 'Vercel Authentication'; then
+            echo "::error::The staged deployment still shows the Vercel login page: VERCEL_AUTOMATION_BYPASS_SECRET does not match the project's Protection Bypass for Automation secret."
+            exit 1
+          fi
           echo "ready: $ready"
           echo "$ready" | tail -1 | grep -qx 200
           echo "$ready" | grep -q '"rules":"loaded"'
@@ -155,6 +170,7 @@ jobs:
       - name: Browser checks at phone width
         env:
           SITE: ${{ steps.deploy.outputs.url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
           npm --prefix frontend ci --no-audit --no-fund
           cd frontend
